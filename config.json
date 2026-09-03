@@ -1,0 +1,25 @@
+{
+  "spreadsheet_id": "1XBNLjZLsgaaHDBqVKsbCSYhzD4v-4qMA6rjGXGG4ThM",
+  "default_gid": "1422896115",
+  "sheet_export_url": "https://docs.google.com/spreadsheets/d/1XBNLjZLsgaaHDBqVKsbCSYhzD4v-4qMA6rjGXGG4ThM/export?format=csv&gid=1422896115",
+  "github": {
+    "remote_url": "https://github.com/your-username/kho-rau-reconciliation.git",
+    "branch": "main",
+    "auto_push_interval_minutes": 15
+  },
+  "rules": {
+    "natural_loss_threshold_percent": {
+      "2.FRUITS": 2.5,
+      "2.VEGETABLES": 3.0,
+      "2.BAKERY": 0.0,
+      "2.EGGS": 0.0,
+      "2.FLOWERS": 0.0,
+      "DEFAULT": 2.0
+    },
+    "responsible_parties": {
+      "dc_errors": ["DC giao thiếu", "DC Pick sai", "DC pick dư"],
+      "store_errors": ["ST kiểm sai QT", "ST nhập thiếu", "ST tự làm bể/hỏng"],
+      "loss_errors": ["Hao hụt", "Hao hụt tự nhiên"]
+    }
+  }
+}
