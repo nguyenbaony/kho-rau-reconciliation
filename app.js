@@ -371,8 +371,94 @@ document.addEventListener('DOMContentLoaded', async () => {
     alert("Repository đã liên kết với:\nhttps://github.com/nguyenbaony/kho-rau-reconciliation");
   });
 
+  // Telegram Groups Modal Logic
+  const modalGroups = document.getElementById('modal-telegram-groups');
+  const btnViewGroups = document.getElementById('btn-view-groups');
+  const btnCloseGroups = document.getElementById('btn-modal-groups-close');
+  const groupsTbody = document.getElementById('groups-tbody');
+  const inputSearchGroups = document.getElementById('input-search-groups');
+  const filterGroupType = document.getElementById('filter-group-type');
+
+  let telegramData = null;
+
+  async function loadTelegramGroups() {
+    if (!telegramData) {
+      try {
+        const res = await fetch('telegram_groups_analysis.json');
+        telegramData = await res.json();
+      } catch (e) {
+        console.error("Không thể nạp telegram_groups_analysis.json", e);
+      }
+    }
+    renderTelegramGroups();
+  }
+
+  function renderTelegramGroups() {
+    if (!telegramData || !groupsTbody) return;
+    const filter = filterGroupType.value;
+    const query = (inputSearchGroups.value || '').toLowerCase().trim();
+
+    let items = [];
+    if (filter === 'ALL' || filter === 'KRC') {
+      telegramData.krc_groups.forEach(g => items.push({ ...g, category: 'Kho Rau Củ (KRC)', badge: 'rgba(16, 185, 129, 0.2)', color: '#34d399' }));
+    }
+    if (filter === 'ALL' || filter === 'ABA') {
+      telegramData.aba_groups.forEach(g => items.push({ ...g, category: 'Kho ABA', badge: 'rgba(168, 85, 247, 0.2)', color: '#c084fc' }));
+    }
+    if (filter === 'ALL' || filter === 'OTHER') {
+      telegramData.other_groups.forEach(g => items.push({ ...g, category: 'Khác', badge: 'rgba(148, 163, 184, 0.2)', color: '#94a3b8' }));
+    }
+
+    if (query) {
+      items = items.filter(g => g.title.toLowerCase().includes(query));
+    }
+
+    let html = '';
+    items.forEach((g, idx) => {
+      html += `
+        <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+          <td style="padding: 8px 12px; color: #94a3b8;">${idx + 1}</td>
+          <td style="padding: 8px 12px;">
+            <span style="background: ${g.badge}; color: ${g.color}; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 600;">
+              ${g.category}
+            </span>
+          </td>
+          <td style="padding: 8px 12px; font-weight: 500; color: #f1f5f9;">${g.title}</td>
+          <td style="padding: 8px 12px; text-align: right; color: ${g.unread_count > 0 ? '#f59e0b' : '#64748b'}; font-weight: 600;">
+            ${g.unread_count > 0 ? g.unread_count : '-'}
+          </td>
+        </tr>
+      `;
+    });
+
+    groupsTbody.innerHTML = html || '<tr><td colspan="4" style="text-align: center; padding: 20px; color: #94a3b8;">Không tìm thấy nhóm phù hợp</td></tr>';
+  }
+
+  if (btnViewGroups) {
+    btnViewGroups.addEventListener('click', () => {
+      modalGroups.classList.add('active');
+      loadTelegramGroups();
+    });
+  }
+
+  if (btnCloseGroups) {
+    btnCloseGroups.addEventListener('click', () => {
+      modalGroups.classList.remove('active');
+    });
+  }
+
+  if (modalGroups) {
+    modalGroups.addEventListener('click', (e) => {
+      if (e.target === modalGroups) modalGroups.classList.remove('active');
+    });
+  }
+
+  if (inputSearchGroups) inputSearchGroups.addEventListener('input', renderTelegramGroups);
+  if (filterGroupType) filterGroupType.addEventListener('change', renderTelegramGroups);
+
   // Initial Run
   updateKPIs();
   populateStores();
   renderTable();
 });
+

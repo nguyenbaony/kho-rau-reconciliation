@@ -36,6 +36,11 @@
           <span class="status-text" id="status-git-sync">GitHub: Main Branch (Up-to-date)</span>
         </div>
 
+        <button id="btn-view-groups" class="btn btn-secondary" style="border-color: rgba(59, 130, 246, 0.4); color: #60a5fa;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+          459 Nhóm Telegram (206 KRC / 192 ABA)
+        </button>
+
         <button id="btn-sync-sheet" class="btn btn-secondary">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
           Đồng Bộ Google Sheet
@@ -225,6 +230,57 @@
         </div>
         <div class="modal-body" id="modal-item-content">
           <!-- Populated by app.js -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Thống Kê Hội Nhóm Telegram -->
+    <div class="modal-overlay" id="modal-telegram-groups">
+      <div class="modal-box glass-panel" style="max-width: 800px; max-height: 85vh; display: flex; flex-direction: column;">
+        <div class="modal-header">
+          <h3 class="modal-title">Hội Nhóm Telegram (@nynguyen09)</h3>
+          <button class="btn-close" id="btn-modal-groups-close">&times;</button>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 16px;">
+          <div style="background: rgba(59, 130, 246, 0.12); padding: 12px; border-radius: 10px; border: 1px solid rgba(59, 130, 246, 0.3);">
+            <div style="font-size: 0.75rem; color: #94a3b8;">Tổng Hội Nhóm</div>
+            <div style="font-size: 1.4rem; font-weight: 800; color: #60a5fa;">459 Nhóm</div>
+          </div>
+          <div style="background: rgba(16, 185, 129, 0.12); padding: 12px; border-radius: 10px; border: 1px solid rgba(16, 185, 129, 0.3);">
+            <div style="font-size: 0.75rem; color: #94a3b8;">Kho Rau Củ (KRC)</div>
+            <div style="font-size: 1.4rem; font-weight: 800; color: #34d399;">206 Nhóm</div>
+          </div>
+          <div style="background: rgba(168, 85, 247, 0.12); padding: 12px; border-radius: 10px; border: 1px solid rgba(168, 85, 247, 0.3);">
+            <div style="font-size: 0.75rem; color: #94a3b8;">Kho Đông Mát (ABA)</div>
+            <div style="font-size: 1.4rem; font-weight: 800; color: #c084fc;">192 Nhóm</div>
+          </div>
+        </div>
+        <div style="display: flex; gap: 10px; margin-bottom: 12px;">
+          <input type="text" id="input-search-groups" placeholder="Tìm tên nhóm hoặc mã siêu thị..." style="flex: 1; background: rgba(15, 23, 42, 0.8); border: 1px solid var(--border-glass); padding: 8px 12px; border-radius: 8px; color: #fff; outline: none;">
+          <select id="filter-group-type" style="background: rgba(15, 23, 42, 0.8); border: 1px solid var(--border-glass); padding: 8px 12px; border-radius: 8px; color: #fff;">
+            <option value="ALL">Tất cả (459)</option>
+            <option value="KRC">Kho Rau Củ (206)</option>
+            <option value="ABA">Kho ABA (192)</option>
+            <option value="OTHER">Khác (61)</option>
+          </select>
+          <a href="Danh_Sach_459_Group_Telegram.csv" download class="btn btn-outline" style="padding: 6px 12px; font-size: 0.8rem; text-decoration: none;">
+            📥 Tải CSV
+          </a>
+        </div>
+        <div style="overflow-y: auto; flex: 1; border: 1px solid var(--border-glass); border-radius: 10px;">
+          <table style="width: 100%; border-collapse: collapse; font-size: 0.82rem;">
+            <thead>
+              <tr style="background: rgba(30, 41, 59, 0.8); position: sticky; top: 0;">
+                <th style="padding: 8px 12px; text-align: left;">STT</th>
+                <th style="padding: 8px 12px; text-align: left;">Phân Loại</th>
+                <th style="padding: 8px 12px; text-align: left;">Tên Hội Nhóm</th>
+                <th style="padding: 8px 12px; text-align: right;">Chưa Đọc</th>
+              </tr>
+            </thead>
+            <tbody id="groups-tbody">
+              <!-- Rendered by app.js -->
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
