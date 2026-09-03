@@ -246,8 +246,26 @@ document.addEventListener('DOMContentLoaded', async () => {
       document.querySelectorAll('.step-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       currentStep = btn.getAttribute('data-step');
-      currentPage = 1;
-      renderTable();
+
+      const filterBar = document.querySelector('.filter-controls');
+      const tableWrap = document.querySelector('.table-responsive');
+      const footerBar = document.getElementById('main-table-footer');
+      const tgSection = document.getElementById('telegram-feed-section');
+
+      if (currentStep === 'telegram') {
+        if (filterBar) filterBar.style.display = 'none';
+        if (tableWrap) tableWrap.style.display = 'none';
+        if (footerBar) footerBar.style.display = 'none';
+        if (tgSection) tgSection.style.display = 'block';
+        loadTelegramFeed();
+      } else {
+        if (filterBar) filterBar.style.display = 'flex';
+        if (tableWrap) tableWrap.style.display = 'block';
+        if (footerBar) footerBar.style.display = 'flex';
+        if (tgSection) tgSection.style.display = 'none';
+        currentPage = 1;
+        renderTable();
+      }
     });
   });
 
@@ -456,9 +474,172 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (inputSearchGroups) inputSearchGroups.addEventListener('input', renderTelegramGroups);
   if (filterGroupType) filterGroupType.addEventListener('change', renderTelegramGroups);
 
+  // Telegram Feed Logic (RAU CỦ vs ABA/DC)
+  let telegramFeedItems = [];
+  let currentTgFilter = 'ALL';
+  const tgCardsGrid = document.getElementById('telegram-cards-grid');
+  const tgInputSearch = document.getElementById('tg-input-search');
+
+  async function loadTelegramFeed() {
+    try {
+      const res = await fetch('data/telegram_feed.json?t=' + Date.now());
+      if (res.ok) {
+        telegramFeedItems = await res.json();
+      }
+    } catch (e) {
+      console.error("Không thể tải telegram_feed.json", e);
+    }
+    renderTelegramFeed();
+  }
+
+  function renderTelegramFeed() {
+    if (!tgCardsGrid) return;
+    const query = (tgInputSearch ? tgInputSearch.value : '').toLowerCase().trim();
+
+    let filtered = telegramFeedItems;
+    if (currentTgFilter !== 'ALL') {
+      filtered = filtered.filter(item => item.group_type === currentTgFilter);
+    }
+    if (query) {
+      filtered = filtered.filter(item => 
+        (item.group_title && item.group_title.toLowerCase().includes(query)) ||
+        (item.store_code && item.store_code.toLowerCase().includes(query)) ||
+        (item.text && item.text.toLowerCase().includes(query)) ||
+        (item.sender_name && item.sender_name.toLowerCase().includes(query))
+      );
+    }
+
+    const totalCount = telegramFeedItems.length;
+    const krcCount = telegramFeedItems.filter(x => x.group_type === 'RAU_CU').length;
+    const abaCount = telegramFeedItems.filter(x => x.group_type === 'ABA_DC').length;
+
+    const btnAll = document.getElementById('tg-filter-all');
+    const btnKrc = document.getElementById('tg-filter-krc');
+    const btnAba = document.getElementById('tg-filter-aba');
+    if (btnAll) btnAll.innerText = `Tất Cả (${totalCount})`;
+    if (btnKrc) btnKrc.innerText = `🥦 1. RAU CỦ (${krcCount})`;
+    if (btnAba) btnAba.innerText = `❄️ 2. ABA / DC (${abaCount})`;
+
+    if (filtered.length === 0) {
+      tgCardsGrid.innerHTML = `
+        <div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #94a3b8; background: rgba(15,23,42,0.6); border-radius: 12px; border: 1px dashed var(--border-glass);">
+          <div style="font-size: 2rem; margin-bottom: 8px;">📭</div>
+          <div style="font-weight: 600; color: #f1f5f9;">Không tìm thấy tin nhắn/hình ảnh phù hợp</div>
+          <div style="font-size: 0.8rem; margin-top: 4px;">Thử chọn lại tab <b>RAU CỦ</b> hoặc <b>ABA/DC</b></div>
+        </div>
+      `;
+      return;
+    }
+
+    let html = '';
+    filtered.forEach(item => {
+      const isRau = item.group_type === 'RAU_CU';
+      const badgeBg = isRau ? 'rgba(16, 185, 129, 0.15)' : 'rgba(56, 189, 248, 0.15)';
+      const badgeBorder = isRau ? 'rgba(16, 185, 129, 0.4)' : 'rgba(56, 189, 248, 0.4)';
+      const badgeColor = isRau ? '#34d399' : '#38bdf8';
+      const groupIcon = isRau ? '🥦' : '❄️';
+      const groupTag = isRau ? 'RAU CỦ' : 'ABA / DC';
+
+      html += `
+        <div class="tg-feed-card" style="background: rgba(15, 23, 42, 0.8); border: 1px solid var(--border-glass); border-radius: 14px; overflow: hidden; display: flex; flex-direction: column; transition: transform 0.2s, border-color 0.2s; box-shadow: 0 4px 20px rgba(0,0,0,0.25);">
+          <div style="padding: 14px 16px 10px; display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; border-bottom: 1px solid rgba(255,255,255,0.05);">
+            <div style="display: flex; gap: 10px; align-items: center;">
+              <div style="width: 36px; height: 36px; border-radius: 10px; background: ${badgeBg}; border: 1px solid ${badgeBorder}; display: flex; align-items: center; justify-content: center; font-size: 1.1rem;">
+                ${groupIcon}
+              </div>
+              <div>
+                <div style="font-weight: 700; font-size: 0.86rem; color: #f8fafc; line-height: 1.25;">${escapeHtml(item.group_title)}</div>
+                <div style="font-size: 0.73rem; color: #94a3b8; margin-top: 2px;">
+                  <span style="color: ${badgeColor}; font-weight: 700; background: ${badgeBg}; padding: 1px 6px; border-radius: 4px;">${groupTag}</span> • ${escapeHtml(item.sender_name)}
+                </div>
+              </div>
+            </div>
+            <span style="font-size: 0.72rem; color: #64748b; white-space: nowrap;">${item.date}</span>
+          </div>
+
+          <div style="padding: 12px 16px; font-size: 0.83rem; color: #cbd5e1; flex: 1; line-height: 1.45;">
+            ${escapeHtml(item.text)}
+          </div>
+
+          <div style="padding: 0 16px 16px;">
+            <div class="tg-img-wrapper" style="position: relative; border-radius: 10px; overflow: hidden; height: 210px; background: #000; border: 1px solid rgba(255,255,255,0.1); cursor: pointer;" onclick="openLightbox('${item.image_url}', '${escapeHtml(item.group_title)} - ${escapeHtml(item.date)}')">
+              <img src="${item.image_url}" loading="lazy" style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.25s;" onmouseover="this.style.transform='scale(1.03)'" onmouseout="this.style.transform='scale(1)'">
+              <div style="position: absolute; bottom: 8px; right: 8px; background: rgba(15,23,42,0.85); backdrop-filter: blur(4px); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.4); padding: 4px 10px; border-radius: 6px; font-size: 0.72rem; font-weight: 600; display: flex; align-items: center; gap: 4px;">
+                🔍 Xem ảnh lớn
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    });
+    tgCardsGrid.innerHTML = html;
+  }
+
+  // Lightbox functions (global scope for onclick)
+  window.openLightbox = function(url, caption) {
+    const modal = document.getElementById('modal-lightbox');
+    const img = document.getElementById('lightbox-img');
+    const cap = document.getElementById('lightbox-caption');
+    if (modal && img) {
+      img.src = url;
+      if (cap) cap.innerText = caption || 'Hình ảnh chứng từ đối soát';
+      modal.classList.add('active');
+    }
+  };
+
+  const btnCloseLightbox = document.getElementById('btn-lightbox-close');
+  const modalLightbox = document.getElementById('modal-lightbox');
+  if (btnCloseLightbox) {
+    btnCloseLightbox.addEventListener('click', () => {
+      modalLightbox.classList.remove('active');
+    });
+  }
+  if (modalLightbox) {
+    modalLightbox.addEventListener('click', (e) => {
+      if (e.target === modalLightbox) modalLightbox.classList.remove('active');
+    });
+  }
+
+  // Sub-filter button clicks
+  document.querySelectorAll('.tg-tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.tg-tab-btn').forEach(b => {
+        b.classList.remove('active');
+        b.style.background = 'transparent';
+        b.style.color = '#94a3b8';
+      });
+      btn.classList.add('active');
+      btn.style.background = 'var(--accent-blue)';
+      btn.style.color = '#fff';
+
+      currentTgFilter = btn.getAttribute('data-tg-group');
+      renderTelegramFeed();
+    });
+  });
+
+  if (tgInputSearch) tgInputSearch.addEventListener('input', renderTelegramFeed);
+
+  const btnRefreshTg = document.getElementById('btn-refresh-telegram');
+  if (btnRefreshTg) {
+    btnRefreshTg.addEventListener('click', () => {
+      btnRefreshTg.innerText = '⏳ Đang làm mới...';
+      loadTelegramFeed().then(() => {
+        btnRefreshTg.innerText = '🔄 Làm Mới';
+      });
+    });
+  }
+
+  // Realtime Polling every 5 seconds when on Telegram tab
+  setInterval(() => {
+    if (currentStep === 'telegram') {
+      loadTelegramFeed();
+    }
+  }, 5000);
+
   // Initial Run
   updateKPIs();
   populateStores();
   renderTable();
 });
+
 

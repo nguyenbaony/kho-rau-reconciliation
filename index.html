@@ -134,6 +134,9 @@
           <button class="step-btn" data-step="step5" id="tab-step5">
             <span class="step-num">5</span> Bảng Datapay Chốt
           </button>
+          <button class="step-btn telegram-tab-btn" data-step="telegram" id="tab-telegram" style="border-color: rgba(56, 189, 248, 0.4); color: #38bdf8;">
+            <span class="step-num" style="background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); color: #fff;">📱</span> 6. Telegram Feed
+          </button>
         </div>
       </div>
 
@@ -211,7 +214,7 @@
       </div>
 
       <!-- Pagination / Footer Bar -->
-      <div class="table-footer">
+      <div class="table-footer" id="main-table-footer">
         <span class="page-info" id="page-counter">Đang hiển thị 1-50 của 6,386 dòng</span>
         <div class="pagination">
           <button class="btn-page" id="btn-prev-page">Trước</button>
@@ -219,7 +222,51 @@
           <button class="btn-page" id="btn-next-page">Tiếp</button>
         </div>
       </div>
+
+      <!-- Telegram Realtime Feed Section (Tab 6) -->
+      <div id="telegram-feed-section" style="display: none; padding: 20px 24px;">
+        <div class="telegram-feed-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 16px;">
+          <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+            <div class="group-toggle-tabs" style="display: flex; background: rgba(15, 23, 42, 0.8); border: 1px solid var(--border-glass); border-radius: 10px; padding: 4px;">
+              <button id="tg-filter-all" class="tg-tab-btn active" data-tg-group="ALL" style="padding: 8px 18px; border-radius: 8px; border: none; cursor: pointer; font-weight: 700; font-size: 0.85rem; background: var(--accent-blue); color: #fff; transition: all 0.2s;">
+                Tất Cả (29+)
+              </button>
+              <button id="tg-filter-krc" class="tg-tab-btn" data-tg-group="RAU_CU" style="padding: 8px 18px; border-radius: 8px; border: none; cursor: pointer; font-weight: 700; font-size: 0.85rem; background: transparent; color: #94a3b8; transition: all 0.2s;">
+                🥦 1. RAU CỦ (Kho Rau Củ)
+              </button>
+              <button id="tg-filter-aba" class="tg-tab-btn" data-tg-group="ABA_DC" style="padding: 8px 18px; border-radius: 8px; border: none; cursor: pointer; font-weight: 700; font-size: 0.85rem; background: transparent; color: #94a3b8; transition: all 0.2s;">
+                ❄️ 2. ABA / DC (Kho Đông Mát & DC)
+              </button>
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px; background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); padding: 6px 14px; border-radius: 20px;">
+              <span class="status-indicator live"></span>
+              <span style="font-size: 0.8rem; color: #34d399; font-weight: 700;">Realtime Sync: Đang kết nối</span>
+            </div>
+          </div>
+
+          <div style="display: flex; gap: 10px; align-items: center;">
+            <input type="text" id="tg-input-search" placeholder="🔍 Tìm theo siêu thị (A128, Midtown...) hoặc nội dung chat..." style="background: rgba(15, 23, 42, 0.8); border: 1px solid var(--border-glass); padding: 8px 16px; border-radius: 8px; color: #fff; width: 340px; font-size: 0.85rem; outline: none;">
+            <button id="btn-refresh-telegram" class="btn btn-outline" style="padding: 8px 14px; font-size: 0.82rem;">
+              🔄 Làm Mới
+            </button>
+          </div>
+        </div>
+
+        <!-- Cards Grid of Telegram Messages & Photos -->
+        <div id="telegram-cards-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 20px;">
+          <!-- Dynamically populated by app.js -->
+        </div>
+      </div>
     </section>
+
+    <!-- Image Lightbox Modal -->
+    <div class="modal-overlay" id="modal-lightbox" style="z-index: 9999;">
+      <div style="max-width: 90vw; max-height: 90vh; position: relative; display: flex; flex-direction: column; align-items: center;">
+        <button id="btn-lightbox-close" style="position: absolute; top: -42px; right: 0; background: rgba(0,0,0,0.7); color: #fff; border: 1px solid rgba(255,255,255,0.3); border-radius: 50%; width: 36px; height: 36px; font-size: 1.3rem; cursor: pointer; display: flex; align-items: center; justify-content: center;">&times;</button>
+        <img id="lightbox-img" src="" style="max-width: 85vw; max-height: 80vh; object-fit: contain; border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.8); border: 1px solid rgba(255,255,255,0.15);">
+        <div id="lightbox-caption" style="margin-top: 12px; color: #f8fafc; font-size: 0.9rem; text-align: center; background: rgba(15,23,42,0.9); padding: 8px 20px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1);"></div>
+      </div>
+    </div>
 
     <!-- Modal Xem Chi Tiết & Bằng Chứng Camera / Claim -->
     <div class="modal-overlay" id="modal-claim-detail">
