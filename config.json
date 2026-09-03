@@ -7,6 +7,13 @@
     "branch": "main",
     "auto_push_interval_minutes": 15
   },
+  "telegram": {
+    "username": "nynguyen09",
+    "phone": "+84352377653",
+    "profile_url": "https://t.me/nynguyen09",
+    "bot_token": "",
+    "chat_id": ""
+  },
   "rules": {
     "natural_loss_threshold_percent": {
       "2.FRUITS": 2.5,
