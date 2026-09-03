@@ -1,7 +1,24 @@
 // Kho Rau Reconciliation & Datapay Frontend Engine
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
   let allRecords = window.RECON_RECORDS || [];
-  const summary = window.RECON_SUMMARY || null;
+  let summary = window.RECON_SUMMARY || null;
+
+  // Fallback: If not loaded via script tag, fetch JSON directly
+  if (!allRecords || allRecords.length === 0) {
+    try {
+      const [recRes, sumRes] = await Promise.all([
+        fetch('data/reconciliation_records.json'),
+        fetch('data/datapay_summary.json')
+      ]);
+      if (recRes.ok) allRecords = await recRes.json();
+      if (sumRes.ok) summary = await sumRes.json();
+    } catch (err) {
+      console.warn('Fallback fetch error:', err);
+    }
+  }
+
+  // Clean data: Filter out any header remnants
+  allRecords = allRecords.filter(r => r.sku && r.sku !== 'Mã hàng' && r.to_order !== 'CLV4');
 
   let currentStep = 'all';
   let searchQuery = '';
@@ -24,7 +41,8 @@ document.addEventListener('DOMContentLoaded', () => {
   // 1. Update KPI Dashboard
   const updateKPIs = () => {
     if (!summary) return;
-    document.getElementById('kpi-total-orders').textContent = formatNumber(summary.total_records, 0);
+    const totalCount = allRecords.length || summary.total_records;
+    document.getElementById('kpi-total-orders').textContent = formatNumber(totalCount, 0);
     document.getElementById('kpi-loss-value').textContent = formatCurrency(summary.financial_summary.total_natural_loss_vnd);
     document.getElementById('kpi-warehouse-val').textContent = formatCurrency(summary.financial_summary.total_warehouse_penalty_vnd);
     document.getElementById('kpi-store-val').textContent = formatCurrency(summary.financial_summary.total_store_penalty_vnd);
@@ -36,7 +54,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const storeSelect = document.getElementById('filter-store');
     const storeMap = new Map();
     allRecords.forEach(r => {
-      if (r.store_id && !storeMap.has(r.store_id)) {
+      if (r.store_id && !storeMap.has(r.store_id) && r.store_id !== 'ID ST') {
         storeMap.set(r.store_id, r.store_name);
       }
     });
@@ -45,7 +63,7 @@ document.addEventListener('DOMContentLoaded', () => {
     Array.from(storeMap.entries()).sort((a, b) => a[0].localeCompare(b[0])).forEach(([id, name]) => {
       const opt = document.createElement('option');
       opt.value = id;
-      opt.textContent = `${id} - ${name.replace('KFM_HCM_', '').replace('KFM_BDU_', '')}`;
+      opt.textContent = `${id} - ${(name || '').replace('KFM_HCM_', '').replace('KFM_BDU_', '')}`;
       storeSelect.appendChild(opt);
     });
   };
@@ -55,16 +73,16 @@ document.addEventListener('DOMContentLoaded', () => {
     return allRecords.filter(item => {
       // Step Filter
       if (currentStep === 'step1') {
-        // Step 1: Điều chuyển TO/PT (Tất cả đơn có TO/PT)
+        // Step 1: Điều chuyển TO/PT
         if (!item.to_order && !item.pt_transfer) return false;
       } else if (currentStep === 'step2') {
         // Step 2: Có chênh lệch hoặc hao hụt
         if (item.qty_diff === 0 && item.natural_loss_qty === 0) return false;
       } else if (currentStep === 'step3') {
         // Step 3: Có phản hồi hoặc claim từ DC / Store
-        if (!item.dc_confirmation && !item.image_link && !item.dc_note) return false;
+        if (!item.dc_confirmation && !item.image_link && !item.dc_note && !item.kfm_feedback) return false;
       } else if (currentStep === 'step4') {
-        // Step 4: Có lỗi xác định trách nhiệm (Kho rau hoặc Siêu thị)
+        // Step 4: Có lỗi xác định trách nhiệm
         if (!item.responsible_party && item.warehouse_penalty === 0 && item.store_penalty === 0) return false;
       } else if (currentStep === 'step5') {
         // Step 5: Bảng chốt Datapay (Có số tiền phạt phát sinh)
@@ -114,27 +132,26 @@ document.addEventListener('DOMContentLoaded', () => {
     tbody.innerHTML = '';
 
     if (pageItems.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="13" style="text-align: center; padding: 32px; color: var(--text-muted);">Không tìm thấy dữ liệu đối soát phù hợp.</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="13" style="text-align: center; padding: 48px; color: var(--text-muted); font-size: 0.95rem;">Không tìm thấy dữ liệu đối soát phù hợp với bộ lọc hiện tại.</td></tr>`;
       return;
     }
 
     pageItems.forEach(item => {
       const tr = document.createElement('tr');
 
-      // Badges
       let dcBadge = `<span class="badge badge-gray">Chưa duyệt</span>`;
-      if (item.dc_confirmation.includes('Đồng ý')) {
+      if ((item.dc_confirmation || '').includes('Đồng ý')) {
         dcBadge = `<span class="badge badge-green">${item.dc_confirmation}</span>`;
-      } else if (item.dc_confirmation.includes('Từ chối')) {
+      } else if ((item.dc_confirmation || '').includes('Từ chối')) {
         dcBadge = `<span class="badge badge-rose">${item.dc_confirmation}</span>`;
-      } else if (item.dc_confirmation.includes('Kiểm tra')) {
+      } else if ((item.dc_confirmation || '').includes('Kiểm tra')) {
         dcBadge = `<span class="badge badge-amber">${item.dc_confirmation}</span>`;
       }
 
       let respBadge = `<span class="badge badge-gray">CXD</span>`;
-      if (item.responsible_party.includes('Kho')) {
+      if ((item.responsible_party || '').includes('Kho')) {
         respBadge = `<span class="badge badge-rose">Kho Rau</span>`;
-      } else if (item.responsible_party.includes('Siêu thị')) {
+      } else if ((item.responsible_party || '').includes('Siêu thị')) {
         respBadge = `<span class="badge badge-purple">Siêu Thị</span>`;
       } else if (item.loss_value > 0) {
         respBadge = `<span class="badge badge-amber">Hao Hụt</span>`;
@@ -183,7 +200,7 @@ document.addEventListener('DOMContentLoaded', () => {
       tbody.appendChild(tr);
     });
 
-    // Attach detail modal trigger
+    // Detail modal handlers
     document.querySelectorAll('.btn-detail').forEach(btn => {
       btn.addEventListener('click', (e) => {
         const id = e.target.getAttribute('data-id');
@@ -296,9 +313,9 @@ document.addEventListener('DOMContentLoaded', () => {
         `"${i.to_order || i.id}"`,
         `"${i.transfer_date}"`,
         `"${i.store_id}"`,
-        `"${i.store_name.replace(/"/g, '""')}"`,
+        `"${(i.store_name || '').replace(/"/g, '""')}"`,
         `"${i.sku}"`,
-        `"${i.product_name.replace(/"/g, '""')}"`,
+        `"${(i.product_name || '').replace(/"/g, '""')}"`,
         `"${i.unit}"`,
         i.qty_transferred,
         i.qty_received,
@@ -322,20 +339,20 @@ document.addEventListener('DOMContentLoaded', () => {
     link.click();
   });
 
-  // Live Sync & Push Feedback
+  // Sync button feedback
   document.getElementById('btn-sync-sheet').addEventListener('click', () => {
     const btn = document.getElementById('btn-sync-sheet');
-    btn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="spin"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg> Đang nạp dữ liệu...`;
+    btn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="spin"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg> Đang tải dữ liệu...`;
     setTimeout(() => {
-      btn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg> Đã đồng bộ 6,384 dòng!`;
+      btn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg> Đã đồng bộ ${allRecords.length} dòng!`;
       setTimeout(() => {
         btn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg> Đồng Bộ Google Sheet`;
       }, 3000);
-    }, 1200);
+    }, 1000);
   });
 
   document.getElementById('btn-git-push').addEventListener('click', () => {
-    alert("Quy trình Git Auto-Push đã sẵn sàng!\nChạy lệnh trong PowerShell:\n.\\auto_push.ps1 -RemoteUrl <Link-GitHub-Cua-Ny>");
+    alert("Repository đã liên kết với:\nhttps://github.com/nguyenbaony/kho-rau-reconciliation");
   });
 
   // Initial Run
