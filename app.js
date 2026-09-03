@@ -339,6 +339,22 @@ document.addEventListener('DOMContentLoaded', async () => {
     link.click();
   });
 
+  // Share Telegram Handler (Dùng chính tài khoản của Ny)
+  const shareBtn = document.getElementById('btn-share-telegram');
+  if (shareBtn) {
+    shareBtn.addEventListener('click', () => {
+      const totalRecs = allRecords.length || (summary ? summary.total_records : 0);
+      const lossVal = summary ? formatCurrency(summary.financial_summary.total_natural_loss_vnd) : '0 đ';
+      const dcVal = summary ? formatCurrency(summary.financial_summary.total_warehouse_penalty_vnd) : '0 đ';
+      const stVal = summary ? formatCurrency(summary.financial_summary.total_store_penalty_vnd) : '0 đ';
+      const nowStr = new Date().toLocaleDateString('vi-VN');
+
+      const text = `🥦 BÁO CÁO ĐỐI SOÁT KHO RAU (${nowStr})\n━━━━━━━━━━━━━━━━━━━\n📦 Tổng dòng đối soát: ${totalRecs}\n📉 Hao hụt tự nhiên: ${lossVal}\n🏭 Phạt Kho Rau (DC): ${dcVal}\n🏪 Phạt Siêu Thị (ST): ${stVal}\n━━━━━━━━━━━━━━━━━━━\n🌐 Xem bảng chi tiết: https://nguyenbaony.github.io/kho-rau-reconciliation/`;
+      const shareUrl = `https://t.me/share/url?url=https://nguyenbaony.github.io/kho-rau-reconciliation/&text=${encodeURIComponent(text)}`;
+      window.open(shareUrl, '_blank');
+    });
+  }
+
   // Sync button feedback
   document.getElementById('btn-sync-sheet').addEventListener('click', () => {
     const btn = document.getElementById('btn-sync-sheet');
