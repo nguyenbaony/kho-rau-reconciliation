@@ -1,0 +1,460 @@
+﻿STT,Phân Loại,Tên Group,Group ID,Tin Chưa Đọc,Loại
+1,1. Kho Rau Củ (KRC),RAU - Vấn đề chất lượng (CATE - STORE),-1001828938896,17678,Kênh/Supergroup
+2,1. Kho Rau Củ (KRC),KRC - SCV,-4979811379,0,Nhóm chat
+3,1. Kho Rau Củ (KRC),MZK1 - KRC,-4030476706,0,Nhóm chat
+4,1. Kho Rau Củ (KRC),26.KRC_SCF x SCM x QC x MD,-1002660074323,102,Kênh/Supergroup
+5,1. Kho Rau Củ (KRC),IC - KDB - KRC,-4987767491,0,Nhóm chat
+6,1. Kho Rau Củ (KRC),KRC - A129 (MIDTOWN),-1003320071474,0,Kênh/Supergroup
+7,1. Kho Rau Củ (KRC),SCM - KRC (Đối soát),-1003511338216,9,Kênh/Supergroup
+8,1. Kho Rau Củ (KRC),KRC-TNT,-884405296,0,Nhóm chat
+9,1. Kho Rau Củ (KRC),KRC - PPZ,-4640196068,0,Nhóm chat
+10,1. Kho Rau Củ (KRC),KRC - VH6 ( GH5),-4932789771,0,Nhóm chat
+11,1. Kho Rau Củ (KRC),KRC - MZ2,-4233295350,0,Nhóm chat
+12,1. Kho Rau Củ (KRC),SCM - KRC (hình ảnh chênh lệch),-1003904217153,0,Kênh/Supergroup
+13,1. Kho Rau Củ (KRC),KRC-A118 (Vĩnh Viễn),-5023949319,0,Nhóm chat
+14,1. Kho Rau Củ (KRC),KRC - CLN,-4259263792,0,Nhóm chat
+15,1. Kho Rau Củ (KRC),KRC - VH7 ( BS11),-4909139945,0,Nhóm chat
+16,1. Kho Rau Củ (KRC),KRC - AKR,-4172822430,0,Nhóm chat
+17,1. Kho Rau Củ (KRC),KRC - A131 (B01.05 Dream Home Palace),-5172801086,0,Nhóm chat
+18,1. Kho Rau Củ (KRC),KRC - ERT,-780757722,0,Nhóm chat
+19,1. Kho Rau Củ (KRC),KRC - LVT,-4589898683,0,Nhóm chat
+20,1. Kho Rau Củ (KRC),KRC - PHI,-602094001,0,Nhóm chat
+21,1. Kho Rau Củ (KRC),KRC - A200 (H36 KDC Thới An),-5576406617,0,Nhóm chat
+22,1. Kho Rau Củ (KRC),KRC - A107 (Đường D3),-1003881507373,0,Kênh/Supergroup
+23,1. Kho Rau Củ (KRC),KRC - A166 (Happy Valley),-5182777019,0,Nhóm chat
+24,1. Kho Rau Củ (KRC),KRC - HPD,-4519351886,0,Nhóm chat
+25,1. Kho Rau Củ (KRC),KRC - A113 (Phan Văn Hân),-4908410647,0,Nhóm chat
+26,1. Kho Rau Củ (KRC),KRC - ECG,-4804060590,0,Nhóm chat
+27,1. Kho Rau Củ (KRC),KRC - A188 (Chung Cư Thuận Việt),-5249434303,0,Nhóm chat
+28,1. Kho Rau Củ (KRC),KRC - PHG,-1001554939736,0,Kênh/Supergroup
+29,1. Kho Rau Củ (KRC),KRC - MTE,-4819157472,0,Nhóm chat
+30,1. Kho Rau Củ (KRC),KRC - A184 (Saigon Mia),-5176917150,0,Nhóm chat
+31,1. Kho Rau Củ (KRC),KRC - A126 (274 Lê Văn Sỹ),-5024268686,0,Nhóm chat
+32,1. Kho Rau Củ (KRC),KRC - NVT,-579645963,0,Nhóm chat
+33,1. Kho Rau Củ (KRC),KRC - PGS,-1001523449323,0,Kênh/Supergroup
+34,1. Kho Rau Củ (KRC),KRC - NTO,-4271997870,0,Nhóm chat
+35,1. Kho Rau Củ (KRC),SCM- KRC Nội bộ,-1003957313850,18,Kênh/Supergroup
+36,1. Kho Rau Củ (KRC),KRC - HMN,-4064721923,0,Nhóm chat
+37,1. Kho Rau Củ (KRC),KRC - TSO,-1003361550177,0,Kênh/Supergroup
+38,1. Kho Rau Củ (KRC),KRC - VH2,-4065136928,0,Nhóm chat
+39,1. Kho Rau Củ (KRC),KRC - CKO,-769181228,0,Nhóm chat
+40,1. Kho Rau Củ (KRC),KRC - KDG,-4943941041,0,Nhóm chat
+41,1. Kho Rau Củ (KRC),KRC-VGP,-948922477,0,Nhóm chat
+42,1. Kho Rau Củ (KRC),KRC - A207 (Palm Residence),-5552370383,0,Nhóm chat
+43,1. Kho Rau Củ (KRC),KRC - VH3,-4085868781,0,Nhóm chat
+44,1. Kho Rau Củ (KRC),KRC - A144 (16 Hoàng Anh Thanh Bình),-5296727737,0,Nhóm chat
+45,1. Kho Rau Củ (KRC),KRC - NHG,-1001635852752,5,Kênh/Supergroup
+46,1. Kho Rau Củ (KRC),KRC - VHT,-1001705324344,1,Kênh/Supergroup
+47,1. Kho Rau Củ (KRC),KRC - A127 (B-SH.06 Urban Green),-5268985249,4,Nhóm chat
+48,1. Kho Rau Củ (KRC),KRC-BCG (Bcons Garden),-4053224638,5,Nhóm chat
+49,1. Kho Rau Củ (KRC),KRC_A105_02 Lê Lợi,-4907500481,5,Nhóm chat
+50,1. Kho Rau Củ (KRC),KRC-A124(74 đướng số 1-Sky9),-5097394639,5,Nhóm chat
+51,1. Kho Rau Củ (KRC),KRC-A103( 222 LVL),-4976500983,0,Nhóm chat
+52,1. Kho Rau Củ (KRC),KRC - HLR,-4566564137,0,Nhóm chat
+53,1. Kho Rau Củ (KRC),KRC - HHT,-4846649931,2,Nhóm chat
+54,1. Kho Rau Củ (KRC),KRC - A170 (Nguyễn Phúc Chu),-5295619682,3,Nhóm chat
+55,1. Kho Rau Củ (KRC),KRC - A106 (Orchard Garden),-4831520955,6,Nhóm chat
+56,1. Kho Rau Củ (KRC),KRC - A163 (Alnata Plus Celadon),-5086579054,5,Nhóm chat
+57,1. Kho Rau Củ (KRC),KRC - A114 (Hưng Phú),-4861820166,0,Nhóm chat
+58,1. Kho Rau Củ (KRC),KRC - CLG,-4824897789,7,Nhóm chat
+59,1. Kho Rau Củ (KRC),KRC - A128 (TM0.03 CH3 Cityland Park Hill),-5048848144,7,Nhóm chat
+60,1. Kho Rau Củ (KRC),KRC - RVS,-4536882122,0,Nhóm chat
+61,1. Kho Rau Củ (KRC),KRC - A137 (60 Lương Định Của),-5042135416,2,Nhóm chat
+62,1. Kho Rau Củ (KRC),KRC - A136 (125 Nguyễn Phúc Nguyên),-4999347623,2,Nhóm chat
+63,1. Kho Rau Củ (KRC),KRC - GDU,-1001746447230,3,Kênh/Supergroup
+64,1. Kho Rau Củ (KRC),KRC - IAP,-4170777358,1,Nhóm chat
+65,1. Kho Rau Củ (KRC),KRC - ACU,-4529392399,6,Nhóm chat
+66,1. Kho Rau Củ (KRC),KRC - A190 (Botanica Premier),-5244839611,3,Nhóm chat
+67,1. Kho Rau Củ (KRC),KRC - A108 ( 38E CÂY KEO ),-4956823565,7,Nhóm chat
+68,1. Kho Rau Củ (KRC),KRC - A123 (4S Linh Đông),-5027193412,3,Nhóm chat
+69,1. Kho Rau Củ (KRC),KRC - A199 (Bàu Cát),-5203032435,0,Nhóm chat
+70,1. Kho Rau Củ (KRC),KRC - A164 (Opal Boulevard),-5116235199,0,Nhóm chat
+71,1. Kho Rau Củ (KRC),KRC_PKD,-4696215604,0,Nhóm chat
+72,1. Kho Rau Củ (KRC),KRC - EHS,-4081351807,2,Nhóm chat
+73,1. Kho Rau Củ (KRC),KRC - EH3,-4869461791,5,Nhóm chat
+74,1. Kho Rau Củ (KRC),KRC - A111 (New City),-4964161256,2,Nhóm chat
+75,1. Kho Rau Củ (KRC),KRC - A143 (83 Khuông Việt),-5270915730,0,Nhóm chat
+76,1. Kho Rau Củ (KRC),KRC - A130 (41 Vũ Tông Phan),-5203306882,2,Nhóm chat
+77,1. Kho Rau Củ (KRC),KRC - LVH,-4676492169,3,Nhóm chat
+78,1. Kho Rau Củ (KRC),HV2- KRC,-4211335281,8,Nhóm chat
+79,1. Kho Rau Củ (KRC),KRC_PVB,-4728905681,0,Nhóm chat
+80,1. Kho Rau Củ (KRC),KRC - A220 (KDC Nam Long),-5158042169,0,Nhóm chat
+81,1. Kho Rau Củ (KRC),KRC - A196 (56 Đường A4),-5260328433,6,Nhóm chat
+82,1. Kho Rau Củ (KRC),KRC - A139 (1 An Lạc),-5080367710,3,Nhóm chat
+83,1. Kho Rau Củ (KRC),KRC - VTG,-1001599147846,3,Kênh/Supergroup
+84,1. Kho Rau Củ (KRC),KRC - DS3,-835477767,5,Nhóm chat
+85,1. Kho Rau Củ (KRC),KRC - SFR,-4129904176,0,Nhóm chat
+86,1. Kho Rau Củ (KRC),KRC - SSR,-4589466365,4,Nhóm chat
+87,1. Kho Rau Củ (KRC),KRC - LTC,-4187036269,10,Nhóm chat
+88,1. Kho Rau Củ (KRC),KRC - VH4 ( S07.02),-4576739871,0,Nhóm chat
+89,1. Kho Rau Củ (KRC),KRC - HNN,-1002776952053,4,Kênh/Supergroup
+90,1. Kho Rau Củ (KRC),KRC - DS7,-4016518746,4,Nhóm chat
+91,1. Kho Rau Củ (KRC),KRC - A195 (Nguyễn Sơn),-5097732830,6,Nhóm chat
+92,1. Kho Rau Củ (KRC),KRC - VLA,-4133662632,0,Nhóm chat
+93,1. Kho Rau Củ (KRC),KRC - TVK,-4536114658,1,Nhóm chat
+94,1. Kho Rau Củ (KRC),KRC - TMY,-1001877377121,0,Kênh/Supergroup
+95,1. Kho Rau Củ (KRC),KRC - NVK,-4595494496,0,Nhóm chat
+96,1. Kho Rau Củ (KRC),KRC - GHA,-4159767480,1,Nhóm chat
+97,1. Kho Rau Củ (KRC),QHG_KRC,-4276040181,0,Nhóm chat
+98,1. Kho Rau Củ (KRC),KRC - Q7R,-4855214802,0,Nhóm chat
+99,1. Kho Rau Củ (KRC),KRC - Q50,-837181180,0,Nhóm chat
+100,1. Kho Rau Củ (KRC),KRC - PHL,-5004018482,0,Nhóm chat
+101,1. Kho Rau Củ (KRC),KRC - PTN,-4145698819,0,Nhóm chat
+102,1. Kho Rau Củ (KRC),KRC - KHI,-1001792915445,3,Kênh/Supergroup
+103,1. Kho Rau Củ (KRC),KRC - HHM,-4221052636,3,Nhóm chat
+104,1. Kho Rau Củ (KRC),KRC - HTN,-4910994239,2,Nhóm chat
+105,1. Kho Rau Củ (KRC),KRC - A192 (Bùi Đình Túy),-4924839025,5,Nhóm chat
+106,1. Kho Rau Củ (KRC),KRC - NVD,-4219495425,0,Nhóm chat
+107,1. Kho Rau Củ (KRC),NTU - KRC (46 Nguyễn Thị Tú),-889835094,0,Nhóm chat
+108,1. Kho Rau Củ (KRC),KRC - NTT,-1001759786537,0,Kênh/Supergroup
+109,1. Kho Rau Củ (KRC),KRC - NTĐ,-916876225,1,Nhóm chat
+110,1. Kho Rau Củ (KRC),KRC - NKM,-1001588306607,1,Kênh/Supergroup
+111,1. Kho Rau Củ (KRC),KRC - NDT,-933928014,1,Nhóm chat
+112,1. Kho Rau Củ (KRC),KRC - NDH,-4539159559,1,Nhóm chat
+113,1. Kho Rau Củ (KRC),KRC - A125 (115 Man Thiện),-5017224430,3,Nhóm chat
+114,1. Kho Rau Củ (KRC),KRC - D10,-4201254758,2,Nhóm chat
+115,1. Kho Rau Củ (KRC),KRC - LVN,-4227569626,1,Nhóm chat
+116,1. Kho Rau Củ (KRC),KRC - CLD,-4569640428,2,Nhóm chat
+117,1. Kho Rau Củ (KRC),KRC - LVL,-1001600362928,1,Kênh/Supergroup
+118,1. Kho Rau Củ (KRC),KRC - BQI,-908978390,3,Nhóm chat
+119,1. Kho Rau Củ (KRC),KRC - JKD,-4208791479,1,Nhóm chat
+120,1. Kho Rau Củ (KRC),KRC - HTP,-1001705640581,1,Kênh/Supergroup
+121,1. Kho Rau Củ (KRC),KRC - A182 (S08.02 Vinhomes Grand Park),-5281159889,3,Nhóm chat
+122,1. Kho Rau Củ (KRC),KRC - AV4,-4542912089,2,Nhóm chat
+123,1. Kho Rau Củ (KRC),KRC_HHG,-4794317543,1,Nhóm chat
+124,1. Kho Rau Củ (KRC),KRC - A159 (Thoại Ngọc Hầu),-5287976626,3,Nhóm chat
+125,1. Kho Rau Củ (KRC),KRC - A154 (Liên Phường),-5256482864,3,Nhóm chat
+126,1. Kho Rau Củ (KRC),KRC_DMR (Diamond Riverside),-4783198151,1,Nhóm chat
+127,1. Kho Rau Củ (KRC),KRC - A119 (09 Đào Trinh Nhất),-5081271186,5,Nhóm chat
+128,1. Kho Rau Củ (KRC),KRC - CTH,-4126553698,0,Nhóm chat
+129,1. Kho Rau Củ (KRC),KRC - A145 (379 Thạch Lam),-5156768332,0,Nhóm chat
+130,1. Kho Rau Củ (KRC),KRC - CN1,-1001851962682,1,Kênh/Supergroup
+131,1. Kho Rau Củ (KRC),KRC - A148 (127 Tân Cảng),-5237455398,4,Nhóm chat
+132,1. Kho Rau Củ (KRC),BVB- KRC,-4518838531,1,Nhóm chat
+133,1. Kho Rau Củ (KRC),KRC - BTH,-4546894766,1,Nhóm chat
+134,1. Kho Rau Củ (KRC),KRC - A138 (48 Trần Văn Quang),-5031173752,2,Nhóm chat
+135,1. Kho Rau Củ (KRC),KRC - A120 (7/29 Thành Thái),-5055225160,3,Nhóm chat
+136,1. Kho Rau Củ (KRC),KRC - A186 (Melody Residence),-5169426606,2,Nhóm chat
+137,1. Kho Rau Củ (KRC),KRC - A198 (Sunrise City View),-5586208104,1,Nhóm chat
+138,1. Kho Rau Củ (KRC),KRC - A185 (BS15 Vinhomes Grand Park),-5009419304,2,Nhóm chat
+139,1. Kho Rau Củ (KRC),KRC - A155 (170 Nguyễn Thị Búp),-5277002255,0,Nhóm chat
+140,1. Kho Rau Củ (KRC),KRC - A116 (48 Trần Thị Cờ),-5036625719,0,Nhóm chat
+141,1. Kho Rau Củ (KRC),KRC - A183 (Đường 339 Phước Long),-5232998340,3,Nhóm chat
+142,1. Kho Rau Củ (KRC),KRC - A181 (Masterise Center Point),-5202342073,2,Nhóm chat
+143,1. Kho Rau Củ (KRC),KRC - A179 (Him Lam Phú An),-5231023620,1,Nhóm chat
+144,1. Kho Rau Củ (KRC),KRC - A149 (50 Lương Minh Nguyệt),-5254927873,3,Nhóm chat
+145,1. Kho Rau Củ (KRC),KRC - A175 (Golden Mansion),-5289817936,2,Nhóm chat
+146,1. Kho Rau Củ (KRC),KRC - A161 (The Park Residence),-5225968216,2,Nhóm chat
+147,1. Kho Rau Củ (KRC),KRC - A157 (Him Lam Chợ Lớn),-5160674327,1,Nhóm chat
+148,1. Kho Rau Củ (KRC),KRC - A141 (X1.013 Sunrise City North),-4687718018,2,Nhóm chat
+149,1. Kho Rau Củ (KRC),KRC - A112 (Cô Giang),-4880441469,2,Nhóm chat
+150,1. Kho Rau Củ (KRC),KRC - A150 (Infinity Riviera Point),-5245896554,1,Nhóm chat
+151,1. Kho Rau Củ (KRC),KRC - A110 ( Jasmine 1 Hà Đô ),-4832567003,0,Nhóm chat
+152,1. Kho Rau Củ (KRC),KRC - A140 (68 Đường Số 1 Khu dân cư 6B Intresco),-5183442232,1,Nhóm chat
+153,1. Kho Rau Củ (KRC),KRC - A134 (4535 Nguyễn Cửu Phú),-5220624198,2,Nhóm chat
+154,1. Kho Rau Củ (KRC),KRC - A133 (Block G Conic Skyway),-5056618818,2,Nhóm chat
+155,1. Kho Rau Củ (KRC),KRC - A132 (136 Hiệp Bình),-5123316336,0,Nhóm chat
+156,1. Kho Rau Củ (KRC),KRC-A121(Lý Chiêu Hoàng),-4998833694,1,Nhóm chat
+157,1. Kho Rau Củ (KRC),KRC - A115 (484B Lê Quang Định),-4930435875,3,Nhóm chat
+158,1. Kho Rau Củ (KRC),KRC - A109 (Trần Trọng Cung),-4920037539,1,Nhóm chat
+159,1. Kho Rau Củ (KRC),KRC - A104 (5/3D Huỳnh Tấn Phát),-1002552114547,3,Kênh/Supergroup
+160,1. Kho Rau Củ (KRC),KRC - A101( Tân Lập ),-4776256360,2,Nhóm chat
+161,1. Kho Rau Củ (KRC),KRC - VPC,-4525179880,0,Nhóm chat
+162,1. Kho Rau Củ (KRC),KRC - A160 (Bình Phú),-5289704187,0,Nhóm chat
+163,1. Kho Rau Củ (KRC),KRC - ĐXH,-912522379,0,Nhóm chat
+164,1. Kho Rau Củ (KRC),KRC-DQH,-869090413,0,Nhóm chat
+165,1. Kho Rau Củ (KRC),KRC - A178 (Celesta Rise),-5230784912,0,Nhóm chat
+166,1. Kho Rau Củ (KRC),KRC - A212 (D1 Phước Long),-5315774877,0,Nhóm chat
+167,1. Kho Rau Củ (KRC),KRC - A194 (Millennium),-5125522049,0,Nhóm chat
+168,1. Kho Rau Củ (KRC),KRC - A165 (Golden Star),-5020576115,0,Nhóm chat
+169,1. Kho Rau Củ (KRC),KRC-CHR,-4780642849,0,Nhóm chat
+170,1. Kho Rau Củ (KRC),LVY - KRC (236A Lê Văn Sỹ),-4796858468,0,Nhóm chat
+171,1. Kho Rau Củ (KRC),KRC - LPM,-4879450613,0,Nhóm chat
+172,1. Kho Rau Củ (KRC),KRC - HTC,-4517101413,0,Nhóm chat
+173,1. Kho Rau Củ (KRC),KRC - HNG,-4923666366,0,Nhóm chat
+174,1. Kho Rau Củ (KRC),KRC- EMR,-4582456571,0,Nhóm chat
+175,1. Kho Rau Củ (KRC),KRC - A221 (DS6 An Lạc),-5493948931,0,Nhóm chat
+176,1. Kho Rau Củ (KRC),KRC - A205 (DS59 An Hội Tây),-5487815548,0,Nhóm chat
+177,1. Kho Rau Củ (KRC),KRC - A203 (Tân Thới Nhất 17),-4993266266,0,Nhóm chat
+178,1. Kho Rau Củ (KRC),KRC - A202 (DS10 Bình Hưng),-5013502390,0,Nhóm chat
+179,1. Kho Rau Củ (KRC),KRC - A191 (Nguyễn Hữu Cầu),-5004207617,2,Nhóm chat
+180,1. Kho Rau Củ (KRC),KRC - A189 (Nhị Đồng 2),-5286777330,0,Nhóm chat
+181,1. Kho Rau Củ (KRC),KRC - A187 (560 Nguyễn Duy Trinh),-4999105600,0,Nhóm chat
+182,1. Kho Rau Củ (KRC),KRC - A177 (Sky Garden 2),-5137746392,0,Nhóm chat
+183,1. Kho Rau Củ (KRC),KRC - A176 (Sunrise Riverside),-5153485294,0,Nhóm chat
+184,1. Kho Rau Củ (KRC),KRC - A174 (Bàn Cờ),-5149214253,0,Nhóm chat
+185,1. Kho Rau Củ (KRC),KRC - A172 (Lê Văn Chí),-5341251224,0,Nhóm chat
+186,1. Kho Rau Củ (KRC),KRC - A171 (Phạm Thế Hiển),-5198232099,0,Nhóm chat
+187,1. Kho Rau Củ (KRC),KRC - A169 (Phúc Yên 2),-5169767732,0,Nhóm chat
+188,1. Kho Rau Củ (KRC),KRC - A167 (9 View),-5238910681,0,Nhóm chat
+189,1. Kho Rau Củ (KRC),KRC - A158 (Opal Garden),-5383543464,0,Nhóm chat
+190,1. Kho Rau Củ (KRC),KRC - A156 (Dương Đình Hội),-5282765822,0,Nhóm chat
+191,1. Kho Rau Củ (KRC),KRC - A151 (20 Lê Đức Thọ),-5185542421,0,Nhóm chat
+192,1. Kho Rau Củ (KRC),KRC - A147 (956 Huỳnh Tấn Phát),-5099001093,0,Nhóm chat
+193,1. Kho Rau Củ (KRC),KRC - A146 (108 Bùi Thị Xuân),-5191889783,0,Nhóm chat
+194,1. Kho Rau Củ (KRC),KRC - A117 (The Rivana),-4863824080,0,Nhóm chat
+195,1. Kho Rau Củ (KRC),KRC_A102_Kha Vạn Cân,-4810931245,0,Nhóm chat
+196,1. Kho Rau Củ (KRC),KRC - WGA (Westgate An Gia),-5588180836,0,Nhóm chat
+197,1. Kho Rau Củ (KRC),KRC - NVQ,-885961261,0,Nhóm chat
+198,1. Kho Rau Củ (KRC),KRC -THN,-4834646921,0,Nhóm chat
+199,1. Kho Rau Củ (KRC),KRC_OPS (Opal Skyline),-4795250025,0,Nhóm chat
+200,1. Kho Rau Củ (KRC),KRC - RS4,-1002992073784,0,Kênh/Supergroup
+201,1. Kho Rau Củ (KRC),KRC - TNO,-1001873237756,0,Kênh/Supergroup
+202,1. Kho Rau Củ (KRC),KRC - VH5 (S03.05),-4510828184,1,Nhóm chat
+203,1. Kho Rau Củ (KRC),KRC - THĐ,-1001620119166,0,Kênh/Supergroup
+204,1. Kho Rau Củ (KRC),KRC - NTN,-4865354826,1,Nhóm chat
+205,1. Kho Rau Củ (KRC),SCM- KRC Nội bộ,-5129187948,0,Nhóm chat
+206,1. Kho Rau Củ (KRC),SCM - KRC (hình ảnh chênh lệch),-5202416092,0,Nhóm chat
+207,2. Kho ABA (ABA),ABA Đông/Mát +Thịt Cá - A128 (Cityland Park Hill),-5004400246,39,Nhóm chat
+208,2. Kho ABA (ABA),ABA - RVS Phú Mỹ Hưng,-4565998341,75,Nhóm chat
+209,2. Kho ABA (ABA),TMY - ABA (31 Tân Mỹ),-637584836,33,Nhóm chat
+210,2. Kho ABA (ABA),ABA Đông Mát/Thịt Cá - A151 (20 Lê Đức Thọ),-5226952638,49,Nhóm chat
+211,2. Kho ABA (ABA),ABA Đông Mát - A109 (Trần Trọng Cung),-1002882274038,23,Kênh/Supergroup
+212,2. Kho ABA (ABA),ABA - A202 (DS10 Bình Hưng),-5233500171,21,Nhóm chat
+213,2. Kho ABA (ABA),NTT - ABA MĐ,-640887076,40,Nhóm chat
+214,2. Kho ABA (ABA),ABA Đông Mát/Thịt Cá - A127 (URBAN GREEN),-5131825480,16,Nhóm chat
+215,2. Kho ABA (ABA),NTD - ABA (160A Nguyễn Thị Định),-820823560,32,Nhóm chat
+216,2. Kho ABA (ABA),LVT - ABA MĐ,-875321112,58,Nhóm chat
+217,2. Kho ABA (ABA),ABA_VH6,-4802496117,8,Nhóm chat
+218,2. Kho ABA (ABA),CLN - ABA,-4202085650,34,Nhóm chat
+219,2. Kho ABA (ABA),ABA - A189 (Nhị Đồng 2),-5263939973,12,Nhóm chat
+220,2. Kho ABA (ABA),VH3- (1.05) ABA,-4019623569,49,Nhóm chat
+221,2. Kho ABA (ABA),SCV - ABA (thịt cá / đông mát),-4966463527,114,Nhóm chat
+222,2. Kho ABA (ABA),HV2-ABA,-4124726502,98,Nhóm chat
+223,2. Kho ABA (ABA),ABA Đông mát-PPZ,-4983741648,17,Nhóm chat
+224,2. Kho ABA (ABA),KHI - ABA MĐ,-880112715,51,Nhóm chat
+225,2. Kho ABA (ABA),VH2 - ABA,-4093547539,28,Nhóm chat
+226,2. Kho ABA (ABA),ABA - MZ2 (A7-8 Valora Mizuki),-4273732297,14,Nhóm chat
+227,2. Kho ABA (ABA),ABA_Q7R,-4832071854,188,Nhóm chat
+228,2. Kho ABA (ABA),LVL - ABA (166E Lê Văn Lương),-783204272,38,Nhóm chat
+229,2. Kho ABA (ABA),VTG - ABA MĐ,-898072705,17,Nhóm chat
+230,2. Kho ABA (ABA),ABA - A199 (Bàu Cát),-5181060615,17,Nhóm chat
+231,2. Kho ABA (ABA),ABA - A170 (Nguyễn Phúc Chu),-5031310721,26,Nhóm chat
+232,2. Kho ABA (ABA),ABA Đông Mát/Thịt Cá - A111 (New City),-4854147505,30,Nhóm chat
+233,2. Kho ABA (ABA),ABA Đông Mát/Thịt cá - A120 (Thành Thái),-5297647450,31,Nhóm chat
+234,2. Kho ABA (ABA),ABA Đông Mát/ Thịt Cá - A117 (The Rivana),-1003595238765,26,Kênh/Supergroup
+235,2. Kho ABA (ABA),QHG - ABA MĐ - NLVJ đông mát,-4275316099,15,Nhóm chat
+236,2. Kho ABA (ABA),ABA - A183 (Đường 339 Phước Long),-5150306625,23,Nhóm chat
+237,2. Kho ABA (ABA),ABA - A138 (48 Trần Văn Quang),-5090615271,48,Nhóm chat
+238,2. Kho ABA (ABA),ABA Đông/Mát và Thịt cá - A124 (Sky 9),-4825566527,15,Nhóm chat
+239,2. Kho ABA (ABA),EHS - Aba,-4071286738,57,Nhóm chat
+240,2. Kho ABA (ABA),HTP - ABA MĐ,-883536739,60,Nhóm chat
+241,2. Kho ABA (ABA),PGS - Aba MĐ,-4015228645,85,Nhóm chat
+242,2. Kho ABA (ABA),ABA - A179 (Him Lam Phú An),-5228058674,20,Nhóm chat
+243,2. Kho ABA (ABA),ABA Đông Mát/Thịt Cá - A150 (Infinity Riviera Point),-5206503915,35,Nhóm chat
+244,2. Kho ABA (ABA),ABA Đông Mát/Thịt Cá - A146 (108 Bùi Thị Xuân),-5269362420,14,Nhóm chat
+245,2. Kho ABA (ABA),ECG - ABA (SH16 Eco Green),-1002479606021,23,Kênh/Supergroup
+246,2. Kho ABA (ABA),TNO-ABA,-4061710654,17,Nhóm chat
+247,2. Kho ABA (ABA),ABA - A177 (Sky Garden 2),-5279185281,26,Nhóm chat
+248,2. Kho ABA (ABA),ABA - LTC,-4174079222,118,Nhóm chat
+249,2. Kho ABA (ABA),ABA - CLD,-4579770752,32,Nhóm chat
+250,2. Kho ABA (ABA),ABA - A212 (D1 Phước Long),-5585568162,0,Nhóm chat
+251,2. Kho ABA (ABA),THN - ABA ĐÔNG MÁT/THỊT CÁ,-4879917758,54,Nhóm chat
+252,2. Kho ABA (ABA),TSO - ABA MĐ,-1003376993342,33,Kênh/Supergroup
+253,2. Kho ABA (ABA),PHI - ABA MĐ,-824620090,24,Nhóm chat
+254,2. Kho ABA (ABA),ERT-ABA,-807927844,107,Nhóm chat
+255,2. Kho ABA (ABA),VGP - ABA (S06.06 Vinhomes Grand Park),-991292712,27,Nhóm chat
+256,2. Kho ABA (ABA),HHT - ABA MĐ,-705684646,37,Nhóm chat
+257,2. Kho ABA (ABA),ABA Đông/Mát và Thịt Cá - A123 (4S Linh Đông),-5037293861,8,Nhóm chat
+258,2. Kho ABA (ABA),ABA Đông Mát/Thịt Cá - A113 (Phan Văn Hân),-4810768163,10,Nhóm chat
+259,2. Kho ABA (ABA),A108 - ITL/ABA (38E Cây Keo),-4813095752,18,Nhóm chat
+260,2. Kho ABA (ABA),CKO - ABA MĐ,-791356749,37,Nhóm chat
+261,2. Kho ABA (ABA),VHT - ABA MĐ - NLVJ đông mát,-614363941,27,Nhóm chat
+262,2. Kho ABA (ABA),ABA - A104 (5/3D Huỳnh Tấn Phát),-1002558007963,42,Kênh/Supergroup
+263,2. Kho ABA (ABA),ABA - A148 (127 Tân Cảng),-5030560383,17,Nhóm chat
+264,2. Kho ABA (ABA),ABA ĐÔNG MÁT/THỊT CÁ - HNN (Hoàng Ngân),-4854268300,17,Nhóm chat
+265,2. Kho ABA (ABA),ABA - A174 (Bàn Cờ),-5156303742,18,Nhóm chat
+266,2. Kho ABA (ABA),SFR - ABA,-4188647393,131,Nhóm chat
+267,2. Kho ABA (ABA),VPC - ABA (02 Nguyễn Thị Nhung),-4571087456,203,Nhóm chat
+268,2. Kho ABA (ABA),ABA ĐÔNG MÁT-HLR,-4892625820,120,Nhóm chat
+269,2. Kho ABA (ABA),NTU - ABA MĐ,-619954677,34,Nhóm chat
+270,2. Kho ABA (ABA),ABA - A169 (Phúc Yên 2),-5208260532,13,Nhóm chat
+271,2. Kho ABA (ABA),DS7 - ABA,-4041044290,34,Nhóm chat
+272,2. Kho ABA (ABA),ABA ĐÔNG MÁT - WGA,-1002881624302,34,Kênh/Supergroup
+273,2. Kho ABA (ABA),"A107 - ABA Đông Mát, Thịt Cá (05 Đường D3 Phước Long)",-1003525071105,47,Kênh/Supergroup
+274,2. Kho ABA (ABA),ABA ĐÔNG MÁT/THỊT CÁ - A143 (Khuông Việt),-5159131607,32,Nhóm chat
+275,2. Kho ABA (ABA),ABA - MTE (D01.14 MT Eastmark City),-4733319672,12,Nhóm chat
+276,2. Kho ABA (ABA),ABA - A129 MIDTOWN Q7,-4995752727,21,Nhóm chat
+277,2. Kho ABA (ABA),ABA - Đông Mát-LVH,-4832327413,11,Nhóm chat
+278,2. Kho ABA (ABA),ABA ĐÔNG MÁT- DMR,-4987817070,24,Nhóm chat
+279,2. Kho ABA (ABA),ABA - A172 (Lê Văn Chí),-5224476913,16,Nhóm chat
+280,2. Kho ABA (ABA),ABA - A171 (Phạm Thế Hiển),-5100060992,13,Nhóm chat
+281,2. Kho ABA (ABA),ABA - A158 (Opal Garden),-5536761493,24,Nhóm chat
+282,2. Kho ABA (ABA),ABA Đông/Mát + Thịt Cá - A144(16 Hoàng Anh Thanh Bình),-5158078354,43,Nhóm chat
+283,2. Kho ABA (ABA),A101 - ABA (27 Tân Lập),-4970846623,10,Nhóm chat
+284,2. Kho ABA (ABA),A103 - ABA (222 Lê Văn Lương),-4886971123,15,Nhóm chat
+285,2. Kho ABA (ABA),ABA-CHR,-4843220137,26,Nhóm chat
+286,2. Kho ABA (ABA),HTC-ABA,-4548375618,25,Nhóm chat
+287,2. Kho ABA (ABA),BVB - ABA,-1002439645926,64,Kênh/Supergroup
+288,2. Kho ABA (ABA),ABA Đông Mát/Thịt Cá - A112 (Cô Giang),-4659539358,18,Nhóm chat
+289,2. Kho ABA (ABA),IAP - ABA,-4129048161,22,Nhóm chat
+290,2. Kho ABA (ABA),ABA - A220 (KDC Nam Long),-5171632693,13,Nhóm chat
+291,2. Kho ABA (ABA),NKM - ABA MĐ,-887431835,39,Nhóm chat
+292,2. Kho ABA (ABA),ABA - A187 (560 Nguyễn Duy Trinh),-1003856051511,17,Kênh/Supergroup
+293,2. Kho ABA (ABA),DS3 - ABA,-955688061,30,Nhóm chat
+294,2. Kho ABA (ABA),ABA - A195 (Nguyễn Sơn),-5138011234,21,Nhóm chat
+295,2. Kho ABA (ABA),ABA Đông mát/Thịt cá - A134 (Nguyễn Cửu Phú),-5057155708,11,Nhóm chat
+296,2. Kho ABA (ABA),ABA - A192 (Bùi Đình Túy),-5254381964,40,Nhóm chat
+297,2. Kho ABA (ABA),ABA Đông Mát-NVK,-4922765575,15,Nhóm chat
+298,2. Kho ABA (ABA),ABA Đông Mát/Thịt Cá - A115 (484B Lê Quang Định),-4870087396,0,Nhóm chat
+299,2. Kho ABA (ABA),ABA - A221 (DS6 An Lạc),-5373475260,30,Nhóm chat
+300,2. Kho ABA (ABA),ABA ĐÔNG MÁT GHA,-4823902549,15,Nhóm chat
+301,2. Kho ABA (ABA),ABA Đông Mát/Thịt Cá - A145 (379 Thạch Lam),-5233572071,18,Nhóm chat
+302,2. Kho ABA (ABA),THD - ABA (229A Tân Hòa Đông),-971553337,9,Nhóm chat
+303,2. Kho ABA (ABA),ABA/NLVJ_HTN,-4617834058,22,Nhóm chat
+304,2. Kho ABA (ABA),PHL - ABA MĐ,-734854443,130,Nhóm chat
+305,2. Kho ABA (ABA),ABA - A207 (Palm Residence),-5425409318,13,Nhóm chat
+306,2. Kho ABA (ABA),D10-ABA,-4207720204,55,Nhóm chat
+307,2. Kho ABA (ABA),BCG - Kho ABA Đông Mát,-4063163569,24,Nhóm chat
+308,2. Kho ABA (ABA),ABA - A188 (Chung Cư Thuận Việt),-5205248121,9,Nhóm chat
+309,2. Kho ABA (ABA),VH4 - ABA Đông mát (S07.02 Vinhomes Grand Park),-4694009977,3,Nhóm chat
+310,2. Kho ABA (ABA),ABA - A160 (Bình Phú),-5187544138,13,Nhóm chat
+311,2. Kho ABA (ABA),ABA_SSR,-4587755984,15,Nhóm chat
+312,2. Kho ABA (ABA),ABA_LPM,-4642722927,22,Nhóm chat
+313,2. Kho ABA (ABA),ABA - PTN,-4141951525,16,Nhóm chat
+314,2. Kho ABA (ABA),ĐÔNG MÁT/ABA - OPS,-4858294597,6,Nhóm chat
+315,2. Kho ABA (ABA),ABA ĐÔNG MÁT/THỊT CÁ-HHM,-4913037367,18,Nhóm chat
+316,2. Kho ABA (ABA),NDT-ABA,-965979457,17,Nhóm chat
+317,2. Kho ABA (ABA),NDH - ABA (1426 Nguyễn Duy Trinh),-4624997784,25,Nhóm chat
+318,2. Kho ABA (ABA),MZK - ABA đông mát (TMDV2 Mizuki Park),-4044742673,12,Nhóm chat
+319,2. Kho ABA (ABA),LVY - ABA,-4830952109,23,Nhóm chat
+320,2. Kho ABA (ABA),LVN - ABA (09 Lâm Văn Bền),-4551905438,142,Nhóm chat
+321,2. Kho ABA (ABA),EMR - ABA (Block A Emerald Golf View),-1002574399398,7,Kênh/Supergroup
+322,2. Kho ABA (ABA),EH3 - ABA,-4844074755,13,Nhóm chat
+323,2. Kho ABA (ABA),CTH - ABA,-4133099957,20,Nhóm chat
+324,2. Kho ABA (ABA),AKR - ABA,-4189502700,11,Nhóm chat
+325,2. Kho ABA (ABA),ABA - A198 (Sunrise City View),-5132757986,14,Nhóm chat
+326,2. Kho ABA (ABA),ABA - A181 (Masterise Center Point),-5293338882,11,Nhóm chat
+327,2. Kho ABA (ABA),ABA - A157 (Him Lam Chợ Lớn),-5263861524,13,Nhóm chat
+328,2. Kho ABA (ABA),ABA - A154 (Liên Phường),-4907799710,10,Nhóm chat
+329,2. Kho ABA (ABA),ABA đông mát/Thịt cá - A133 (Block G Conic Skyway),-5212554383,7,Nhóm chat
+330,2. Kho ABA (ABA),ABA - A178 (Celesta Rise),-5288962344,43,Nhóm chat
+331,2. Kho ABA (ABA),ABA Đông/Mát và Thịt Cá - A121 (123 Lý Chiêu Hoàng),-5022284943,32,Nhóm chat
+332,2. Kho ABA (ABA),ABA - A184 (Saigon Mia),-5203833846,64,Nhóm chat
+333,2. Kho ABA (ABA),ABA ĐÔNG MÁT-A105,-4947055311,8,Nhóm chat
+334,2. Kho ABA (ABA),NHG - ABA MĐ (15 Nguyên Hồng),-719226115,13,Nhóm chat
+335,2. Kho ABA (ABA),Aba - NTO,-4254286776,14,Nhóm chat
+336,2. Kho ABA (ABA),NTN - ABA MĐ,-803166048,3,Nhóm chat
+337,2. Kho ABA (ABA),NTN - ABA (154 Nguyễn Trọng Tuyển),-1002745971083,3,Kênh/Supergroup
+338,2. Kho ABA (ABA),KDG - ABA (10D Kỳ Đồng),-4685936814,18,Nhóm chat
+339,2. Kho ABA (ABA),JKD- ABA MĐ - NLVJ đông mát,-4218466578,9,Nhóm chat
+340,2. Kho ABA (ABA),HPD - ABA (01-06 TMDV Him Lam Phú Đông),-4533722045,5,Nhóm chat
+341,2. Kho ABA (ABA),HHG - ABA (103 Hòa Hưng),-4623899543,14,Nhóm chat
+342,2. Kho ABA (ABA),ABA - GHA,-4192894522,5,Nhóm chat
+343,2. Kho ABA (ABA),GDU - ABA,-915258555,23,Nhóm chat
+344,2. Kho ABA (ABA),DXH - ABA (539 Đỗ Xuân Hợp),-954752748,7,Nhóm chat
+345,2. Kho ABA (ABA),DQH-ABA,-852406010,12,Nhóm chat
+346,2. Kho ABA (ABA),CN1 - ABA MĐ,-822801997,9,Nhóm chat
+347,2. Kho ABA (ABA),ABA_AV4_The Sun Avenue,-4503460791,30,Nhóm chat
+348,2. Kho ABA (ABA),ACU - ABA thịt cá - đông mát,-4513412580,6,Nhóm chat
+349,2. Kho ABA (ABA),Aba-Đông Mát - A132 (136 Hiệp Bình),-5060013044,18,Nhóm chat
+350,2. Kho ABA (ABA),ABA ĐÔNG MÁT-PVB,-4850759942,11,Nhóm chat
+351,2. Kho ABA (ABA),ABA ĐÔNG MÁT-TVK,-1002878256189,18,Kênh/Supergroup
+352,2. Kho ABA (ABA),ABA ĐÔNG MÁT-BTH,-4840150141,13,Nhóm chat
+353,2. Kho ABA (ABA),ABA Đông Mát-VH7,-4758804950,19,Nhóm chat
+354,2. Kho ABA (ABA),ABA Đông Mát-HNG (Hưng Ngân),-4843390858,21,Nhóm chat
+355,2. Kho ABA (ABA),ABA Đông Mát/Thịt cá - A149 (Lương Minh Nguyệt),-5052944571,7,Nhóm chat
+356,2. Kho ABA (ABA),ABA Đông Mát/Thịt Cá - A137 (60 Lương Định Của),-5000807561,17,Nhóm chat
+357,2. Kho ABA (ABA),ABA Đông mát/Thịt cá - A140 (68 đường số 1),-5263695143,33,Nhóm chat
+358,2. Kho ABA (ABA),ABA đông mát/thịt cá - A130 (Vũ Tông Phan),-5056493930,9,Nhóm chat
+359,2. Kho ABA (ABA),ABA - A205 (DS59 An Hội Tây),-5204014049,5,Nhóm chat
+360,2. Kho ABA (ABA),ABA - A203 (Tân Thới Nhất 17),-5242263578,29,Nhóm chat
+361,2. Kho ABA (ABA),ABA - A200 (H36 KDC Thới An),-5125738337,16,Nhóm chat
+362,2. Kho ABA (ABA),ABA - A196 (56 Đường A4),-5034156634,16,Nhóm chat
+363,2. Kho ABA (ABA),ABA - A194 (Millennium),-5290327565,17,Nhóm chat
+364,2. Kho ABA (ABA),ABA - A193 (Homyland Riverside),-5030598033,5,Nhóm chat
+365,2. Kho ABA (ABA),ABA - A191 (Nguyễn Hữu Cầu),-5157171466,33,Nhóm chat
+366,2. Kho ABA (ABA),ABA - A190 (Botanica Premier),-5162953573,12,Nhóm chat
+367,2. Kho ABA (ABA),ABA - A186 (Melody Residence),-5291554022,20,Nhóm chat
+368,2. Kho ABA (ABA),ABA - A185 (BS15 Vinhomes Grand Park),-5163672851,6,Nhóm chat
+369,2. Kho ABA (ABA),ABA - A182 (S08.02 Vinhomes Grand Park),-5268822151,6,Nhóm chat
+370,2. Kho ABA (ABA),ABA - A176 (Sunrise Riverside),-5088265050,6,Nhóm chat
+371,2. Kho ABA (ABA),ABA - A175 (Golden Mansion),-5169150901,24,Nhóm chat
+372,2. Kho ABA (ABA),ABA - A167 (9 View),-5202511646,8,Nhóm chat
+373,2. Kho ABA (ABA),ABA - A166 (Happy Valley),-5135406910,12,Nhóm chat
+374,2. Kho ABA (ABA),ABA - A164 (Opal Boulevard),-5223853892,20,Nhóm chat
+375,2. Kho ABA (ABA),ABA - A163 (Alnata Plus Celadon),-5210410858,11,Nhóm chat
+376,2. Kho ABA (ABA),ABA - A161 (The Park Residence),-5188493690,14,Nhóm chat
+377,2. Kho ABA (ABA),ABA - A159 (Thoại Ngọc Hầu),-5018175502,11,Nhóm chat
+378,2. Kho ABA (ABA),ABA - A156 (Dương Đình Hội),-5099008566,5,Nhóm chat
+379,2. Kho ABA (ABA),ABA - A155,-5143331178,42,Nhóm chat
+380,2. Kho ABA (ABA),ABA - A141 (X1.013 Sunrise City North),-5102570262,13,Nhóm chat
+381,2. Kho ABA (ABA),Đông Mát/ABA - A110 (Hà Đô),-4916334714,5,Nhóm chat
+382,2. Kho ABA (ABA),Đông Mát/ABA - A106 (Orchard Garden),-4746420333,15,Nhóm chat
+383,2. Kho ABA (ABA),ABA Đông/Mát Thịt Cá - A119 (09 Đào Trinh Nhất),-5009402250,20,Nhóm chat
+384,2. Kho ABA (ABA),ABA Đông/Mát Thịt Cá - A126 (274 Lê Văn Sỹ),-5005449812,12,Nhóm chat
+385,2. Kho ABA (ABA),NVQ-ABA,-764538790,10,Nhóm chat
+386,2. Kho ABA (ABA),NVT - ABA MĐ,-874764140,6,Nhóm chat
+387,2. Kho ABA (ABA),ABA - PKD,-4901512510,20,Nhóm chat
+388,2. Kho ABA (ABA),PHG - ABA MĐ,-887863930,17,Nhóm chat
+389,2. Kho ABA (ABA),A110 - ABA,-1002900710978,9,Kênh/Supergroup
+390,2. Kho ABA (ABA),ABA ĐÔNG MÁT-CLG,-4842272947,14,Nhóm chat
+391,2. Kho ABA (ABA),RS4- ABA,-4876357427,5,Nhóm chat
+392,2. Kho ABA (ABA),NVD- ABA,-4136471345,16,Nhóm chat
+393,2. Kho ABA (ABA),TNT - ABA Thịt Cá - Đông Mát,-913905784,38,Nhóm chat
+394,2. Kho ABA (ABA),ABA Đông Mát/Thịt Cá - A114 (Hưng Phú),-4850342862,6,Nhóm chat
+395,2. Kho ABA (ABA),VLA - ABA MĐ - NLVJ đông mát,-4192610070,8,Nhóm chat
+396,2. Kho ABA (ABA),ABA Đông/mát và Thịt Cá - A125 (Man Thiện),-5039669634,4,Nhóm chat
+397,2. Kho ABA (ABA),(OFF) TSO - ABA MĐ,-844356477,0,Nhóm chat
+398,2. Kho ABA (ABA),ABA Đông Mát/Thịt Cá - A165 (Golden Star),-4906644767,0,Nhóm chat
+399,3. Nhóm Khác,Đông/Mát và Thịt cá - A147 (956 HTP),-5110539026,16,Nhóm chat
+400,3. Nhóm Khác,"CATE - STORE - THỊT, CÁ, TRỨNG, VN READY MEAL",-1002034614480,4,Kênh/Supergroup
+401,3. Nhóm Khác,BAKERY x DC: HUB BÁNH TƯƠI,-5097435576,1,Nhóm chat
+402,3. Nhóm Khác,DC - A135 (1652 Huỳnh Tấn Phát),-1004437324085,80,Kênh/Supergroup
+403,3. Nhóm Khác,Logistic _ inventory,-1003951952395,1,Kênh/Supergroup
+404,3. Nhóm Khác,DC - A209 (Lê Trọng Tấn),-1004469963017,6,Kênh/Supergroup
+405,3. Nhóm Khác,SCM - nội bộ - thịt cá,-5373621519,24,Nhóm chat
+406,3. Nhóm Khác,Đối soát - MeatFish - Miền Đông,-5509916175,40,Nhóm chat
+407,3. Nhóm Khác,DC - A234 (Conic Riverside),-1003716491337,6,Kênh/Supergroup
+408,3. Nhóm Khác,DC - A224 (Nguyễn Văn Dung),-1003888540638,12,Kênh/Supergroup
+409,3. Nhóm Khác,DC - A223 (Đặng Văn Ngữ),-1004424998343,6,Kênh/Supergroup
+410,3. Nhóm Khác,Zui zẻ không quạo - LG,-1002805059148,3,Kênh/Supergroup
+411,3. Nhóm Khác,DC - A225 (ĐS12 Tam Bình),-1004375842803,11,Kênh/Supergroup
+412,3. Nhóm Khác,DC - A214 (Vĩnh Phú 41),-1003707250405,27,Kênh/Supergroup
+413,3. Nhóm Khác,DC - LVY (236A Lê Văn Sỹ),-1003958612570,9,Kênh/Supergroup
+414,3. Nhóm Khác,DC - A217 (129 Hoàng Diệu 2),-1004334608188,1,Kênh/Supergroup
+415,3. Nhóm Khác,DC - A232 (376 Nguyễn Thị Định),-1004392333450,1,Kênh/Supergroup
+416,3. Nhóm Khác,SCM - ĐÔNG MÁT (hình ảnh chênh lệch),-5360167260,61,Nhóm chat
+417,3. Nhóm Khác,DC - A208 (BS08 Vinhomes Grand Park),-1004369961071,2,Kênh/Supergroup
+418,3. Nhóm Khác,DC - A197 (Empire City),-1004396051291,24,Kênh/Supergroup
+419,3. Nhóm Khác,DC - Q50 (Quốc Lộ 50),-1004301337474,1,Kênh/Supergroup
+420,3. Nhóm Khác,DC - STORE - SOE,-1001632996518,37,Kênh/Supergroup
+421,3. Nhóm Khác,[SCM ĐỐI SOÁT] BÁNH TRÁI,-5255795148,24,Nhóm chat
+422,3. Nhóm Khác,GHKNN_SCM x 58 ST,-1004334053068,157,Kênh/Supergroup
+423,3. Nhóm Khác,SCM - THỊT CÁ (hình ảnh chênh lệch),-5472227069,184,Nhóm chat
+424,3. Nhóm Khác,DC - A231 (1M Đường A8 Bình Hưng Hòa B),-1004339440131,15,Kênh/Supergroup
+425,3. Nhóm Khác,DC - A240 (S02.03 Vinhomes Grand Park),-1004473589568,9,Kênh/Supergroup
+426,3. Nhóm Khác,HMN - Đông Mát (Secom),-4066759092,38,Nhóm chat
+427,3. Nhóm Khác,DC - A237 (A&T Sky Garden),-1004341740983,36,Kênh/Supergroup
+428,3. Nhóm Khác,Đông/Mát và Thịt Cá - A116 (48 Trần Thị Cờ),-5065492668,14,Nhóm chat
+429,3. Nhóm Khác,DC - A201 (An Hội Đông),-1004405937281,1,Kênh/Supergroup
+430,3. Nhóm Khác,Logistic KFM,-4795315212,15,Nhóm chat
+431,3. Nhóm Khác,DC - A242 (Q7 Boulevard),-1004268595947,71,Kênh/Supergroup
+432,3. Nhóm Khác,DC - A233 (New Lavida),-1003904512457,9,Kênh/Supergroup
+433,3. Nhóm Khác,DC - A210 (Hồng Lạc),-1004413869891,3,Kênh/Supergroup
+434,3. Nhóm Khác,DC - VH5 (S03.05 Vinhomes),-1004357370577,0,Kênh/Supergroup
+435,3. Nhóm Khác,DC - A235 (44 Thăng Long),-1004327581275,2,Kênh/Supergroup
+436,3. Nhóm Khác,DC - A204 (67A Nguyễn Duy Trinh),-1004332992942,2,Kênh/Supergroup
+437,3. Nhóm Khác,DC - A236 (DN5 KDC An Sương),-1004475154133,279,Kênh/Supergroup
+438,3. Nhóm Khác,DC - A218 (Nguyễn Duy Dương),-1004322601078,2,Kênh/Supergroup
+439,3. Nhóm Khác,DC - A219 (D-Homme),-1004410100037,28,Kênh/Supergroup
+440,3. Nhóm Khác,DC - A193 (Homyland Riverside),-1003958760392,6,Kênh/Supergroup
+441,3. Nhóm Khác,DC - A229 (58 Nguyễn Hữu Tiến),-1004312253338,16,Kênh/Supergroup
+442,3. Nhóm Khác,Đông Mát/Thịt Cá - A139 (1 An Lạc),-5094000749,59,Nhóm chat
+443,3. Nhóm Khác,Đông Mát-A102,-4957522643,19,Nhóm chat
+444,3. Nhóm Khác,BQI -Đông Hưng,-967297157,9,Nhóm chat
+445,3. Nhóm Khác,DC - A241 (S05.02 Vinhomes Grand Park),-1004495534449,21,Kênh/Supergroup
+446,3. Nhóm Khác,DC - NTN (Nguyễn Trọng Tuyển),-1004389700726,0,Kênh/Supergroup
+447,3. Nhóm Khác,LOG - Xử lý lệch nội bộ,-4752734610,151,Nhóm chat
+448,3. Nhóm Khác,Đông/Mát-A118 (Vĩnh Viễn),-5094638485,14,Nhóm chat
+449,3. Nhóm Khác,Đông/Mát + Thịt Cá - A131 (B01.05 Dream Home Palace),-5152526449,8,Nhóm chat
+450,3. Nhóm Khác,Đông/Mát + Thịt Cá - A136 (125 Nguyễn Phúc Nguyên),-5158389296,2,Nhóm chat
+451,3. Nhóm Khác,KFM - SEEDLOG Support,-620755596,24,Nhóm chat
+452,3. Nhóm Khác,DC - LVY (236A Lê Văn Sỹ),-5406820158,0,Nhóm chat
+453,3. Nhóm Khác,GHKNN_SCM x 58 ST,-5115999359,0,Nhóm chat
+454,3. Nhóm Khác,Bonding Quý X - 202X,-1003414292507,0,Kênh/Supergroup
+455,3. Nhóm Khác,DC - A225 (ĐS12 Tam Bình),-5404865328,0,Nhóm chat
+456,3. Nhóm Khác,DC - Q50 (Quốc Lộ 50),-5478025073,0,Nhóm chat
+457,3. Nhóm Khác,DC - VH5 (S03.05 Vinhomes),-5564355018,0,Nhóm chat
+458,3. Nhóm Khác,DC - A193 (Homyland Riverside),-5169655411,0,Nhóm chat
+459,3. Nhóm Khác,Logicstic _ inventory,-4675677783,0,Nhóm chat
