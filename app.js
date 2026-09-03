@@ -474,6 +474,16 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (inputSearchGroups) inputSearchGroups.addEventListener('input', renderTelegramGroups);
   if (filterGroupType) filterGroupType.addEventListener('change', renderTelegramGroups);
 
+  function escapeHtml(str) {
+    if (!str) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
+  }
+
   // Telegram Feed Logic (RAU CỦ vs ABA/DC)
   let telegramFeedItems = [];
   let currentTgFilter = 'ALL';
@@ -562,7 +572,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           </div>
 
           <div style="padding: 0 16px 16px;">
-            <div class="tg-img-wrapper" style="position: relative; border-radius: 10px; overflow: hidden; height: 210px; background: #000; border: 1px solid rgba(255,255,255,0.1); cursor: pointer;" onclick="openLightbox('${item.image_url}', '${escapeHtml(item.group_title)} - ${escapeHtml(item.date)}')">
+            <div class="tg-img-wrapper" data-img="${item.image_url}" data-cap="${escapeHtml(item.group_title)} - ${escapeHtml(item.date)}" style="position: relative; border-radius: 10px; overflow: hidden; height: 210px; background: #000; border: 1px solid rgba(255,255,255,0.1); cursor: pointer;">
               <img src="${item.image_url}" loading="lazy" style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.25s;" onmouseover="this.style.transform='scale(1.03)'" onmouseout="this.style.transform='scale(1)'">
               <div style="position: absolute; bottom: 8px; right: 8px; background: rgba(15,23,42,0.85); backdrop-filter: blur(4px); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.4); padding: 4px 10px; border-radius: 6px; font-size: 0.72rem; font-weight: 600; display: flex; align-items: center; gap: 4px;">
                 🔍 Xem ảnh lớn
@@ -575,7 +585,19 @@ document.addEventListener('DOMContentLoaded', async () => {
     tgCardsGrid.innerHTML = html;
   }
 
-  // Lightbox functions (global scope for onclick)
+  // Delegated click on images in feed
+  if (tgCardsGrid) {
+    tgCardsGrid.addEventListener('click', (e) => {
+      const wrap = e.target.closest('.tg-img-wrapper');
+      if (wrap) {
+        const imgUrl = wrap.getAttribute('data-img');
+        const cap = wrap.getAttribute('data-cap');
+        openLightbox(imgUrl, cap);
+      }
+    });
+  }
+
+  // Lightbox functions (global scope)
   window.openLightbox = function(url, caption) {
     const modal = document.getElementById('modal-lightbox');
     const img = document.getElementById('lightbox-img');
