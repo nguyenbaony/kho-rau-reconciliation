@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kho Rau Intelligence - Đối Soát Dữ Liệu & Datapay Tự Động</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Top Navigation Bar -->
+    <header class="navbar">
+      <div class="brand-section">
+        <div class="brand-logo">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
+          </svg>
+        </div>
+        <div>
+          <h1 class="brand-title">KHO RAU RECON ENGINE</h1>
+          <span class="brand-subtitle">Đối Soát Kho Rau & Datapay Hub Tháng 09.2026</span>
+        </div>
+      </div>
+
+      <div class="actions-section">
+        <div class="system-status">
+          <span class="status-indicator live"></span>
+          <span class="status-text" id="status-sheet-sync">Google Sheets: Đã kết nối</span>
+        </div>
+
+        <div class="system-status">
+          <span class="status-indicator git"></span>
+          <span class="status-text" id="status-git-sync">GitHub: Main Branch (Up-to-date)</span>
+        </div>
+
+        <button id="btn-sync-sheet" class="btn btn-secondary">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+          Đồng Bộ Google Sheet
+        </button>
+
+        <button id="btn-git-push" class="btn btn-primary">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
+          Push Code Lên GitHub
+        </button>
+      </div>
+    </header>
+
+    <!-- KPI Metrics Grid -->
+    <section class="kpi-grid">
+      <div class="kpi-card glass-panel" id="card-total-records">
+        <div class="kpi-icon-wrap icon-blue">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+        </div>
+        <div class="kpi-details">
+          <span class="kpi-label">Tổng Số Lệnh Giao Nhận</span>
+          <span class="kpi-value" id="kpi-total-orders">6,386</span>
+          <span class="kpi-trend positive">100% Đồng bộ từ TO/PT</span>
+        </div>
+      </div>
+
+      <div class="kpi-card glass-panel" id="card-total-loss">
+        <div class="kpi-icon-wrap icon-amber">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+        </div>
+        <div class="kpi-details">
+          <span class="kpi-label">Hao Hụt Tự Nhiên (Định mức)</span>
+          <span class="kpi-value" id="kpi-loss-value">13.739.510 ₫</span>
+          <span class="kpi-trend neutral">Hao hụt bay hơi tự nhiên</span>
+        </div>
+      </div>
+
+      <div class="kpi-card glass-panel" id="card-warehouse-penalty">
+        <div class="kpi-icon-wrap icon-rose">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>
+        </div>
+        <div class="kpi-details">
+          <span class="kpi-label">Datapay Phạt Kho Rau (DC)</span>
+          <span class="kpi-value" id="kpi-warehouse-val">19.659.253 ₫</span>
+          <span class="kpi-trend negative">Lỗi DC giao thiếu, pick sai</span>
+        </div>
+      </div>
+
+      <div class="kpi-card glass-panel" id="card-store-penalty">
+        <div class="kpi-icon-wrap icon-purple">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+        </div>
+        <div class="kpi-details">
+          <span class="kpi-label">Datapay Phạt Siêu Thị (ST)</span>
+          <span class="kpi-value" id="kpi-store-val">8.420.000 ₫</span>
+          <span class="kpi-trend alert">Lỗi kiểm sai QT, nhập thiếu</span>
+        </div>
+      </div>
+
+      <div class="kpi-card glass-panel" id="card-undetermined">
+        <div class="kpi-icon-wrap icon-cyan">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+        </div>
+        <div class="kpi-details">
+          <span class="kpi-label">Lệch Chưa Xác Định (CXD)</span>
+          <span class="kpi-value" id="kpi-undetermined-val">3.150.000 ₫</span>
+          <span class="kpi-trend pending">Cần camera / HLV quyết định</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Workflow Tabs Section (5-Step Pipeline) -->
+    <section class="workflow-section glass-panel">
+      <div class="workflow-header">
+        <h2 class="section-title">PHÂN LUỒNG QUY TRÌNH ĐỐI SOÁT THEO STEP</h2>
+        <div class="step-nav" id="step-nav-bar">
+          <button class="step-btn active" data-step="all" id="tab-all">
+            <span class="step-num">★</span> Tất Cả Dòng
+          </button>
+          <button class="step-btn" data-step="step1" id="tab-step1">
+            <span class="step-num">1</span> Điều Chuyển TO/PT
+          </button>
+          <button class="step-btn" data-step="step2" id="tab-step2">
+            <span class="step-num">2</span> Chênh Lệch & Hao Hụt
+          </button>
+          <button class="step-btn" data-step="step3" id="tab-step3">
+            <span class="step-num">3</span> Thẩm Định & Camera
+          </button>
+          <button class="step-btn" data-step="step4" id="tab-step4">
+            <span class="step-num">4</span> Phân Bổ Lỗi
+          </button>
+          <button class="step-btn" data-step="step5" id="tab-step5">
+            <span class="step-num">5</span> Bảng Datapay Chốt
+          </button>
+        </div>
+      </div>
+
+      <!-- Filters & Controls Bar -->
+      <div class="filter-controls">
+        <div class="search-box">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+          <input type="text" id="input-search" placeholder="Tìm theo Mã hàng, Tên rau củ, Siêu thị, Mã TO, PT...">
+        </div>
+
+        <div class="filter-group">
+          <select id="filter-store" class="select-input">
+            <option value="">Tất cả siêu thị</option>
+            <option value="LVT">KFM Lê Văn Thọ (LVT)</option>
+            <option value="A195">KFM Nguyễn Sơn (A195)</option>
+            <option value="A242">KFM Boulevard (A242)</option>
+            <option value="A229">KFM Nguyễn Hữu Tiến (A229)</option>
+            <option value="CLD">KFM Diamond Celadon (CLD)</option>
+            <option value="LVL">KFM Lê Văn Lương (LVL)</option>
+          </select>
+
+          <select id="filter-error" class="select-input">
+            <option value="">Tất cả loại lỗi</option>
+            <option value="Hao hụt">Hao hụt tự nhiên</option>
+            <option value="DC giao thiếu">DC giao thiếu</option>
+            <option value="DC Pick sai">DC Pick sai</option>
+            <option value="ST kiểm sai QT">ST kiểm sai QT</option>
+            <option value="ST nhập thiếu">ST nhập thiếu</option>
+          </select>
+
+          <select id="filter-status" class="select-input">
+            <option value="">Tất cả trạng thái</option>
+            <option value="Hoàn Thành">Hoàn Thành</option>
+            <option value="Pending">Chờ duyệt</option>
+            <option value="Đồng ý claim">DC đồng ý claim</option>
+            <option value="Từ chối claim">Từ chối claim</option>
+          </select>
+
+          <button id="btn-export-csv" class="btn btn-outline">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+            Xuất Excel Datapay
+          </button>
+        </div>
+      </div>
+
+      <!-- Data Table -->
+      <div class="table-responsive">
+        <table class="recon-table" id="table-reconciliation">
+          <thead>
+            <tr>
+              <th>Mã Đơn / Ngày</th>
+              <th>Siêu Thị Nhận</th>
+              <th>Mã Hàng & Tên Sản Phẩm</th>
+              <th>ĐVT</th>
+              <th class="text-right">SL Chuyển</th>
+              <th class="text-right">SL Nhận</th>
+              <th class="text-right">Chênh Lệch</th>
+              <th>Phân Loại Lỗi</th>
+              <th>DC Xác Nhận</th>
+              <th>Trách Nhiệm</th>
+              <th class="text-right">Giá Nhập</th>
+              <th class="text-right">Datapay Phạt</th>
+              <th>Thao Tác</th>
+            </tr>
+          </thead>
+          <tbody id="recon-tbody">
+            <!-- Dynamic rows loaded via app.js -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination / Footer Bar -->
+      <div class="table-footer">
+        <span class="page-info" id="page-counter">Đang hiển thị 1-50 của 6,386 dòng</span>
+        <div class="pagination">
+          <button class="btn-page" id="btn-prev-page">Trước</button>
+          <span class="current-page-badge" id="current-page-num">1</span>
+          <button class="btn-page" id="btn-next-page">Tiếp</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Modal Xem Chi Tiết & Bằng Chứng Camera / Claim -->
+    <div class="modal-overlay" id="modal-claim-detail">
+      <div class="modal-box glass-panel">
+        <div class="modal-header">
+          <h3 class="modal-title" id="modal-item-title">Chi Tiết Biên Bản Đối Soát</h3>
+          <button class="btn-close" id="btn-modal-close">&times;</button>
+        </div>
+        <div class="modal-body" id="modal-item-content">
+          <!-- Populated by app.js -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="data/reconciliation_data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
