@@ -6,12 +6,15 @@ document.addEventListener('DOMContentLoaded', async () => {
   let allRecords = [];
   let summary = null;
 
+  const bundledRecords = window.RECON_RECORDS || [];
+  const bundledSummary = window.RECON_SUMMARY || null;
+
   // 1. Try to load from Local Cache first (Instant load)
   try {
-    const cached = localStorage.getItem('KHO_RAU_CACHE_V2');
+    const cached = localStorage.getItem('KHO_RAU_CACHE_V4');
     if (cached) {
       const parsedCache = JSON.parse(cached);
-      if (parsedCache && parsedCache.records && parsedCache.records.length > 0) {
+      if (parsedCache && parsedCache.records && parsedCache.records.length >= bundledRecords.length) {
         allRecords = parsedCache.records;
         summary = parsedCache.summary;
         console.log(`[Cache] Loaded ${allRecords.length} records from localStorage.`);
@@ -21,10 +24,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     console.warn('[Cache] Could not read localStorage:', e);
   }
 
-  // 2. If no cache, load from window.RECON_RECORDS or bundled JSON
-  if (!allRecords || allRecords.length === 0) {
-    allRecords = window.RECON_RECORDS || [];
-    summary = window.RECON_SUMMARY || null;
+  // 2. If no cache or bundled data has more records, load from bundled records
+  if (!allRecords || allRecords.length === 0 || allRecords.length < bundledRecords.length) {
+    allRecords = bundledRecords;
+    summary = bundledSummary;
   }
 
   // Fallback: If not loaded via script tag, fetch JSON directly
@@ -124,6 +127,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const populateDates = () => {
     const dateSelect = document.getElementById('filter-date');
     if (!dateSelect) return;
+    const currentVal = dateSelect.value;
     const dateSet = new Set();
     allRecords.forEach(r => {
       if (r.transfer_date && r.transfer_date !== 'Tổng GT' && r.transfer_date.includes('/')) {
@@ -149,6 +153,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     customOpt.value = '__custom__';
     customOpt.textContent = '📅 Khoảng ngày tùy chọn...';
     dateSelect.appendChild(customOpt);
+
+    if (currentVal && Array.from(dateSelect.options).some(o => o.value === currentVal)) {
+      dateSelect.value = currentVal;
+    }
   };
 
   // 2. Populate Store Options
@@ -1113,7 +1121,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         // Save to cache
         try {
-          localStorage.setItem('KHO_RAU_CACHE_V2', JSON.stringify({
+          localStorage.setItem('KHO_RAU_CACHE_V4', JSON.stringify({
             records: allRecords,
             summary: summary,
             syncedAt: Date.now()
