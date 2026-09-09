@@ -50,7 +50,12 @@ while ($listener.IsListening) {
             $response.ContentType = $mime
             $response.ContentLength64 = $bytes.Length
             $response.StatusCode = 200
-            $response.OutputStream.Write($bytes, 0, $bytes.Length)
+            $response.AddHeader("Cache-Control", "no-cache, no-store, must-revalidate")
+            $response.AddHeader("Pragma", "no-cache")
+            $response.AddHeader("Expires", "0")
+            if ($request.HttpMethod -ne "HEAD") {
+                $response.OutputStream.Write($bytes, 0, $bytes.Length)
+            }
         } else {
             $response.StatusCode = 404
             $notFoundBytes = [System.Text.Encoding]::UTF8.GetBytes("404 Not Found")

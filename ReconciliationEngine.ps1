@@ -14,8 +14,8 @@ $configFile = "$PSScriptRoot\config.json"
 $config = Get-Content $configFile -Raw | ConvertFrom-Json
 
 function Get-Col([string[]]$arr, [int]$idx, [string]$def = "") {
-    if ($idx -lt $arr.Length) {
-        return $arr[$idx]
+    if ($idx -lt $arr.Length -and $arr[$idx] -ne $null) {
+        return $arr[$idx].Trim()
     }
     return $def
 }
@@ -59,34 +59,17 @@ if ($SourceCsvPath -ne "" -and (Test-Path $SourceCsvPath)) {
     Write-Host "Fetching live data from Google Sheets..." -ForegroundColor Cyan
     $sheetUrl = $config.sheet_export_url
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-    Invoke-WebRequest -Uri $sheetUrl -OutFile $csvFile
+    curl.exe -s -L -o $csvFile $sheetUrl
     Write-Host "Download complete: $csvFile" -ForegroundColor Green
 }
 
-Write-Host "Parsing and normalizing records..." -ForegroundColor Cyan
-$lines = [System.IO.File]::ReadAllLines($csvFile, [System.Text.Encoding]::UTF8)
+Write-Host "Parsing and normalizing records using high-performance parser..." -ForegroundColor Cyan
+Add-Type -AssemblyName Microsoft.VisualBasic
 
-$headerIndex = -1
-for ($i = 0; $i -lt [Math]::Min(25, $lines.Length); $i++) {
-    if ($lines[$i] -match "TO" -and $lines[$i] -match "PT" -and $lines[$i] -match "SL") {
-        $headerIndex = $i
-        break
-    }
-}
-if ($headerIndex -eq -1) {
-    $headerIndex = 10
-}
-
-Write-Host "Header detected at line index: $headerIndex" -ForegroundColor Yellow
-
-function Split-CsvRow([string]$line) {
-    $pattern = ',(?=(?:[^"]*"[^"]*")*[^"]*$)'
-    $parts = [regex]::Split($line, $pattern)
-    for ($k = 0; $k -lt $parts.Length; $k++) {
-        $parts[$k] = $parts[$k].Trim().Trim('"').Replace('""', '"')
-    }
-    return $parts
-}
+$parser = New-Object Microsoft.VisualBasic.FileIO.TextFieldParser($csvFile, [System.Text.Encoding]::UTF8)
+$parser.TextFieldType = [Microsoft.VisualBasic.FileIO.FieldType]::Delimited
+$parser.SetDelimiters(",")
+$parser.HasFieldsEnclosedInQuotes = $true
 
 $records = [System.Collections.Generic.List[PSObject]]::new()
 
@@ -98,23 +81,39 @@ $totalStorePenalty = 0.0
 $totalWarehousePenalty = 0.0
 $totalUndeterminedVal = 0.0
 
-for ($r = $headerIndex + 1; $r -lt $lines.Length; $r++) {
-    $line = $lines[$r]
-    if ([string]::IsNullOrWhiteSpace($line)) { continue }
-    $cols = Split-CsvRow $line
+$r = 0
+$headerIndex = 2
+
+while (-not $parser.EndOfData) {
+    $cols = $parser.ReadFields()
+    $r++
+
+    # First few rows check header
+    if ($r -le 3) {
+        $joined = $cols -join " "
+        if ($joined -match "TO" -and $joined -match "PT" -and $joined -match "SL") {
+            $headerIndex = $r - 1
+        }
+        continue
+    }
+
     if ($cols.Length -lt 10) { continue }
+
+    $sku         = Get-Col $cols 4
+    $productName = Get-Col $cols 5
+
+    if ([string]::IsNullOrWhiteSpace($sku) -and [string]::IsNullOrWhiteSpace($productName)) {
+        continue
+    }
+    if ($sku -eq "Ma hng" -or $sku -eq "Mã hàng") {
+        continue
+    }
 
     $handler       = Get-Col $cols 0
     $transferDate  = Get-Col $cols 1
     $storeName     = Get-Col $cols 2
     $storeId       = Get-Col $cols 3
-    $sku           = Get-Col $cols 4
-    $productName   = Get-Col $cols 5
     $unit          = Get-Col $cols 6
-    
-    if ([string]::IsNullOrWhiteSpace($sku) -and [string]::IsNullOrWhiteSpace($productName)) {
-        continue
-    }
 
     $rawQtyTransferred = Get-Col $cols 7 "0"
     $rawQtyReceived    = Get-Col $cols 8 "0"
@@ -160,7 +159,7 @@ for ($r = $headerIndex + 1; $r -lt $lines.Length; $r++) {
     if ($valStore -eq 0.0 -and $valWarehouse -eq 0.0 -and $valUndetermined -eq 0.0 -and $valNaturalLoss -eq 0.0) {
         if ($responsible -match "Kho" -or $dcConfirm -match "claim" -or $errorType -match "DC") {
             $valWarehouse = $totalValue
-        } elseif ($responsible -match "ST|ieu thi" -or $errorType -match "ST") {
+        } elseif ($responsible -match "ST|ieu thi|iêu thị" -or $errorType -match "ST") {
             $valStore = $totalValue
         } elseif ($errorType -match "Hao" -or $naturalLossQty -gt 0) {
             $valNaturalLoss = $totalValue
@@ -174,7 +173,7 @@ for ($r = $headerIndex + 1; $r -lt $lines.Length; $r++) {
     $area= Get-Col $cols 42
 
     $item = [PSCustomObject]@{
-        id                      = "REC-" + ($r - $headerIndex).ToString("D5")
+        id                      = "REC-" + ($records.Count + 1).ToString("D5")
         handler                 = $handler
         transfer_date           = $transferDate
         store_id                = $storeId
@@ -220,6 +219,8 @@ for ($r = $headerIndex + 1; $r -lt $lines.Length; $r++) {
     $totalWarehousePenalty += $valWarehouse
     $totalUndeterminedVal += $valUndetermined
 }
+
+$parser.Close()
 
 Write-Host "Processed $($records.Count) reconciliation rows successfully!" -ForegroundColor Green
 

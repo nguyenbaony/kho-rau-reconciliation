@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css?v=20260909_realtime">
 </head>
 <body>
   <div class="app-container">
@@ -27,14 +27,20 @@
       </div>
 
       <div class="actions-section">
-        <div class="system-status">
+        <div class="system-status" id="status-box-sheet">
           <span class="status-indicator live"></span>
-          <span class="status-text" id="status-sheet-sync">Google Sheets: Đã kết nối</span>
+          <span class="status-text" id="status-sheet-sync">Google Sheets: <b style="color: #10b981;">Realtime</b></span>
         </div>
 
-        <div class="system-status">
-          <span class="status-indicator git"></span>
-          <span class="status-text" id="status-git-sync">GitHub: Main Branch (Up-to-date)</span>
+        <div class="system-status" style="padding: 4px 10px; border-color: rgba(56, 189, 248, 0.3);">
+          <span style="color: #94a3b8; font-size: 0.76rem;">⚡ Tự động:</span>
+          <select id="select-auto-sync" style="background: transparent; color: #38bdf8; border: none; font-size: 0.76rem; font-weight: 600; outline: none; cursor: pointer; padding: 2px;">
+            <option value="60000" style="background: #1e293b; color: #38bdf8;" selected>1 phút</option>
+            <option value="180000" style="background: #1e293b; color: #38bdf8;">3 phút</option>
+            <option value="300000" style="background: #1e293b; color: #38bdf8;">5 phút</option>
+            <option value="0" style="background: #1e293b; color: #94a3b8;">Tắt</option>
+          </select>
+          <span id="auto-sync-countdown" style="font-size: 0.72rem; color: #64748b; font-variant-numeric: tabular-nums;">(60s)</span>
         </div>
 
         <button id="btn-view-groups" class="btn btn-secondary" style="border-color: rgba(59, 130, 246, 0.4); color: #60a5fa;">
@@ -42,9 +48,9 @@
           459 Nhóm Telegram (206 KRC / 192 ABA)
         </button>
 
-        <button id="btn-sync-sheet" class="btn btn-secondary">
+        <button id="btn-sync-sheet" class="btn btn-secondary" title="Đồng bộ trực tiếp dữ liệu mới nhất từ Google Sheets">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
-          Đồng Bộ Google Sheet
+          <span id="btn-sync-sheet-text">Đồng Bộ Google Sheet</span>
         </button>
 
         <button id="btn-git-push" class="btn btn-primary">
@@ -467,7 +473,9 @@
     </div>
   </div>
 
-  <script src="data/reconciliation_data.js"></script>
-  <script src="app.js"></script>
+  <div id="toast-container" class="toast-container"></div>
+
+  <script src="data/reconciliation_data.js?v=20260909_realtime"></script>
+  <script src="app.js?v=20260909_realtime"></script>
 </body>
 </html>

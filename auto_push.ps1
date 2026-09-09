@@ -11,9 +11,9 @@ Write-Host "=== STARTING GIT AUTO PUSH PIPELINE ===" -ForegroundColor Cyan
 Write-Host "Project Directory: $projectDir"
 
 # 1. Check Git
-$minGitPath = "C:\Users\longa\AppData\Local\MinGit\cmd\git.exe"
+$minGitPath = "$env:LOCALAPPDATA\MinGit\cmd\git.exe"
 if (Test-Path $minGitPath) {
-    $env:Path = "C:\Users\longa\AppData\Local\MinGit\cmd;" + $env:Path
+    $env:Path = "$env:LOCALAPPDATA\MinGit\cmd;" + $env:Path
 }
 
 $gitCmd = Get-Command git -ErrorAction SilentlyContinue

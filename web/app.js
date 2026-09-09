@@ -1,7 +1,31 @@
 // Kho Rau Reconciliation & Datapay Frontend Engine
 document.addEventListener('DOMContentLoaded', async () => {
-  let allRecords = window.RECON_RECORDS || [];
-  let summary = window.RECON_SUMMARY || null;
+  // Google Sheets Export Configuration
+  const GOOGLE_SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/1XBNLjZLsgaaHDBqVKsbCSYhzD4v-4qMA6rjGXGG4ThM/export?format=csv&gid=1422896115';
+
+  let allRecords = [];
+  let summary = null;
+
+  // 1. Try to load from Local Cache first (Instant load)
+  try {
+    const cached = localStorage.getItem('KHO_RAU_CACHE_V2');
+    if (cached) {
+      const parsedCache = JSON.parse(cached);
+      if (parsedCache && parsedCache.records && parsedCache.records.length > 0) {
+        allRecords = parsedCache.records;
+        summary = parsedCache.summary;
+        console.log(`[Cache] Loaded ${allRecords.length} records from localStorage.`);
+      }
+    }
+  } catch (e) {
+    console.warn('[Cache] Could not read localStorage:', e);
+  }
+
+  // 2. If no cache, load from window.RECON_RECORDS or bundled JSON
+  if (!allRecords || allRecords.length === 0) {
+    allRecords = window.RECON_RECORDS || [];
+    summary = window.RECON_SUMMARY || null;
+  }
 
   // Fallback: If not loaded via script tag, fetch JSON directly
   if (!allRecords || allRecords.length === 0) {
@@ -18,7 +42,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   // Clean data: Filter out any header remnants
-  allRecords = allRecords.filter(r => r.sku && r.sku !== 'Mã hàng' && r.to_order !== 'CLV4');
+  allRecords = allRecords.filter(r => r.sku && r.sku !== 'Mã hàng' && r.sku !== 'Ma hang' && r.sku !== 'Ma hng' && r.to_order !== 'CLV4');
 
   let currentStep = 'all';
   let searchQuery = '';
@@ -817,17 +841,374 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   }
 
-  // Sync button feedback
-  document.getElementById('btn-sync-sheet').addEventListener('click', () => {
-    const btn = document.getElementById('btn-sync-sheet');
-    btn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="spin"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg> Đang tải dữ liệu...`;
+  // Toast Notification Helper
+  const showToast = (msg, type = 'info') => {
+    const container = document.getElementById('toast-container');
+    if (!container) return;
+    const toast = document.createElement('div');
+    toast.className = `toast toast-${type}`;
+    let icon = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>`;
+    if (type === 'success') {
+      icon = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>`;
+    } else if (type === 'warning') {
+      icon = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>`;
+    }
+    toast.innerHTML = `${icon}<span>${msg}</span>`;
+    container.appendChild(toast);
+    requestAnimationFrame(() => toast.classList.add('show'));
     setTimeout(() => {
-      btn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg> Đã đồng bộ ${allRecords.length} dòng!`;
-      setTimeout(() => {
-        btn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg> Đồng Bộ Google Sheet`;
-      }, 3000);
+      toast.classList.remove('show');
+      setTimeout(() => toast.remove(), 350);
+    }, 3500);
+  };
+
+  // Fast CSV Parser (RFC 4180 compliant)
+  function parseCSV(text) {
+    const rows = [];
+    let currentRow = [];
+    let currentVal = '';
+    let insideQuotes = false;
+    for (let i = 0; i < text.length; i++) {
+      const c = text[i];
+      const next = text[i + 1];
+      if (c === '"') {
+        if (insideQuotes && next === '"') {
+          currentVal += '"';
+          i++;
+        } else {
+          insideQuotes = !insideQuotes;
+        }
+      } else if (c === ',' && !insideQuotes) {
+        currentRow.push(currentVal.trim());
+        currentVal = '';
+      } else if ((c === '\r' || c === '\n') && !insideQuotes) {
+        if (c === '\r' && next === '\n') i++;
+        currentRow.push(currentVal.trim());
+        if (currentRow.length > 1 || (currentRow.length === 1 && currentRow[0] !== '')) {
+          rows.push(currentRow);
+        }
+        currentRow = [];
+        currentVal = '';
+      } else {
+        currentVal += c;
+      }
+    }
+    if (currentVal || currentRow.length > 0) {
+      currentRow.push(currentVal.trim());
+      rows.push(currentRow);
+    }
+    return rows;
+  }
+
+  const parseVnDecimal = (val) => {
+    if (!val) return 0;
+    let clean = String(val).trim().replace(/"/g, '').replace(/\s+/g, '');
+    if (/\.\d{3},\d+/.test(clean)) {
+      clean = clean.replace(/\./g, '').replace(',', '.');
+    } else if (/,\d+/.test(clean)) {
+      clean = clean.replace(',', '.');
+    } else if (/^\d{1,3}(\.\d{3})+$/.test(clean)) {
+      clean = clean.replace(/\./g, '');
+    }
+    const num = parseFloat(clean);
+    return isNaN(num) ? 0 : Math.round(num * 10000) / 10000;
+  };
+
+  const parseVnCurrency = (val) => {
+    if (!val) return 0;
+    let clean = String(val).trim().replace(/"/g, '').replace(/\s+/g, '').replace(/VND/gi, '').replace(/₫/g, '');
+    if (clean.includes('.')) clean = clean.replace(/\./g, '');
+    if (clean.includes(',')) clean = clean.replace(/,/g, '.');
+    const num = parseFloat(clean);
+    return isNaN(num) ? 0 : Math.round(num);
+  };
+
+  const getCol = (arr, idx, def = '') => {
+    if (idx < arr.length && arr[idx] !== undefined && arr[idx] !== null) {
+      return String(arr[idx]).trim();
+    }
+    return def;
+  };
+
+  function processSheetCSV(csvText) {
+    const rows = parseCSV(csvText);
+    if (!rows || rows.length < 5) return null;
+
+    let headerIndex = 2;
+    for (let i = 0; i < Math.min(15, rows.length); i++) {
+      const lineStr = rows[i].join(' ');
+      if (lineStr.includes('TO') && lineStr.includes('PT') && (lineStr.includes('SL') || lineStr.includes('Chuyển'))) {
+        headerIndex = i;
+        break;
+      }
+    }
+
+    const records = [];
+    let totalTransferred = 0;
+    let totalReceived = 0;
+    let totalDiff = 0;
+    let totalLossVal = 0;
+    let totalStorePenalty = 0;
+    let totalWarehousePenalty = 0;
+    let totalUndeterminedVal = 0;
+
+    for (let r = headerIndex + 1; r < rows.length; r++) {
+      const cols = rows[r];
+      if (!cols || cols.length < 10) continue;
+
+      const sku = getCol(cols, 4);
+      const productName = getCol(cols, 5);
+      if (!sku && !productName) continue;
+      if (sku === 'Mã hàng' || sku === 'Ma hang' || sku === 'Ma hng') continue;
+
+      const handler = getCol(cols, 0);
+      const transferDate = getCol(cols, 1);
+      const storeName = getCol(cols, 2);
+      const storeId = getCol(cols, 3);
+      const unit = getCol(cols, 6);
+
+      const qtyTransferred = parseVnDecimal(getCol(cols, 7, '0'));
+      const qtyReceived = parseVnDecimal(getCol(cols, 8, '0'));
+      let qtyDiff = parseVnDecimal(getCol(cols, 9, '0'));
+      if (qtyDiff === 0 && (qtyTransferred > 0 || qtyReceived > 0)) {
+        qtyDiff = Math.round((qtyTransferred - qtyReceived) * 1000) / 1000;
+      }
+
+      const ptTransfer = getCol(cols, 10);
+      const crateCode = getCol(cols, 11);
+      const toOrder = getCol(cols, 12);
+      const naturalLossQty = parseVnDecimal(getCol(cols, 13, '0'));
+      const storeReturnQty = parseVnDecimal(getCol(cols, 14, '0'));
+      const undeterminedQty = parseVnDecimal(getCol(cols, 15, '0'));
+
+      const status = getCol(cols, 20, 'Pending');
+      const errorType = getCol(cols, 21);
+      const responsible = getCol(cols, 25);
+      const imageLink = getCol(cols, 26);
+      const dcConfirm = getCol(cols, 27);
+      const dcNote = getCol(cols, 28);
+      const kfmFeedback = getCol(cols, 29);
+
+      const categoryV2 = getCol(cols, 31, 'OTHER');
+      const costPrice = parseVnCurrency(getCol(cols, 34, '0'));
+
+      const totalValue = Math.round(qtyDiff * costPrice);
+      let valNaturalLoss = Math.round(naturalLossQty * costPrice);
+
+      const rawValStore = getCol(cols, 37, '');
+      const rawValWarehouse = getCol(cols, 38, '');
+      const rawValUndetermined = getCol(cols, 39, '');
+
+      let valStore = rawValStore !== '' ? parseVnCurrency(rawValStore) : 0;
+      let valWarehouse = rawValWarehouse !== '' ? parseVnCurrency(rawValWarehouse) : 0;
+      let valUndetermined = rawValUndetermined !== '' ? parseVnCurrency(rawValUndetermined) : 0;
+
+      if (valStore === 0 && valWarehouse === 0 && valUndetermined === 0 && valNaturalLoss === 0) {
+        if (/Kho/i.test(responsible) || /claim/i.test(dcConfirm) || /DC/i.test(errorType)) {
+          valWarehouse = totalValue;
+        } else if (/ST|iêu thị|ieu thi/i.test(responsible) || /ST/i.test(errorType)) {
+          valStore = totalValue;
+        } else if (/Hao/i.test(errorType) || naturalLossQty > 0) {
+          valNaturalLoss = totalValue;
+        } else {
+          valUndetermined = totalValue;
+        }
+      }
+
+      const gsm = getCol(cols, 40);
+      const rsm = getCol(cols, 41);
+      const area = getCol(cols, 42);
+
+      records.push({
+        id: 'REC-' + String(records.length + 1).padStart(5, '0'),
+        handler,
+        transfer_date: transferDate,
+        store_id: storeId,
+        store_name: storeName,
+        area,
+        sku,
+        product_name: productName,
+        unit,
+        category_v2: categoryV2,
+        to_order: toOrder,
+        pt_transfer: ptTransfer,
+        crate_code: crateCode,
+        qty_transferred: qtyTransferred,
+        qty_received: qtyReceived,
+        qty_diff: qtyDiff,
+        natural_loss_qty: naturalLossQty,
+        store_return_qty: storeReturnQty,
+        undetermined_qty: undeterminedQty,
+        cost_price: costPrice,
+        total_value: totalValue,
+        loss_value: valNaturalLoss,
+        store_penalty: valStore,
+        warehouse_penalty: valWarehouse,
+        undetermined_value: valUndetermined,
+        status,
+        error_type: errorType,
+        responsible_party: responsible,
+        dc_confirmation: dcConfirm,
+        dc_note: dcNote,
+        kfm_feedback: kfmFeedback,
+        image_link: imageLink,
+        gsm,
+        rsm
+      });
+
+      totalTransferred += qtyTransferred;
+      totalReceived += qtyReceived;
+      totalDiff += qtyDiff;
+      totalLossVal += valNaturalLoss;
+      totalStorePenalty += valStore;
+      totalWarehousePenalty += valWarehouse;
+      totalUndeterminedVal += valUndetermined;
+    }
+
+    const summary = {
+      generated_at: new Date().toISOString().replace('T', ' ').slice(0, 19),
+      total_records: records.length,
+      total_qty_transferred: Math.round(totalTransferred * 100) / 100,
+      total_qty_received: Math.round(totalReceived * 100) / 100,
+      total_qty_diff: Math.round(totalDiff * 100) / 100,
+      financial_summary: {
+        total_natural_loss_vnd: totalLossVal,
+        total_store_penalty_vnd: totalStorePenalty,
+        total_warehouse_penalty_vnd: totalWarehousePenalty,
+        total_undetermined_vnd: totalUndeterminedVal,
+        grand_total_penalty_vnd: totalStorePenalty + totalWarehousePenalty
+      }
+    };
+
+    return { records, summary };
+  }
+
+  let isSyncing = false;
+
+  async function syncGoogleSheetsRealtime(isManual = false) {
+    if (isSyncing) return;
+    isSyncing = true;
+
+    const btnSync = document.getElementById('btn-sync-sheet');
+    const statusText = document.getElementById('status-sheet-sync');
+
+    if (btnSync) {
+      btnSync.style.opacity = '0.75';
+      btnSync.style.pointerEvents = 'none';
+      btnSync.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="spin"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg> <span id="btn-sync-sheet-text">Đang tải Sheets...</span>`;
+    }
+
+    try {
+      const liveUrl = `${GOOGLE_SHEET_CSV_URL}&_t=${Date.now()}`;
+      console.log('[Realtime] Fetching Google Sheets CSV:', liveUrl);
+      const res = await fetch(liveUrl);
+      if (!res.ok) throw new Error(`HTTP status ${res.status}`);
+      const csvText = await res.text();
+      
+      const parsed = processSheetCSV(csvText);
+      if (parsed && parsed.records && parsed.records.length > 0) {
+        const prevCount = allRecords.length;
+        allRecords = parsed.records;
+        summary = parsed.summary;
+
+        // Save to cache
+        try {
+          localStorage.setItem('KHO_RAU_CACHE_V2', JSON.stringify({
+            records: allRecords,
+            summary: summary,
+            syncedAt: Date.now()
+          }));
+        } catch (e) {
+          console.warn('[Cache] Could not write to localStorage:', e);
+        }
+
+        const now = new Date();
+        const timeStr = now.toLocaleTimeString('vi-VN', { hour12: false });
+        if (statusText) {
+          statusText.innerHTML = `Google Sheets: <b style="color: #10b981;">Realtime</b> <span style="font-size: 0.74rem; color: #94a3b8;">(${timeStr} - ${formatNumber(allRecords.length, 0)} dòng)</span>`;
+        }
+
+        // Re-render UI
+        populateDates();
+        populateStores();
+        updateKPIs(filterRecords());
+        renderTable();
+        const currentMode = document.querySelector('.view-tab-btn.active')?.getAttribute('data-view') || 'analytics';
+        if (currentMode === 'analytics') {
+          updateAnalyticsCharts(filterRecords());
+        }
+
+        if (isManual) {
+          showToast(`✓ Đã đồng bộ thành công ${formatNumber(allRecords.length, 0)} dòng mới nhất từ Google Sheets!`, 'success');
+        } else if (prevCount > 0 && prevCount !== allRecords.length) {
+          showToast(`⚡ Cập nhật Realtime: ${formatNumber(allRecords.length, 0)} dòng (+${allRecords.length - prevCount} mới)`, 'info');
+        }
+      }
+    } catch (err) {
+      console.error('[Realtime] Sync error:', err);
+      if (isManual) {
+        showToast('⚠️ Không thể tải trực tiếp từ Google Sheets, hiển thị dữ liệu lưu gần nhất.', 'warning');
+      }
+      if (statusText && (!allRecords || allRecords.length === 0)) {
+        statusText.innerHTML = `Google Sheets: <span style="color:#f87171;">Lỗi kết nối</span>`;
+      }
+    } finally {
+      isSyncing = false;
+      if (btnSync) {
+        btnSync.style.opacity = '1';
+        btnSync.style.pointerEvents = 'auto';
+        btnSync.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg> <span id="btn-sync-sheet-text">Đồng Bộ Google Sheet</span>`;
+      }
+    }
+  }
+
+  // Realtime Auto-Sync Polling
+  const selectAutoSync = document.getElementById('select-auto-sync');
+  const countdownEl = document.getElementById('auto-sync-countdown');
+  let autoSyncInterval = 60000;
+  let remainingSeconds = 60;
+  let autoSyncTimerId = null;
+
+  function resetAutoSyncTimer() {
+    if (autoSyncTimerId) clearInterval(autoSyncTimerId);
+    if (autoSyncInterval <= 0) {
+      if (countdownEl) countdownEl.textContent = '(Tắt)';
+      return;
+    }
+    remainingSeconds = Math.round(autoSyncInterval / 1000);
+    if (countdownEl) countdownEl.textContent = `(${remainingSeconds}s)`;
+
+    autoSyncTimerId = setInterval(() => {
+      remainingSeconds--;
+      if (remainingSeconds <= 0) {
+        remainingSeconds = Math.round(autoSyncInterval / 1000);
+        if (countdownEl) countdownEl.textContent = `(${remainingSeconds}s)`;
+        syncGoogleSheetsRealtime(false);
+      } else {
+        if (countdownEl) countdownEl.textContent = `(${remainingSeconds}s)`;
+      }
     }, 1000);
-  });
+  }
+
+  if (selectAutoSync) {
+    selectAutoSync.addEventListener('change', (e) => {
+      autoSyncInterval = parseInt(e.target.value, 10);
+      resetAutoSyncTimer();
+      if (autoSyncInterval > 0) {
+        showToast(`⚡ Đã bật tự động cập nhật Realtime mỗi ${autoSyncInterval / 60000} phút.`, 'info');
+      } else {
+        showToast('Đã tắt tự động cập nhật Realtime.', 'info');
+      }
+    });
+  }
+
+  // Sync button feedback
+  const btnSyncSheetEl = document.getElementById('btn-sync-sheet');
+  if (btnSyncSheetEl) {
+    btnSyncSheetEl.addEventListener('click', () => {
+      syncGoogleSheetsRealtime(true);
+    });
+  }
 
   document.getElementById('btn-git-push').addEventListener('click', () => {
     alert("Repository đã liên kết với:\nhttps://github.com/nguyenbaony/kho-rau-reconciliation");
@@ -1108,6 +1489,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   updateKPIs();
   renderTable();
   switchViewMode('analytics');
+
+  // Trigger Realtime Sync immediately after initial render
+  syncGoogleSheetsRealtime(false);
+  resetAutoSyncTimer();
 });
 
 
