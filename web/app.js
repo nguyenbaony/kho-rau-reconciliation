@@ -399,43 +399,50 @@ document.addEventListener('DOMContentLoaded', async () => {
   let stream3Initialized = false;
   async function initStream3() {
     if (stream3Initialized) {
-      if (window.Chart && Chart.instances) {
-        Object.values(Chart.instances).forEach(c => c && typeof c.resize === 'function' && c.resize());
-      }
+      setTimeout(() => {
+        const currentMode = document.querySelector('.view-tab-btn.active')?.getAttribute('data-view') || 'analytics';
+        if (currentMode === 'analytics' && typeof updateAnalyticsCharts === 'function' && typeof filterRecords === 'function') {
+          updateAnalyticsCharts(filterRecords());
+        }
+        if (window.Chart && Chart.instances) {
+          Object.values(Chart.instances).forEach(c => c && typeof c.resize === 'function' && c.resize());
+        }
+      }, 50);
       return;
     }
     stream3Initialized = true;
     console.log('[Luồng 3] Initializing Datapay & CDC Reconciliation Engine...');
 
     // Google Sheets Export Configuration
-  const GOOGLE_SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/1XBNLjZLsgaaHDBqVKsbCSYhzD4v-4qMA6rjGXGG4ThM/export?format=csv&gid=1422896115';
+    const GOOGLE_SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/1XBNLjZLsgaaHDBqVKsbCSYhzD4v-4qMA6rjGXGG4ThM/export?format=csv&gid=1422896115';
 
-  let allRecords = [];
-  let summary = null;
+    let allRecords = [];
+    let summary = null;
 
-  const bundledRecords = window.RECON_RECORDS || [];
-  const bundledSummary = window.RECON_SUMMARY || null;
+    const bundledRecords = window.RECON_RECORDS || [];
+    const bundledSummary = window.RECON_SUMMARY || null;
 
-  // 1. Try to load from Local Cache first (Instant load)
-  try {
-    const cached = localStorage.getItem('KHO_RAU_CACHE_V4');
-    if (cached) {
-      const parsedCache = JSON.parse(cached);
-      if (parsedCache && parsedCache.records && parsedCache.records.length >= bundledRecords.length) {
-        allRecords = parsedCache.records;
-        summary = parsedCache.summary;
-        console.log(`[Cache] Loaded ${allRecords.length} records from localStorage.`);
+    // 1. Try to load from bundled data first (Instant)
+    if (bundledRecords && bundledRecords.length > 0) {
+      allRecords = bundledRecords;
+      summary = bundledSummary;
+      console.log(`[Luồng 3] Loaded ${allRecords.length} bundled records.`);
+    } else {
+      // Try local cache
+      try {
+        const cached = localStorage.getItem('KHO_RAU_CACHE_V4');
+        if (cached) {
+          const parsedCache = JSON.parse(cached);
+          if (parsedCache && parsedCache.records && parsedCache.records.length > 0) {
+            allRecords = parsedCache.records;
+            summary = parsedCache.summary;
+            console.log(`[Cache] Loaded ${allRecords.length} records from localStorage.`);
+          }
+        }
+      } catch (e) {
+        console.warn('[Cache] Could not read localStorage:', e);
       }
     }
-  } catch (e) {
-    console.warn('[Cache] Could not read localStorage:', e);
-  }
-
-  // 2. If no cache or bundled data has more records, load from bundled records
-  if (!allRecords || allRecords.length === 0 || allRecords.length < bundledRecords.length) {
-    allRecords = bundledRecords;
-    summary = bundledSummary;
-  }
 
   // Fallback: If not loaded via script tag, fetch JSON directly
   if (!allRecords || allRecords.length === 0) {

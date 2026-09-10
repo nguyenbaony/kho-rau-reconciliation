@@ -39,13 +39,22 @@ if (-not $Stream1Only) {
     }
 }
 
-# 3. Tai tao Data Bundle
+# 3. Tai tao Data Bundle cho Luong 1 & Luong 2
 Write-Host "`n[BUNDLE] Dang tai tao data_bundle.js..." -ForegroundColor Yellow
 try {
     & $pythonExe "$projectDir\build_data_bundle.py"
-    Write-Host "  -> Bundle hoan tat!" -ForegroundColor Green
+    Write-Host "  -> Bundle Luong 1 & 2 hoan tat!" -ForegroundColor Green
 } catch {
     Write-Host "  -> Loi tao bundle: $_" -ForegroundColor Red
+}
+
+# 3b. Tai tao Data Bundle cho Luong 3 (Datapay & TO/PT)
+Write-Host "`n[BUNDLE] Dang toi uu hoa du lieu Luong 3 (reconciliation_data.js)..." -ForegroundColor Yellow
+try {
+    & $pythonExe "$projectDir\minify_recon_data.py"
+    Write-Host "  -> Bundle Luong 3 hoan tat!" -ForegroundColor Green
+} catch {
+    Write-Host "  -> Loi tao bundle Luong 3: $_" -ForegroundColor Red
 }
 
 # 4. Day code len GitHub neu duoc yeu cau

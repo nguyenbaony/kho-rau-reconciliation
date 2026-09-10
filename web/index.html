@@ -3,14 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Báo Cáo Đối Soát Kho Rau Củ (KRC) - 2 Luồng Độc Lập: Google Sheets & StarRocks CDC | KFM - SCM</title>
+  <title>Báo Cáo Tổng Hợp & Đối Soát Kho Rau Củ (KRC) - 3 Luồng Độc Lập: Timeline, StarRocks CDC & Datapay TO/PT | KFM - SCM</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Roboto+Mono:wght@500;600;700&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="style_legacy.css">
-  <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <!-- Top Global Header -->
@@ -19,8 +18,8 @@
       <div class="logo-box">
         <span class="logo-icon">🥦</span>
         <div>
-          <div class="logo-title">KRC DUAL PIPELINE ENGINE <span class="badge-preview" style="background: linear-gradient(135deg, #10b981, #059669); color: #fff;">LIVE</span></div>
-          <div class="logo-sub">Hệ Thống Phân Tách 2 Luồng Độc Lập: Google Sheets & StarRocks CDC</div>
+          <div class="logo-title">KRC PIPELINE ENGINE <span class="badge-preview" style="background: linear-gradient(135deg, #10b981, #059669); color: #fff;">LIVE</span></div>
+          <div class="logo-sub">Hệ Thống Phân Tách 3 Luồng Độc Lập: Google Sheets • StarRocks CDC • Datapay TO/PT</div>
         </div>
       </div>
     </div>
@@ -892,6 +891,7 @@
 
   <div id="toast-container" class="toast-container"></div>
   <script src="data/data_bundle.js"></script>
+  <script src="data/reconciliation_data.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

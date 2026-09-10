@@ -939,3 +939,143 @@
   font-weight: 600;
 }
 
+/* ==========================================================================
+   STREAM 3 ISOLATED DARK STYLING (OVERRIDING GLOBAL LIGHT THEME)
+   ========================================================================== */
+#view-stream3 {
+  background: radial-gradient(circle at 10% 20%, #0d1527 0%, #090d16 90%) !important;
+  color: #f8fafc !important;
+  border-radius: 16px !important;
+  padding: 24px !important;
+  margin-top: 10px !important;
+  min-height: 80vh !important;
+}
+
+#view-stream3 .kpi-grid {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)) !important;
+  gap: 16px !important;
+  margin-bottom: 24px !important;
+}
+
+#view-stream3 .kpi-card {
+  background: rgba(15, 23, 42, 0.8) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 16px !important;
+  padding: 18px 20px !important;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37) !important;
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  gap: 16px !important;
+  position: relative !important;
+  overflow: hidden !important;
+}
+
+#view-stream3 .kpi-card::before {
+  content: '' !important;
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: 2px !important;
+  background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.5), transparent) !important;
+}
+
+#view-stream3 .kpi-icon-wrap {
+  width: 44px !important;
+  height: 44px !important;
+  border-radius: 12px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex-shrink: 0 !important;
+}
+
+#view-stream3 .kpi-details {
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+#view-stream3 .kpi-label {
+  font-size: 0.78rem !important;
+  font-weight: 600 !important;
+  color: #94a3b8 !important;
+  margin-bottom: 4px !important;
+}
+
+#view-stream3 .kpi-value {
+  font-size: 1.45rem !important;
+  font-weight: 800 !important;
+  letter-spacing: -0.02em !important;
+  color: #ffffff !important;
+  margin-bottom: 4px !important;
+  line-height: 1.2 !important;
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+#view-stream3 .kpi-trend {
+  font-size: 0.73rem !important;
+  font-weight: 600 !important;
+}
+
+#view-stream3 .glass-panel {
+  background: rgba(15, 23, 42, 0.75) !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 16px !important;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37) !important;
+  color: #f8fafc !important;
+}
+
+#view-stream3 .filter-controls {
+  background: rgba(15, 23, 42, 0.75) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  color: #f8fafc !important;
+}
+
+#view-stream3 .search-box input,
+#view-stream3 select,
+#view-stream3 input[type="text"],
+#view-stream3 input[type="date"] {
+  background: rgba(15, 23, 42, 0.9) !important;
+  color: #f8fafc !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+}
+
+#view-stream3 .chart-card {
+  background: rgba(15, 23, 42, 0.75) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 16px !important;
+  padding: 20px 24px !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3) !important;
+}
+
+#view-stream3 .chart-title {
+  color: #f8fafc !important;
+  font-weight: 700 !important;
+}
+
+#view-stream3 .table-custom {
+  width: 100% !important;
+  background: transparent !important;
+  color: #f8fafc !important;
+}
+
+#view-stream3 .table-custom th {
+  background: rgba(15, 23, 42, 0.95) !important;
+  color: #94a3b8 !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+  padding: 12px 14px !important;
+}
+
+#view-stream3 .table-custom td {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+  color: #f1f5f9 !important;
+  padding: 10px 14px !important;
+}
+
+
