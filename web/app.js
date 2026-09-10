@@ -1014,11 +1014,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     document.getElementById('modal-item-content').innerHTML = html;
     modal.classList.add('active');
+    modal.style.display = 'flex';
   };
 
   // Close Modal
   document.getElementById('btn-modal-close').addEventListener('click', () => {
     document.getElementById('modal-claim-detail').classList.remove('active');
+    document.getElementById('modal-claim-detail').style.display = 'none';
   });
 
   // View Mode Switcher
@@ -1695,6 +1697,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (btnViewGroups) {
     btnViewGroups.addEventListener('click', () => {
       modalGroups.classList.add('active');
+      modalGroups.style.display = 'flex';
       loadTelegramGroups();
     });
   }
@@ -1702,12 +1705,16 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (btnCloseGroups) {
     btnCloseGroups.addEventListener('click', () => {
       modalGroups.classList.remove('active');
+      modalGroups.style.display = 'none';
     });
   }
 
   if (modalGroups) {
     modalGroups.addEventListener('click', (e) => {
-      if (e.target === modalGroups) modalGroups.classList.remove('active');
+      if (e.target === modalGroups) {
+        modalGroups.classList.remove('active');
+        modalGroups.style.display = 'none';
+      }
     });
   }
 
@@ -1846,6 +1853,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       img.src = url;
       if (cap) cap.innerText = caption || 'Hình ảnh chứng từ đối soát';
       modal.classList.add('active');
+      modal.style.display = 'flex';
     }
   };
 
@@ -1854,13 +1862,27 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (btnCloseLightbox) {
     btnCloseLightbox.addEventListener('click', () => {
       modalLightbox.classList.remove('active');
+      modalLightbox.style.display = 'none';
     });
   }
   if (modalLightbox) {
     modalLightbox.addEventListener('click', (e) => {
-      if (e.target === modalLightbox) modalLightbox.classList.remove('active');
+      if (e.target === modalLightbox) {
+        modalLightbox.classList.remove('active');
+        modalLightbox.style.display = 'none';
+      }
     });
   }
+
+  // Global backdrop click to close any active modal
+  document.querySelectorAll('.modal-overlay').forEach(overlay => {
+    overlay.addEventListener('click', (e) => {
+      if (e.target === overlay) {
+        overlay.classList.remove('active');
+        overlay.style.display = 'none';
+      }
+    });
+  });
 
   // Sub-filter button clicks
   document.querySelectorAll('.tg-tab-btn').forEach(btn => {
