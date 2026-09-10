@@ -2,7 +2,7 @@ param (
     [int]$Port = 8085
 )
 
-$webRoot = Join-Path $PSScriptRoot "web"
+$webRoot = $PSScriptRoot
 $prefix = "http://localhost:$Port/"
 
 $listener = New-Object System.Net.HttpListener

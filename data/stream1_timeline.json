@@ -1,0 +1,1736 @@
+{
+  "generated_at": "2026-09-10 12:00:00",
+  "timeline_summary": {
+    "tong_so_ngay": 10,
+    "hoan_thanh_100": 2,
+    "dang_xu_ly": 8,
+    "ty_le_hoan_thanh_chung": 55,
+    "tong_phieu": 4188,
+    "tong_sl_chuyen": 1414504,
+    "tong_sl_nhan": 1406490,
+    "tong_cl_thieu": 10875.7,
+    "tong_cl_thua": 2657.5,
+    "tong_cl": 13533.2,
+    "tong_da_xu_ly": 7478.9,
+    "tong_con_lai": 6054.3
+  },
+  "timeline_days": [
+    {
+      "day": "01/09",
+      "phieu": 193,
+      "sl_chuyen": 5119.2,
+      "sl_nhan": 4170.5,
+      "cl_thieu": 49.3,
+      "cl_thua": 949.0,
+      "tong_cl": 998.3,
+      "da_xu_ly": 597.6,
+      "con_lai": 0.0,
+      "status": "Hoàn thành",
+      "tien_do": 100
+    },
+    {
+      "day": "02/09",
+      "phieu": 189,
+      "sl_chuyen": 6835.6,
+      "sl_nhan": 6006.4,
+      "cl_thieu": 829.4,
+      "cl_thua": 829.4,
+      "tong_cl": 1658.8,
+      "da_xu_ly": 1081.4,
+      "con_lai": 0.0,
+      "status": "Hoàn thành",
+      "tien_do": 100
+    },
+    {
+      "day": "03/09",
+      "phieu": 174,
+      "sl_chuyen": 4769.7,
+      "sl_nhan": 3895.2,
+      "cl_thieu": 874.7,
+      "cl_thua": 874.7,
+      "tong_cl": 1749.4,
+      "da_xu_ly": 1077.3,
+      "con_lai": 672.1,
+      "status": "Đang xử lý",
+      "tien_do": 95
+    },
+    {
+      "day": "04/09",
+      "phieu": 184,
+      "sl_chuyen": 4150.1,
+      "sl_nhan": 3523.7,
+      "cl_thieu": 626.7,
+      "cl_thua": 626.7,
+      "tong_cl": 1253.4,
+      "da_xu_ly": 842.8,
+      "con_lai": 410.6,
+      "status": "Đang xử lý",
+      "tien_do": 98
+    },
+    {
+      "day": "05/09",
+      "phieu": 204,
+      "sl_chuyen": 6546.0,
+      "sl_nhan": 5704.2,
+      "cl_thieu": 854.0,
+      "cl_thua": 842.2,
+      "tong_cl": 1696.2,
+      "da_xu_ly": 828.9,
+      "con_lai": 867.3,
+      "status": "Đang xử lý",
+      "tien_do": 82
+    },
+    {
+      "day": "06/09",
+      "phieu": 207,
+      "sl_chuyen": 5826.1,
+      "sl_nhan": 5059.2,
+      "cl_thieu": 767.3,
+      "cl_thua": 767.3,
+      "tong_cl": 1534.6,
+      "da_xu_ly": 852.4,
+      "con_lai": 682.2,
+      "status": "Đang xử lý",
+      "tien_do": 92
+    },
+    {
+      "day": "07/09",
+      "phieu": 194,
+      "sl_chuyen": 5938.4,
+      "sl_nhan": 5116.4,
+      "cl_thieu": 822.4,
+      "cl_thua": 822.4,
+      "tong_cl": 1644.8,
+      "da_xu_ly": 514.1,
+      "con_lai": 1130.7,
+      "status": "Đang xử lý",
+      "tien_do": 44
+    },
+    {
+      "day": "08/09",
+      "phieu": 178,
+      "sl_chuyen": 5784.7,
+      "sl_nhan": 4449.7,
+      "cl_thieu": 1335.2,
+      "cl_thua": 1335.2,
+      "tong_cl": 2670.4,
+      "da_xu_ly": 868.6,
+      "con_lai": 1801.8,
+      "status": "Đang xử lý",
+      "tien_do": 45
+    },
+    {
+      "day": "09/09",
+      "phieu": 240,
+      "sl_chuyen": 8583.7,
+      "sl_nhan": 7500.4,
+      "cl_thieu": 1083.6,
+      "cl_thua": 1083.6,
+      "tong_cl": 2167.2,
+      "da_xu_ly": 546.0,
+      "con_lai": 1621.2,
+      "status": "Đang xử lý",
+      "tien_do": 37
+    },
+    {
+      "day": "10/09",
+      "phieu": 224,
+      "sl_chuyen": 10135.9,
+      "sl_nhan": 9040.9,
+      "cl_thieu": 3633.1,
+      "cl_thua": 1095.3,
+      "tong_cl": 4728.4,
+      "da_xu_ly": 269.8,
+      "con_lai": 4458.6,
+      "status": "Đang xử lý",
+      "tien_do": 7
+    }
+  ],
+  "error_summary": {
+    "tong_so_vu_loi": 7987,
+    "tong_sl_chenh_lech": 9212.946,
+    "tong_gia_tri_that_thoat": 163275850,
+    "top_van_de_loi": "DC giao thiếu",
+    "top_van_de_pct": 71.07,
+    "top_van_de_sl": 6547.39,
+    "ton_dong_chua_cai_thien": 16328252,
+    "ton_dong_pct": 10.0
+  },
+  "error_categories": [
+    {
+      "stt": 1,
+      "loi": "DC giao thiếu",
+      "sl_lech": 6315.415,
+      "gia_tri": 99060313,
+      "ty_le": 71.07,
+      "danh_gia": "Rủi ro cao",
+      "items": [
+        {
+          "date": "09/01/2026",
+          "store": "KFM_HCM_TBI - 108 Bùi Thị Xuân",
+          "sku": "11586",
+          "product": "THANH LONG RUỘT TRẮNG (QUẢ)",
+          "diff": 1.0,
+          "val": 20000,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/01/2026",
+          "store": "KFM_HCM_Q07 - C0.01 Riverside Phú Mỹ Hưng",
+          "sku": "10836",
+          "product": "ĐẬU COVE 250G",
+          "diff": 1.0,
+          "val": 14000,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/01/2026",
+          "store": "KFM_HCM_Q07 - C0.01 Riverside Phú Mỹ Hưng",
+          "sku": "10962",
+          "product": "THÌ LÀ VIETGAP 50G",
+          "diff": 3.0,
+          "val": 19500,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/01/2026",
+          "store": "KFM_HCM_Q07 - C0.01 Riverside Phú Mỹ Hưng",
+          "sku": "11055",
+          "product": "CẢI NGỌT NHẬT HỮU CƠ 300G",
+          "diff": 1.0,
+          "val": 16815,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/01/2026",
+          "store": "KFM_HCM_Q07 - C0.01 Riverside Phú Mỹ Hưng",
+          "sku": "8938525767738",
+          "product": "HỖN HỢP RAU OM, NGÒ GAI 50G",
+          "diff": 2.0,
+          "val": 9000,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/01/2026",
+          "store": "KFM_HCM_TDU - TMDV Citihome Cát Lái",
+          "sku": "10356",
+          "product": "XÀ LÁCH THUỶ TINH THUỶ CANH VIETGAP 1 CÂY",
+          "diff": 3.0,
+          "val": 28809,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/01/2026",
+          "store": "KFM_HCM_TDU - TMDV Citihome Cát Lái",
+          "sku": "11074",
+          "product": "MƯỚP HƯƠNG 400G",
+          "diff": 2.0,
+          "val": 28000,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/01/2026",
+          "store": "KFM_HCM_TDU - TMDV Citihome Cát Lái",
+          "sku": "11230",
+          "product": "ĐẬU BẮP 300G",
+          "diff": 1.0,
+          "val": 12500,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/01/2026",
+          "store": "KFM_HCM_TDU - TMDV Citihome Cát Lái",
+          "sku": "11365",
+          "product": "ĐẬU ĐŨA 300G",
+          "diff": 1.0,
+          "val": 11000,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/01/2026",
+          "store": "KFM_HCM_Q07 - B0.02 Scenic Valley 2",
+          "sku": "10704",
+          "product": "RAU TẦN Ô VIETGAP 300G",
+          "diff": 1.0,
+          "val": 15000,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/01/2026",
+          "store": "KFM_HCM_Q07 - B0.02 Scenic Valley 2",
+          "sku": "1101302",
+          "product": "CHUỐI GIÀ GIỐNG NAM MỸ",
+          "diff": 0.78,
+          "val": 13650,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/01/2026",
+          "store": "KFM_HCM_TDU - The Art Gia Hòa",
+          "sku": "8938525767295",
+          "product": "VIETRAT-TÍA TÔ HỮU CƠ 100G",
+          "diff": 1.0,
+          "val": 8550,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/01/2026",
+          "store": "KFM_HCM_BCH - A7-8 Valora Mizuki",
+          "sku": "1101062",
+          "product": "CHUỐI LABA ĐÀ LẠT",
+          "diff": 1.04,
+          "val": 23920,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/01/2026",
+          "store": "KFM_HCM_Q07 - 17 Đường số 16, Khu Nam Viên Midtown",
+          "sku": "8936210960815",
+          "product": "NẤM XANH- NẤM RƠM TƯƠI VN 200G",
+          "diff": 1.0,
+          "val": 23000,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/01/2026",
+          "store": "KFM_HCM_Q07 - 17 Đường số 16, Khu Nam Viên Midtown",
+          "sku": "8936210960594",
+          "product": "NẤM XANH- NẤM HƯƠNG TƯƠI ( NẤM ĐÔNG CÔ) VN 150G",
+          "diff": 2.0,
+          "val": 47000,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/01/2026",
+          "store": "KFM_HCM_Q07 - 956 Huỳnh Tấn Phát",
+          "sku": "11373",
+          "product": "RAU THƠM HỖN HỢP VIETGAP 100G",
+          "diff": 2.0,
+          "val": 17000,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/01/2026",
+          "store": "KFM_HCM_TPH - 91 Nguyễn Sơn",
+          "sku": "8938513029442",
+          "product": "TAFA - TRỨNG GÀ SẠCH PRO HỘP 10 QUẢ (65G ± 2G)",
+          "diff": 8.0,
+          "val": 244800,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/01/2026",
+          "store": "KFM_HCM_TDU - 128A Kha Vạn Cân",
+          "sku": "11062",
+          "product": "CẢI DÚN THUỶ CANH 300G",
+          "diff": 1.0,
+          "val": 12500,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/01/2026",
+          "store": "KFM_HCM_Q07 - A01-06 Hoàng Anh Thanh Bình",
+          "sku": "11377",
+          "product": "KHỔ QUA RỪNG BABY 350G",
+          "diff": 1.0,
+          "val": 15000,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/01/2026",
+          "store": "KFM_HCM_Q07 - A01-06 Hoàng Anh Thanh Bình",
+          "sku": "8936148072369",
+          "product": "CÀ PHÁO 300G",
+          "diff": 1.0,
+          "val": 10000,
+          "status": "Thiếu Item trong kiện"
+        }
+      ]
+    },
+    {
+      "stt": 2,
+      "loi": "VT giao sai điểm",
+      "sl_lech": 906.02,
+      "gia_tri": 17994368,
+      "ty_le": 9.83,
+      "danh_gia": "Kiểm soát tốt",
+      "items": [
+        {
+          "date": "09/01/2026",
+          "store": "KFM_HCM_NBE - A.1.05 Sunrise Riverside",
+          "sku": "10248",
+          "product": "TÁO XANH NINH THUẬN HỘP 1KG",
+          "diff": 2.0,
+          "val": 100000,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/01/2026",
+          "store": "KFM_HCM_NBE - A.1.05 Sunrise Riverside",
+          "sku": "10356",
+          "product": "XÀ LÁCH THUỶ TINH THUỶ CANH VIETGAP 1 CÂY",
+          "diff": 3.0,
+          "val": 28809,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/01/2026",
+          "store": "KFM_HCM_NBE - A.1.05 Sunrise Riverside",
+          "sku": "10433",
+          "product": "BƯỞI ĐƯỜNG LÁ CAM TÂN TRIỀU",
+          "diff": 5.0,
+          "val": 109615,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/01/2026",
+          "store": "KFM_HCM_NBE - A.1.05 Sunrise Riverside",
+          "sku": "10462",
+          "product": "HÀNH TÂY ĐÀ LẠT SIZE LỚN VIETGAP 500G",
+          "diff": 5.0,
+          "val": 75000,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/01/2026",
+          "store": "KFM_HCM_NBE - A.1.05 Sunrise Riverside",
+          "sku": "10463",
+          "product": "DƯA LEO BABY ĐÀ LẠT VIETGAP 500G",
+          "diff": 5.0,
+          "val": 50000,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/01/2026",
+          "store": "KFM_HCM_NBE - A.1.05 Sunrise Riverside",
+          "sku": "10565",
+          "product": "ỔI ĐÀI LOAN VỈ (VỈ)",
+          "diff": 3.0,
+          "val": 44820,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/01/2026",
+          "store": "KFM_HCM_NBE - A.1.05 Sunrise Riverside",
+          "sku": "10689",
+          "product": "PTFARM - ỚT SỪNG XANH VIETGAP 100G",
+          "diff": 2.0,
+          "val": 22000,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/01/2026",
+          "store": "KFM_HCM_NBE - A.1.05 Sunrise Riverside",
+          "sku": "10791",
+          "product": "HÀNH LÁ VIETGAP 100G",
+          "diff": 5.0,
+          "val": 37500,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/01/2026",
+          "store": "KFM_HCM_NBE - A.1.05 Sunrise Riverside",
+          "sku": "10793",
+          "product": "DIẾP CÁ (DẤP CÁ) VIETGAP 100G",
+          "diff": 1.0,
+          "val": 5500,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/01/2026",
+          "store": "KFM_HCM_NBE - A.1.05 Sunrise Riverside",
+          "sku": "10827",
+          "product": "KHOAI LANG HẠT DẺ BABY 1KG",
+          "diff": 5.0,
+          "val": 195775,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/01/2026",
+          "store": "KFM_HCM_NBE - A.1.05 Sunrise Riverside",
+          "sku": "10865",
+          "product": "XÀ LÁCH THUỶ TINH MIX XANH TÍM VIETGAP",
+          "diff": 4.0,
+          "val": 56000,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/01/2026",
+          "store": "KFM_HCM_NBE - A.1.05 Sunrise Riverside",
+          "sku": "10911",
+          "product": "CÀ CHUA SIZE NHỎ VIETGAP 500G",
+          "diff": 5.0,
+          "val": 110000,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/01/2026",
+          "store": "KFM_HCM_NBE - A.1.05 Sunrise Riverside",
+          "sku": "10923",
+          "product": "CÀ CHUA BI VÀNG 250G",
+          "diff": 2.0,
+          "val": 29100,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/01/2026",
+          "store": "KFM_HCM_NBE - A.1.05 Sunrise Riverside",
+          "sku": "10962",
+          "product": "THÌ LÀ VIETGAP 50G",
+          "diff": 3.0,
+          "val": 19500,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/01/2026",
+          "store": "KFM_HCM_NBE - A.1.05 Sunrise Riverside",
+          "sku": "11005",
+          "product": "ORLAR - XÀ LÁCH ROMAINE XANH 150G",
+          "diff": 1.0,
+          "val": 11698,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/01/2026",
+          "store": "KFM_HCM_NBE - A.1.05 Sunrise Riverside",
+          "sku": "11097",
+          "product": "KHOAI LANG GIỐNG NHẬT XUẤT KHẨU 500G",
+          "diff": 5.0,
+          "val": 109825,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/01/2026",
+          "store": "KFM_HCM_NBE - A.1.05 Sunrise Riverside",
+          "sku": "11273",
+          "product": "CÀ RỐT BABY 200G",
+          "diff": 1.0,
+          "val": 16000,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/01/2026",
+          "store": "KFM_HCM_NBE - A.1.05 Sunrise Riverside",
+          "sku": "11321",
+          "product": "RAU MUỐNG BABY VIETGAP 300G",
+          "diff": 1.0,
+          "val": 11596,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/01/2026",
+          "store": "KFM_HCM_NBE - A.1.05 Sunrise Riverside",
+          "sku": "11323",
+          "product": "ỚT CHUÔNG BABY/ ỚT NGỌT MINIMO 3 MÀU 350G",
+          "diff": 2.0,
+          "val": 60000,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/01/2026",
+          "store": "KFM_HCM_NBE - A.1.05 Sunrise Riverside",
+          "sku": "11374",
+          "product": "DƯA LEO 500G",
+          "diff": 5.0,
+          "val": 66530,
+          "status": "Thiếu Item trong kiện"
+        }
+      ]
+    },
+    {
+      "stt": 3,
+      "loi": "ST nhập thiếu",
+      "sl_lech": 438.078,
+      "gia_tri": 9378314,
+      "ty_le": 4.76,
+      "danh_gia": "Kiểm soát tốt",
+      "items": [
+        {
+          "date": "09/01/2026",
+          "store": "KFM_HCM_PNH - 154 Nguyễn Trọng Tuyển",
+          "sku": "11321",
+          "product": "RAU MUỐNG BABY VIETGAP 300G",
+          "diff": 2.0,
+          "val": 23192,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/01/2026",
+          "store": "KFM_HCM_Q7 - 01 Đường Số 10 Tân Kiểng",
+          "sku": "8936210960303",
+          "product": "NẤM XANH- NẤM BÀO NGƯ XÁM TƯƠI VN 200G",
+          "diff": 1.0,
+          "val": 12600,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/01/2026",
+          "store": "KFM_HCM_TBI - 236A Lê Văn Sỹ",
+          "sku": "1100942",
+          "product": "BƠ BOOTH",
+          "diff": 3.0,
+          "val": 105000,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/01/2026",
+          "store": "KFM_HCM_TBI - 236A Lê Văn Sỹ",
+          "sku": "1101079",
+          "product": "BƠ 034",
+          "diff": 3.32,
+          "val": 230461,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/01/2026",
+          "store": "KFM_HCM_TBI - 236A Lê Văn Sỹ",
+          "sku": "1101403",
+          "product": "HỒNG GIÒN CHÍN NÊN",
+          "diff": 6.0,
+          "val": 312000,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/01/2026",
+          "store": "KFM_HCM_TBI - 236A Lê Văn Sỹ",
+          "sku": "1102035",
+          "product": "MẬN ĐÁ ĐƯỜNG",
+          "diff": 4.0,
+          "val": 140000,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/01/2026",
+          "store": "KFM_HCM_TPH - S1.0.38 Block A5 Diamond Celadon City",
+          "sku": "1101003",
+          "product": "DƯA HẤU KHÔNG HẠT",
+          "diff": 2.858,
+          "val": 68592,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/01/2026",
+          "store": "KFM_HCM_NBE - 166E Lê Văn Lương",
+          "sku": "8938568878033",
+          "product": "GIA PHÁT - TRỨNG GÀ TA 33-35G (HỘP 6 QUẢ)",
+          "diff": 1.0,
+          "val": 19277,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/01/2026",
+          "store": "KFM_HCM_NBE - 166E Lê Văn Lương",
+          "sku": "8938513029442",
+          "product": "TAFA - TRỨNG GÀ SẠCH PRO HỘP 10 QUẢ (65G ± 2G)",
+          "diff": 1.0,
+          "val": 30600,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/01/2026",
+          "store": "KFM_HCM_TDU - 60 Lương Định Của",
+          "sku": "8936088900494",
+          "product": "BA KHÁNH - BÚN TƯƠI SỢI LỚN 300G",
+          "diff": 1.0,
+          "val": 4813,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/01/2026",
+          "store": "KFM_HCM_Q07 - 09 Lâm Văn Bền",
+          "sku": "10988",
+          "product": "BÓ XÔI BABY GLOBAL GAP 100G",
+          "diff": 1.0,
+          "val": 29100,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/01/2026",
+          "store": "KFM_HCM_Q07 - 09 Lâm Văn Bền",
+          "sku": "11382",
+          "product": "BẮP NẾP CẶP",
+          "diff": 3.0,
+          "val": 45000,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/01/2026",
+          "store": "KFM_HCM_Q07 - C0.01 Riverside Phú Mỹ Hưng",
+          "sku": "8938529809274",
+          "product": "LV NUFRES - BÁNH MÌ QUE 200G (50G x 4 CÁI)",
+          "diff": 2.0,
+          "val": 27432,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/01/2026",
+          "store": "KFM_HCM_Q07 - C0.01 Riverside Phú Mỹ Hưng",
+          "sku": "SP001928",
+          "product": "BON - BÁNH MÌ XÚC XÍCH 90G",
+          "diff": 1.0,
+          "val": 14805,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/01/2026",
+          "store": "KFM_HCM_Q07 - C0.01 Riverside Phú Mỹ Hưng",
+          "sku": "SP001987",
+          "product": "BMQ - BÁNH MÌ CHÀ BÔNG CAY 70G",
+          "diff": 1.0,
+          "val": 13483,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/01/2026",
+          "store": "KFM_HCM_Q01 - 35 Nguyễn Hữu Cầu",
+          "sku": "8936109824228",
+          "product": "SAINT HONORE - BÁNH MÌ TRUYỀN THỐNG MINI 200G (40G x 5 CÁI)",
+          "diff": 2.0,
+          "val": 21000,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/02/2026",
+          "store": "KFM_HCM_TDU - 96K Đường Số 12 Tam Bình",
+          "sku": "11024",
+          "product": "LÁ VỪNG (LÁ MÈ) 50G",
+          "diff": 2.0,
+          "val": 16000,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/02/2026",
+          "store": "KFM_HCM_BCH - 10 Phạm Hùng",
+          "sku": "8936064240019",
+          "product": "QL - TRỨNG GÀ TƯƠI SIZE 60G (HỘP 6 QUẢ)",
+          "diff": 20.0,
+          "val": 324000,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/02/2026",
+          "store": "KFM_HCM_Q07 - SH16 Eco Green",
+          "sku": "10791",
+          "product": "HÀNH LÁ VIETGAP 100G",
+          "diff": 10.0,
+          "val": 75000,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/02/2026",
+          "store": "KFM_HCM_Q10 - 103 Hòa Hưng",
+          "sku": "10356",
+          "product": "XÀ LÁCH THUỶ TINH THUỶ CANH VIETGAP 1 CÂY",
+          "diff": 1.0,
+          "val": 9603,
+          "status": "Thiếu Item trong kiện"
+        }
+      ]
+    },
+    {
+      "stt": 4,
+      "loi": "Hao hụt",
+      "sl_lech": 540.748,
+      "gia_tri": 19543931,
+      "ty_le": 4.08,
+      "danh_gia": "Kiểm soát tốt",
+      "items": [
+        {
+          "date": "09/01/2026",
+          "store": "KFM_HCM_TBI - 108 Bùi Thị Xuân",
+          "sku": "1101302",
+          "product": "CHUỐI GIÀ GIỐNG NAM MỸ",
+          "diff": 0.14,
+          "val": 2450,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/01/2026",
+          "store": "KFM_HCM_Q07 - C0.01 Riverside Phú Mỹ Hưng",
+          "sku": "1101366",
+          "product": "BÔNG CẢI XANH ĐÀ LẠT  (KG)",
+          "diff": 0.12,
+          "val": 6600,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/01/2026",
+          "store": "KFM_HCM_TDU - TMDV Citihome Cát Lái",
+          "sku": "1101366",
+          "product": "BÔNG CẢI XANH ĐÀ LẠT  (KG)",
+          "diff": 0.12,
+          "val": 6600,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/01/2026",
+          "store": "KFM_HCM_Q07 - B0.02 Scenic Valley 2",
+          "sku": "1100942",
+          "product": "BƠ BOOTH",
+          "diff": 0.16,
+          "val": 5600,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/01/2026",
+          "store": "KFM_HCM_Q07 - B0.02 Scenic Valley 2",
+          "sku": "1100992",
+          "product": "DƯA LƯỚI VỎ XANH RUỘT CAM",
+          "diff": 0.02,
+          "val": 740,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/01/2026",
+          "store": "KFM_HCM_Q07 - B0.02 Scenic Valley 2",
+          "sku": "1101003",
+          "product": "DƯA HẤU KHÔNG HẠT",
+          "diff": 0.08,
+          "val": 1920,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/01/2026",
+          "store": "KFM_HCM_Q07 - B0.02 Scenic Valley 2",
+          "sku": "1101079",
+          "product": "BƠ 034",
+          "diff": 0.06,
+          "val": 4165,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/01/2026",
+          "store": "KFM_HCM_Q07 - B0.02 Scenic Valley 2",
+          "sku": "1101094",
+          "product": "MÍT GIỐNG THÁI CẮT MIÊNG",
+          "diff": 0.02,
+          "val": 740,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/01/2026",
+          "store": "KFM_HCM_Q07 - B0.02 Scenic Valley 2",
+          "sku": "1101366",
+          "product": "BÔNG CẢI XANH ĐÀ LẠT  (KG)",
+          "diff": 0.06,
+          "val": 3300,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/01/2026",
+          "store": "KFM_HCM_TDU - The Art Gia Hòa",
+          "sku": "1100261",
+          "product": "DƯA LÊ HOÀNG KIM",
+          "diff": 0.04,
+          "val": 1907,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/01/2026",
+          "store": "KFM_HCM_TDU - The Art Gia Hòa",
+          "sku": "1101366",
+          "product": "BÔNG CẢI XANH ĐÀ LẠT  (KG)",
+          "diff": 0.08,
+          "val": 4400,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/01/2026",
+          "store": "KFM_HCM_BCH - A7-8 Valora Mizuki",
+          "sku": "1101079",
+          "product": "BƠ 034",
+          "diff": 0.02,
+          "val": 1388,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/01/2026",
+          "store": "KFM_HCM_BCH - A7-8 Valora Mizuki",
+          "sku": "1101366",
+          "product": "BÔNG CẢI XANH ĐÀ LẠT  (KG)",
+          "diff": 0.08,
+          "val": 4400,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/01/2026",
+          "store": "KFM_HCM_BCH - A7-8 Valora Mizuki",
+          "sku": "1101377",
+          "product": "BÔNG CẢI TRẮNG ĐÀ LẠT VIETGAP",
+          "diff": 0.02,
+          "val": 1200,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/01/2026",
+          "store": "KFM_HCM_TDU - 74 Đường Số 1 Chung Cư Sky 9",
+          "sku": "1100942",
+          "product": "BƠ BOOTH",
+          "diff": 0.085,
+          "val": 2975,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/01/2026",
+          "store": "KFM_HCM_TDU - 74 Đường Số 1 Chung Cư Sky 9",
+          "sku": "1101079",
+          "product": "BƠ 034",
+          "diff": 0.01,
+          "val": 694,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/01/2026",
+          "store": "KFM_HCM_TDU - 74 Đường Số 1 Chung Cư Sky 9",
+          "sku": "1101366",
+          "product": "BÔNG CẢI XANH ĐÀ LẠT  (KG)",
+          "diff": 0.14,
+          "val": 7700,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/01/2026",
+          "store": "KFM_HCM_Q07 - 17 Đường số 16, Khu Nam Viên Midtown",
+          "sku": "1101079",
+          "product": "BƠ 034",
+          "diff": 0.02,
+          "val": 1388,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/01/2026",
+          "store": "KFM_HCM_BCH - TMDV2 Mizuki Park",
+          "sku": "1101302",
+          "product": "CHUỐI GIÀ GIỐNG NAM MỸ",
+          "diff": 0.01,
+          "val": 175,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/01/2026",
+          "store": "KFM_HCM_TPH - 91 Nguyễn Sơn",
+          "sku": "1100992",
+          "product": "DƯA LƯỚI VỎ XANH RUỘT CAM",
+          "diff": 0.085,
+          "val": 3145,
+          "status": "Thiếu Item trong kiện"
+        }
+      ]
+    },
+    {
+      "stt": 5,
+      "loi": "DC giao bù",
+      "sl_lech": 369.2,
+      "gia_tri": 6076166,
+      "ty_le": 4.01,
+      "danh_gia": "Kiểm soát tốt",
+      "items": [
+        {
+          "date": "09/01/2026",
+          "store": "KFM_HCM_NBE - G16 Celesta Rise",
+          "sku": "10464",
+          "product": "CẦN TÂY ĐÀ LẠT 500G",
+          "diff": 2.0,
+          "val": 56000,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/01/2026",
+          "store": "KFM_HCM_NBE - G16 Celesta Rise",
+          "sku": "10465",
+          "product": "CẢI BÓ XÔI ĐÀ LẠT 300G",
+          "diff": 3.0,
+          "val": 66000,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/01/2026",
+          "store": "KFM_HCM_NBE - G16 Celesta Rise",
+          "sku": "10700",
+          "product": "COMBO 3 - DỪA XIÊM XANH (LỚN)",
+          "diff": 10.0,
+          "val": 315000,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/01/2026",
+          "store": "KFM_HCM_NBE - G16 Celesta Rise",
+          "sku": "10704",
+          "product": "RAU TẦN Ô VIETGAP 300G",
+          "diff": 3.0,
+          "val": 45000,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/01/2026",
+          "store": "KFM_HCM_NBE - G16 Celesta Rise",
+          "sku": "10900",
+          "product": "CẢI THÌA VIETGAP 300G",
+          "diff": 5.0,
+          "val": 50000,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/01/2026",
+          "store": "KFM_HCM_NBE - G16 Celesta Rise",
+          "sku": "10902",
+          "product": "MỒNG TƠI VIETGAP 300G",
+          "diff": 3.0,
+          "val": 30000,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/01/2026",
+          "store": "KFM_HCM_NBE - G16 Celesta Rise",
+          "sku": "10903",
+          "product": "CẢI BẸ XANH VIETGAP 300G",
+          "diff": 2.0,
+          "val": 20000,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/01/2026",
+          "store": "KFM_HCM_NBE - G16 Celesta Rise",
+          "sku": "10908",
+          "product": "RAU MUỐNG NƯỚC 400G",
+          "diff": 8.0,
+          "val": 72000,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/01/2026",
+          "store": "KFM_HCM_NBE - G16 Celesta Rise",
+          "sku": "11054",
+          "product": "CẢI BÓ XÔI HỮU CƠ 300G",
+          "diff": 1.0,
+          "val": 20235,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/01/2026",
+          "store": "KFM_HCM_NBE - G16 Celesta Rise",
+          "sku": "11111",
+          "product": "CẢI KALE 200G",
+          "diff": 2.0,
+          "val": 26000,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/01/2026",
+          "store": "KFM_HCM_NBE - G16 Celesta Rise",
+          "sku": "11230",
+          "product": "ĐẬU BẮP 300G",
+          "diff": 5.0,
+          "val": 62500,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/01/2026",
+          "store": "KFM_HCM_NBE - G16 Celesta Rise",
+          "sku": "11280",
+          "product": "BẮP CẢI TRÁI TIM ĐÀ LẠT VIETGAP ( 1 BẮP)",
+          "diff": 5.0,
+          "val": 82500,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/01/2026",
+          "store": "KFM_HCM_NBE - G16 Celesta Rise",
+          "sku": "11297",
+          "product": "RAU MỒNG TƠI BABY VIETGAP 300G",
+          "diff": 4.0,
+          "val": 48000,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/01/2026",
+          "store": "KFM_HCM_NBE - G16 Celesta Rise",
+          "sku": "11319",
+          "product": "RAU DỀN BABY HỖN HỢP VIETGAP 250G",
+          "diff": 1.0,
+          "val": 10750,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/01/2026",
+          "store": "KFM_HCM_NBE - G16 Celesta Rise",
+          "sku": "11373",
+          "product": "RAU THƠM HỖN HỢP VIETGAP 100G",
+          "diff": 4.0,
+          "val": 34000,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/01/2026",
+          "store": "KFM_HCM_NBE - G16 Celesta Rise",
+          "sku": "11376",
+          "product": "RAU MÁ LÁ NHỎ VIETGAP 200G",
+          "diff": 3.0,
+          "val": 30000,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/01/2026",
+          "store": "KFM_HCM_NBE - G16 Celesta Rise",
+          "sku": "11606",
+          "product": "RAU LANG VIETGAP 300G",
+          "diff": 3.0,
+          "val": 21000,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/01/2026",
+          "store": "KFM_HCM_NBE - G16 Celesta Rise",
+          "sku": "11689",
+          "product": "CỦ CẢI TRẮNG ĐÀ LẠT 250G UP",
+          "diff": 5.0,
+          "val": 40000,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/01/2026",
+          "store": "KFM_HCM_NBE - G16 Celesta Rise",
+          "sku": "11758",
+          "product": "RAU RỪNG VIETGAP 300G",
+          "diff": 2.0,
+          "val": 24000,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/01/2026",
+          "store": "KFM_HCM_NBE - G16 Celesta Rise",
+          "sku": "50236",
+          "product": "DƯA LEO MINI/DƯA LEO GIÒN VIETGAP 500G",
+          "diff": 5.0,
+          "val": 70000,
+          "status": "Thiếu Item trong kiện"
+        }
+      ]
+    },
+    {
+      "stt": 6,
+      "loi": "DC Pick sai",
+      "sl_lech": 389.83,
+      "gia_tri": 6478519,
+      "ty_le": 3.94,
+      "danh_gia": "Kiểm soát tốt",
+      "items": [
+        {
+          "date": "09/01/2026",
+          "store": "KFM_HCM_TDU - 46 Trần Não",
+          "sku": "1101062",
+          "product": "CHUỐI LABA ĐÀ LẠT",
+          "diff": 10.0,
+          "val": 230000,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/01/2026",
+          "store": "KFM_HCM_Q07 - 09 Lâm Văn Bền",
+          "sku": "1100867",
+          "product": "BƯỞI DA XANH LOẠI 1",
+          "diff": 5.7,
+          "val": 188100,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/02/2026",
+          "store": "KFM_HCM_NBE - 166E Lê Văn Lương",
+          "sku": "11571",
+          "product": "THANH LONG TÍM HỒNG (QUẢ)",
+          "diff": 5.0,
+          "val": 87500,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/03/2026",
+          "store": "KFM_HCM_TBI - 44 Thăng Long",
+          "sku": "8936117053023",
+          "product": "PTFARM-ỚT XIÊM XANH VIETGAP 50G",
+          "diff": 5.0,
+          "val": 52500,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/03/2026",
+          "store": "KFM_HCM_TDU - 129 Hoàng Diệu 2",
+          "sku": "8936117053023",
+          "product": "PTFARM-ỚT XIÊM XANH VIETGAP 50G",
+          "diff": 5.0,
+          "val": 52500,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/03/2026",
+          "store": "KFM_HCM_Q07 - 17 Đường số 16, Khu Nam Viên Midtown",
+          "sku": "11127",
+          "product": "BÍ ĐAO XANH 1 TRÁI",
+          "diff": 5.0,
+          "val": 67500,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/03/2026",
+          "store": "KFM_HCM_TDU - 67A Nguyễn Duy Trinh Long Trường",
+          "sku": "8936117053023",
+          "product": "PTFARM-ỚT XIÊM XANH VIETGAP 50G",
+          "diff": 5.0,
+          "val": 52500,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/03/2026",
+          "store": "KFM_HCM_Q12 - 45F1 Đường DN5 KDC An Sương",
+          "sku": "10354",
+          "product": "XÀ LÁCH LÔ LÔ XANH THUỶ CANH VIETGAP 1 CÂY",
+          "diff": 24.0,
+          "val": 223560,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/03/2026",
+          "store": "KFM_HCM_TDU - SH-1C 2 Đường A5 KDC Palm Residence",
+          "sku": "10651",
+          "product": "HÀNH PARO VIETGAP 200G",
+          "diff": 3.0,
+          "val": 36000,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/03/2026",
+          "store": "KFM_HCM_BTH - 107 Bình Quới",
+          "sku": "10914",
+          "product": "BÍ ĐỎ NON (1 TRÁI)",
+          "diff": 5.0,
+          "val": 50000,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/03/2026",
+          "store": "KFM_HCM_TDU - 59 Quốc Hương",
+          "sku": "11280",
+          "product": "BẮP CẢI TRÁI TIM ĐÀ LẠT VIETGAP ( 1 BẮP)",
+          "diff": 14.0,
+          "val": 231000,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/03/2026",
+          "store": "KFM_HCM_TDU - GH5 Vinhomes Grand Park",
+          "sku": "11278",
+          "product": "ỚT CHUÔNG ĐỎ ĐÀ LẠT VIETGAP 200G UP",
+          "diff": 5.0,
+          "val": 65000,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/03/2026",
+          "store": "KFM_HCM_TDU - 299 Liên Phường",
+          "sku": "10790",
+          "product": "NGÒ RÍ 50G",
+          "diff": 17.0,
+          "val": 85000,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/03/2026",
+          "store": "KFM_HCM_TDU - D1-1.24 SAFIRA Khang Điền",
+          "sku": "8938509616045",
+          "product": "HÀNH TÍM LÝ SƠN 300G",
+          "diff": 10.0,
+          "val": 193500,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/03/2026",
+          "store": "KFM_HCM_Q07 - 436 Nguyễn Thị Thập",
+          "sku": "1101079",
+          "product": "BƠ 034",
+          "diff": 3.0,
+          "val": 208248,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/03/2026",
+          "store": "KFM_HCM_Q07 - 43 Bùi Văn Ba",
+          "sku": "10962",
+          "product": "THÌ LÀ VIETGAP 50G",
+          "diff": 3.0,
+          "val": 19500,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/03/2026",
+          "store": "KFM_HCM_Q07 - 571 Huỳnh Tấn Phát",
+          "sku": "8938525767295",
+          "product": "VIETRAT-TÍA TÔ HỮU CƠ 100G",
+          "diff": 3.0,
+          "val": 25650,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/03/2026",
+          "store": "KFM_HCM_Q07 - 0105 B4 Era Town",
+          "sku": "11062",
+          "product": "CẢI DÚN THUỶ CANH 300G",
+          "diff": 3.0,
+          "val": 37500,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/04/2026",
+          "store": "KFM_HCM_TDU - 128A Kha Vạn Cân",
+          "sku": "8934680090209",
+          "product": "KINH ĐÔ - BÁNH TRUNG THU HẠT SEN 150G",
+          "diff": 1.0,
+          "val": 50667,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/04/2026",
+          "store": "KFM_HCM_Q06 - 229A Tân Hòa Đông",
+          "sku": "11374",
+          "product": "DƯA LEO 500G",
+          "diff": 5.0,
+          "val": 66530,
+          "status": "Thiếu Item trong kiện"
+        }
+      ]
+    },
+    {
+      "stt": 7,
+      "loi": "DC thao tác sai",
+      "sl_lech": 169.7,
+      "gia_tri": 2684968,
+      "ty_le": 1.84,
+      "danh_gia": "Kiểm soát tốt",
+      "items": [
+        {
+          "date": "09/03/2026",
+          "store": "KFM_HCM_TPH - 85 Cây Keo",
+          "sku": "1101366",
+          "product": "BÔNG CẢI XANH ĐÀ LẠT  (KG)",
+          "diff": 0.7,
+          "val": 38500,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/05/2026",
+          "store": "KFM_HCM_TDU - 63 Đường Số 3",
+          "sku": "8938529809038",
+          "product": "LV NUFRES - BÁNH SANDWICH KHOAI LANG NGUYÊN CÁM 150G",
+          "diff": 1.0,
+          "val": 11800,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/06/2026",
+          "store": "KFM_HCM_Q12 - Block B1 Hưng Ngân Garden",
+          "sku": "8936076271285",
+          "product": "SAVOURE - BÁNH BUN LẠT TRÒN 240G",
+          "diff": 1.0,
+          "val": 20818,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/08/2026",
+          "store": "KFM_HCM_NBE - 166E Lê Văn Lương",
+          "sku": "8938529809038",
+          "product": "LV NUFRES - BÁNH SANDWICH KHOAI LANG NGUYÊN CÁM 150G",
+          "diff": 1.0,
+          "val": 11800,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/09/2026",
+          "store": "KFM_HCM_TDU - 02 Nguyễn Thị Nhung",
+          "sku": "8938525767059",
+          "product": "VIETRAT-RAU THƠM HỖN HỢP HỮU CƠ 150G",
+          "diff": 8.0,
+          "val": 125400,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/09/2026",
+          "store": "KFM_HCM_TDU - 305 Nguyễn Duy Trinh",
+          "sku": "8938525767059",
+          "product": "VIETRAT-RAU THƠM HỖN HỢP HỮU CƠ 150G",
+          "diff": 4.0,
+          "val": 62700,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/09/2026",
+          "store": "KFM_HCM_Q07 - 97 Lê Thị Chợ",
+          "sku": "8938525767059",
+          "product": "VIETRAT-RAU THƠM HỖN HỢP HỮU CƠ 150G",
+          "diff": 6.0,
+          "val": 94050,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/09/2026",
+          "store": "KFM_HCM_TDU - BS11 Vinhomes Grand Park",
+          "sku": "8938525767059",
+          "product": "VIETRAT-RAU THƠM HỖN HỢP HỮU CƠ 150G",
+          "diff": 1.0,
+          "val": 15675,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/09/2026",
+          "store": "KFM_HCM_TPH - 85 Cây Keo",
+          "sku": "8938525767059",
+          "product": "VIETRAT-RAU THƠM HỖN HỢP HỮU CƠ 150G",
+          "diff": 5.0,
+          "val": 78375,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/09/2026",
+          "store": "KFM_HCM_TDU - The Art Gia Hòa",
+          "sku": "8938525767059",
+          "product": "VIETRAT-RAU THƠM HỖN HỢP HỮU CƠ 150G",
+          "diff": 8.0,
+          "val": 125400,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/09/2026",
+          "store": "KFM_HCM_Q07 - 31 Tân Mỹ",
+          "sku": "8938525767059",
+          "product": "VIETRAT-RAU THƠM HỖN HỢP HỮU CƠ 150G",
+          "diff": 12.0,
+          "val": 188100,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/09/2026",
+          "store": "KFM_BDU_TAN - SH04 The Rivana",
+          "sku": "8938525767059",
+          "product": "VIETRAT-RAU THƠM HỖN HỢP HỮU CƠ 150G",
+          "diff": 2.0,
+          "val": 31350,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/09/2026",
+          "store": "KFM_HCM_Q07 - E72 Phú Thuận",
+          "sku": "8938525767059",
+          "product": "VIETRAT-RAU THƠM HỖN HỢP HỮU CƠ 150G",
+          "diff": 5.0,
+          "val": 78375,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/09/2026",
+          "store": "KFM_HCM_Q07 - 43 Bùi Văn Ba",
+          "sku": "8938525767059",
+          "product": "VIETRAT-RAU THƠM HỖN HỢP HỮU CƠ 150G",
+          "diff": 2.0,
+          "val": 31350,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/09/2026",
+          "store": "KFM_HCM_Q07 - R13 Hưng Vượng 2",
+          "sku": "8938525767059",
+          "product": "VIETRAT-RAU THƠM HỖN HỢP HỮU CƠ 150G",
+          "diff": 3.0,
+          "val": 47025,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/09/2026",
+          "store": "KFM_HCM_TBI - 22 Hoàng Hoa Thám",
+          "sku": "8938525767059",
+          "product": "VIETRAT-RAU THƠM HỖN HỢP HỮU CƠ 150G",
+          "diff": 4.0,
+          "val": 62700,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/09/2026",
+          "store": "KFM_HCM_Q12 - 678 Nguyễn Văn Quá",
+          "sku": "8938525767059",
+          "product": "VIETRAT-RAU THƠM HỖN HỢP HỮU CƠ 150G",
+          "diff": 2.0,
+          "val": 31350,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/09/2026",
+          "store": "KFM_HCM_Q03 - 14 Huỳnh Tịnh Của",
+          "sku": "8938525767059",
+          "product": "VIETRAT-RAU THƠM HỖN HỢP HỮU CƠ 150G",
+          "diff": 3.0,
+          "val": 47025,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/09/2026",
+          "store": "KFM_HCM_Q07 - 436 Nguyễn Thị Thập",
+          "sku": "8938525767059",
+          "product": "VIETRAT-RAU THƠM HỖN HỢP HỮU CƠ 150G",
+          "diff": 7.0,
+          "val": 109725,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/09/2026",
+          "store": "KFM_HCM_BTA - AK4 Akari City",
+          "sku": "8938525767059",
+          "product": "VIETRAT-RAU THƠM HỖN HỢP HỮU CƠ 150G",
+          "diff": 7.0,
+          "val": 109725,
+          "status": "Thiếu Item trong kiện"
+        }
+      ]
+    },
+    {
+      "stt": 8,
+      "loi": "ST thông tin sai/không phản hồi",
+      "sl_lech": 36.1,
+      "gia_tri": 1003065,
+      "ty_le": 0.39,
+      "danh_gia": "Kiểm soát tốt",
+      "items": [
+        {
+          "date": "09/01/2026",
+          "store": "KFM_HCM_TDU - 59 Quốc Hương",
+          "sku": "1100942",
+          "product": "BƠ BOOTH",
+          "diff": 6.1,
+          "val": 213500,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/01/2026",
+          "store": "KFM_HCM_NBE - 166E Lê Văn Lương",
+          "sku": "10458",
+          "product": "MĂNG CỤT HỘP 1KG",
+          "diff": 4.0,
+          "val": 388000,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/03/2026",
+          "store": "KFM_HCM_TDU - GH5 Vinhomes Grand Park",
+          "sku": "11694",
+          "product": "BÍ GIỐNG MỸ (1 TRÁI)",
+          "diff": 15.0,
+          "val": 179565,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/04/2026",
+          "store": "KFM_HCM_BCH - 10 Phạm Hùng",
+          "sku": "10911",
+          "product": "CÀ CHUA SIZE NHỎ VIETGAP 500G",
+          "diff": 1.0,
+          "val": 22000,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/05/2026",
+          "store": "KFM_HCM_TDU - S06.06 Vinhomes Grand Park",
+          "sku": "11019",
+          "product": "CÀ RỐT ĐÀ LẠT VIETGAP 500G",
+          "diff": 10.0,
+          "val": 200000,
+          "status": "Thiếu Item trong kiện"
+        }
+      ]
+    },
+    {
+      "stt": 9,
+      "loi": "ST kiểm sai QT",
+      "sl_lech": 60.745,
+      "gia_tri": 1393031,
+      "ty_le": 0.08,
+      "danh_gia": "Kiểm soát tốt",
+      "items": [
+        {
+          "date": "09/01/2026",
+          "store": "KFM_HCM_Q10 - BB17 Trường Sơn",
+          "sku": "1101366",
+          "product": "BÔNG CẢI XANH ĐÀ LẠT  (KG)",
+          "diff": 0.545,
+          "val": 29975,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/01/2026",
+          "store": "KFM_HCM_TDU - 101C Dương Đình Hội",
+          "sku": "1101302",
+          "product": "CHUỐI GIÀ GIỐNG NAM MỸ",
+          "diff": 0.26,
+          "val": 4550,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/01/2026",
+          "store": "KFM_HCM_TDU - 136 Hiệp Bình",
+          "sku": "1101366",
+          "product": "BÔNG CẢI XANH ĐÀ LẠT  (KG)",
+          "diff": 0.04,
+          "val": 2200,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/01/2026",
+          "store": "KFM_HCM_TDU - S05.02 Vinhomes Grand Park",
+          "sku": "1101992",
+          "product": "XOÀI TỨ QUÝ",
+          "diff": 1.435,
+          "val": 53095,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/02/2026",
+          "store": "KFM_HCM_TDU - SH-1C 2 Đường A5 KDC Palm Residence",
+          "sku": "1100942",
+          "product": "BƠ BOOTH",
+          "diff": 0.04,
+          "val": 1400,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/02/2026",
+          "store": "KFM_HCM_TDU - SH-1C 2 Đường A5 KDC Palm Residence",
+          "sku": "1101062",
+          "product": "CHUỐI LABA ĐÀ LẠT",
+          "diff": 0.1,
+          "val": 2300,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/02/2026",
+          "store": "KFM_HCM_TDU - SH-1C 2 Đường A5 KDC Palm Residence",
+          "sku": "1101094",
+          "product": "MÍT GIỐNG THÁI CẮT MIÊNG",
+          "diff": 0.04,
+          "val": 1480,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/03/2026",
+          "store": "KFM_HCM_Q09 - 367 Nguyễn Văn Tăng",
+          "sku": "1101366",
+          "product": "BÔNG CẢI XANH ĐÀ LẠT  (KG)",
+          "diff": 0.08,
+          "val": 4400,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/03/2026",
+          "store": "KFM_HCM_BTH - 216 Phan Văn Hân",
+          "sku": "1101377",
+          "product": "BÔNG CẢI TRẮNG ĐÀ LẠT VIETGAP",
+          "diff": 0.06,
+          "val": 3600,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/03/2026",
+          "store": "KFM_HCM_BTA - AK4 Akari City",
+          "sku": "1101302",
+          "product": "CHUỐI GIÀ GIỐNG NAM MỸ",
+          "diff": 0.34,
+          "val": 5950,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/03/2026",
+          "store": "KFM_HCM_TDU - GH5 Vinhomes Grand Park",
+          "sku": "1100917",
+          "product": "BÍ ĐỎ TRÒN",
+          "diff": 0.06,
+          "val": 1470,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/03/2026",
+          "store": "KFM_HCM_TDU - GH5 Vinhomes Grand Park",
+          "sku": "1101062",
+          "product": "CHUỐI LABA ĐÀ LẠT",
+          "diff": 0.16,
+          "val": 3680,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/03/2026",
+          "store": "KFM_HCM_TDU - GH5 Vinhomes Grand Park",
+          "sku": "1101077",
+          "product": "CHANH DÂY",
+          "diff": 0.16,
+          "val": 7200,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/03/2026",
+          "store": "KFM_HCM_TDU - GH5 Vinhomes Grand Park",
+          "sku": "1101079",
+          "product": "BƠ 034",
+          "diff": 0.02,
+          "val": 1388,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/03/2026",
+          "store": "KFM_HCM_TDU - GH5 Vinhomes Grand Park",
+          "sku": "1101318",
+          "product": "MẬN AN PHƯỚC",
+          "diff": 0.04,
+          "val": 1400,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/03/2026",
+          "store": "KFM_HCM_TDU - GH5 Vinhomes Grand Park",
+          "sku": "1101366",
+          "product": "BÔNG CẢI XANH ĐÀ LẠT  (KG)",
+          "diff": 0.28,
+          "val": 15400,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/03/2026",
+          "store": "KFM_HCM_TDU - GH5 Vinhomes Grand Park",
+          "sku": "1101941",
+          "product": "DƯA LƯỚI VỎ VÀNG RUỘT CAM",
+          "diff": 0.04,
+          "val": 1760,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/04/2026",
+          "store": "KFM_HCM_TDU - S08.02 Vinhomes Grand Park",
+          "sku": "1100942",
+          "product": "BƠ BOOTH",
+          "diff": 0.005,
+          "val": 175,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/04/2026",
+          "store": "KFM_HCM_NBE - A2.SH28-30 The Park Residence",
+          "sku": "1101366",
+          "product": "BÔNG CẢI XANH ĐÀ LẠT  (KG)",
+          "diff": 0.1,
+          "val": 5500,
+          "status": "Thiếu Item trong kiện"
+        },
+        {
+          "date": "09/04/2026",
+          "store": "KFM_HCM_TDU - 376 Nguyễn Thị Định",
+          "sku": "1100816",
+          "product": "DƯA HẤU RUỘT ĐỎ",
+          "diff": 0.1,
+          "val": 1900,
+          "status": "Thiếu Item trong kiện"
+        }
+      ]
+    }
+  ]
+}
