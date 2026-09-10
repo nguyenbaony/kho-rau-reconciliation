@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Báo Cáo Tổng Hợp Datapay & CDC - StarRocks SCM</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --card-border: #334155;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --primary: #38bdf8;
+            --danger: #f43f5e;
+            --warning: #fbbf24;
+            --success: #10b981;
+            --purple: #c084fc;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: var(--bg-color);
+            color: var(--text-main);
+            padding: 40px 20px;
+            line-height: 1.6;
+        }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .header {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            border: 1px solid var(--card-border);
+            padding: 30px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+        }
+        .header h1 { font-size: 26px; font-weight: 800; color: #fff; margin-bottom: 10px; letter-spacing: -0.5px; }
+        .header p { color: var(--text-muted); font-size: 14px; }
+        .badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+        .badge-blue { background: rgba(56, 189, 248, 0.15); color: var(--primary); border: 1px solid rgba(56, 189, 248, 0.3); }
+        
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .kpi-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 14px;
+            padding: 22px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .kpi-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 20px -8px rgba(0,0,0,0.4);
+        }
+        .kpi-title { font-size: 13px; color: var(--text-muted); text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px; }
+        .kpi-value { font-size: 26px; font-weight: 800; margin: 10px 0; }
+        .kpi-sub { font-size: 12.5px; color: var(--text-muted); }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 26px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
+        }
+        .card-title {
+            font-size: 19px;
+            font-weight: 700;
+            margin-bottom: 22px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #fff;
+        }
+        .table-responsive {
+            overflow-x: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+            text-align: left;
+        }
+        th {
+            background: rgba(15, 23, 42, 0.75);
+            color: #94a3b8;
+            padding: 14px 16px;
+            font-weight: 700;
+            border-bottom: 2px solid var(--card-border);
+            white-space: nowrap;
+        }
+        td {
+            padding: 14px 16px;
+            border-bottom: 1px solid rgba(51, 65, 85, 0.6);
+            vertical-align: middle;
+        }
+        tr:hover td { background: rgba(255, 255, 255, 0.03); }
+        .text-right { text-align: right; }
+        .text-center { text-align: center; }
+        .text-danger { color: var(--danger); font-weight: 700; }
+        .text-purple { color: var(--purple); font-weight: 700; }
+        .text-warning { color: var(--warning); font-weight: 700; }
+        
+        .cdc-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+            gap: 18px;
+        }
+        .cdc-item {
+            background: rgba(15, 23, 42, 0.55);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 18px;
+        }
+        .cdc-table-name {
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+            font-size: 13.5px;
+            color: var(--primary);
+            font-weight: 700;
+            margin-bottom: 8px;
+            word-break: break-all;
+        }
+        .cdc-desc { font-size: 13px; color: #cbd5e1; line-height: 1.5; }
+        code {
+            background: rgba(255, 255, 255, 0.08);
+            padding: 2px 6px;
+            border-radius: 4px;
+            color: #f1f5f9;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <span class="badge badge-blue">STARROCKS SCM ANALYTICS</span>
+            <h1 style="margin-top: 12px;">BÁO CÁO TỔNG HỢP CÁC LOẠI DATAPAY & TẦNG DỮ LIỆU CDC</h1>
+            <p>Database: <strong>kfm_scm</strong> (103.147.122.103:9030) &bull; Tài khoản: <strong>kfm_scm_tho_nguyen</strong> &bull; Cập nhật: <strong>04/09/2026</strong></p>
+        </div>
+
+        <div class="kpi-grid">
+            <div class="kpi-card">
+                <div class="kpi-title">Phạt Kho Rau (DC Penalty)</div>
+                <div class="kpi-value text-danger">99,854,622 ₫</div>
+                <div class="kpi-sub">Lỗi chính: DC Giao thiếu, Pick sai, Thao tác sai</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-title">Phạt Siêu Thị (ST Penalty)</div>
+                <div class="kpi-value text-purple">19,659,253 ₫</div>
+                <div class="kpi-sub">Lỗi chính: ST Nhập thiếu, Kiểm sai quy trình</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-title">Hao Hụt Tự Nhiên (Định Mức)</div>
+                <div class="kpi-value text-warning">13,744,798 ₫</div>
+                <div class="kpi-sub">Theo dung sai CLV2 (Rau: 3.0%, Trái cây: 2.5%)</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-title">Tổng Tiền Phạt Datapay</div>
+                <div class="kpi-value" style="color: #fff;">119,513,875 ₫</div>
+                <div class="kpi-sub">Đã nạp vào DB: 6,383 bản ghi kỳ mới nhất</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">
+                <span>📊</span>
+                <span>Bảng Thống Kê Chi Tiết Các Loại Lỗi Datapay Phát Sinh Thực Tế</span>
+            </div>
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th class="text-center" style="width: 50px;">STT</th>
+                            <th>Loại Lỗi Datapay</th>
+                            <th class="text-right">Số Dòng</th>
+                            <th class="text-right">SL Lệch (Kg/Pack)</th>
+                            <th class="text-right">Tổng GT (VND)</th>
+                            <th class="text-right">Phạt Kho DC (VND)</th>
+                            <th class="text-right">Phạt ST (VND)</th>
+                            <th>Bản Chất Nghiệp Vụ</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="text-center">1</td>
+                            <td><strong style="color: #fff;">DC giao thiếu</strong></td>
+                            <td class="text-right">10,154</td>
+                            <td class="text-right">22,907.44</td>
+                            <td class="text-right">75,786,046 ₫</td>
+                            <td class="text-right text-danger">75,104,665 ₫</td>
+                            <td class="text-right text-purple">54,253 ₫</td>
+                            <td style="font-size: 13px; color: #cbd5e1;">Phiếu xuất kho (PT/TO) có ghi nhận nhưng thực tế mở kiện ra bị thiếu hàng. Kho DC chịu trách nhiệm đền bù.</td>
+                        </tr>
+                        <tr>
+                            <td class="text-center">2</td>
+                            <td><strong style="color: #fff;">VT giao sai điểm</strong></td>
+                            <td class="text-right">1,439</td>
+                            <td class="text-right">5,023.18</td>
+                            <td class="text-right">18,714,131 ₫</td>
+                            <td class="text-right text-danger">18,647,181 ₫</td>
+                            <td class="text-right text-purple">283 ₫</td>
+                            <td style="font-size: 13px; color: #cbd5e1;">Tài xế/đơn vị vận tải trả nhầm kiện hàng của siêu thị này sang siêu thị khác trên tuyến giao.</td>
+                        </tr>
+                        <tr>
+                            <td class="text-center">3</td>
+                            <td><strong style="color: #fff;">ST nhập thiếu</strong></td>
+                            <td class="text-right">1,350</td>
+                            <td class="text-right">4,192.38</td>
+                            <td class="text-right">9,829,117 ₫</td>
+                            <td class="text-right text-danger">307,460 ₫</td>
+                            <td class="text-right text-purple">9,488,014 ₫</td>
+                            <td style="font-size: 13px; color: #cbd5e1;">Kho DC giao đủ hàng nhưng nhân viên ST kiểm đếm sót, nhập thiếu vào hệ thống KDB. ST chịu phạt.</td>
+                        </tr>
+                        <tr>
+                            <td class="text-center">4</td>
+                            <td><strong style="color: #fff;">DC giao bù</strong></td>
+                            <td class="text-right">387</td>
+                            <td class="text-right">1,864.64</td>
+                            <td class="text-right">9,448,485 ₫</td>
+                            <td class="text-right text-danger">185,758 ₫</td>
+                            <td class="text-right text-purple">9,258,654 ₫</td>
+                            <td style="font-size: 13px; color: #cbd5e1;">Hàng giao bù cho các đơn lệch kỳ trước; hệ thống ghi nhận điều chỉnh quy hoàn lại giá trị cho ST.</td>
+                        </tr>
+                        <tr>
+                            <td class="text-center">5</td>
+                            <td><strong style="color: #fff;">DC Pick sai</strong></td>
+                            <td class="text-right">878</td>
+                            <td class="text-right">3,954.10</td>
+                            <td class="text-right">5,775,554 ₫</td>
+                            <td class="text-right text-danger">5,742,013 ₫</td>
+                            <td class="text-right text-purple">1,457 ₫</td>
+                            <td style="font-size: 13px; color: #cbd5e1;">Nhân viên kho soạn nhầm mã SKU, nhầm chủng loại hoặc sai quy cách đóng gói (Pack vs KG).</td>
+                        </tr>
+                        <tr>
+                            <td class="text-center">6</td>
+                            <td><strong style="color: #fff;">Hao hụt (Vượt ngưỡng)</strong></td>
+                            <td class="text-right">21,183</td>
+                            <td class="text-right">2,243.54</td>
+                            <td class="text-right">15,932,919 ₫</td>
+                            <td class="text-right text-danger">9,112 ₫</td>
+                            <td class="text-right text-purple">2,243,666 ₫</td>
+                            <td style="font-size: 13px; color: #cbd5e1;">Chênh lệch trọng lượng rau củ quả vượt quá ngưỡng dung sai tự nhiên theo định mức quy định.</td>
+                        </tr>
+                        <tr>
+                            <td class="text-center">7</td>
+                            <td><strong style="color: #fff;">ST kiểm sai QT</strong></td>
+                            <td class="text-right">287</td>
+                            <td class="text-right">344.40</td>
+                            <td class="text-right">438,495 ₫</td>
+                            <td class="text-right text-danger">20,456 ₫</td>
+                            <td class="text-right text-purple">418,039 ₫</td>
+                            <td style="font-size: 13px; color: #cbd5e1;">ST không tuân thủ quy trình nghiệm thu hàng tươi sống (không chụp ảnh kiện, kiểm trễ giờ quy định).</td>
+                        </tr>
+                        <tr>
+                            <td class="text-center">8</td>
+                            <td><strong style="color: #fff;">ST thông tin sai/không phản hồi</strong></td>
+                            <td class="text-right">171</td>
+                            <td class="text-right">390.33</td>
+                            <td class="text-right">327,142 ₫</td>
+                            <td class="text-right text-danger">17,892 ₫</td>
+                            <td class="text-right text-purple">309,250 ₫</td>
+                            <td style="font-size: 13px; color: #cbd5e1;">ST tạo claim nhưng khi DC/KFM đối chất thì không cung cấp được bằng chứng hợp lệ.</td>
+                        </tr>
+                        <tr>
+                            <td class="text-center">9</td>
+                            <td><strong style="color: #fff;">DC thao tác sai</strong></td>
+                            <td class="text-right">65</td>
+                            <td class="text-right">162.30</td>
+                            <td class="text-right">198,454 ₫</td>
+                            <td class="text-right text-danger">2,443 ₫</td>
+                            <td class="text-right text-purple">195,741 ₫</td>
+                            <td style="font-size: 13px; color: #cbd5e1;">Lỗi quy trình đóng gói, dán nhãn sai mã kiện/thùng tote tại kho DC.</td>
+                        </tr>
+                        <tr>
+                            <td class="text-center">10</td>
+                            <td><strong style="color: #fff;">Lỗi hệ thống</strong></td>
+                            <td class="text-right">387</td>
+                            <td class="text-right">613.14</td>
+                            <td class="text-right">10,405 ₫</td>
+                            <td class="text-right text-danger">10,400 ₫</td>
+                            <td class="text-right text-purple">5 ₫</td>
+                            <td style="font-size: 13px; color: #cbd5e1;">Chênh lệch do lỗi kỹ thuật đồng bộ giữa WMS và KDB (xử lý kỹ thuật, không phạt nhân sự).</td>
+                        </tr>
+                        <tr>
+                            <td class="text-center">11</td>
+                            <td><strong style="color: #fff;">Không đạt nhiệt độ</strong></td>
+                            <td class="text-right">554</td>
+                            <td class="text-right">0.00</td>
+                            <td class="text-right">0 ₫</td>
+                            <td class="text-right text-danger">0 ₫</td>
+                            <td class="text-right text-purple">0 ₫</td>
+                            <td style="font-size: 13px; color: #cbd5e1;">Vi phạm quy chuẩn nhiệt độ bảo quản lạnh lúc giao nhận hàng (theo dữ liệu hình ảnh đo nhiệt độ CDC).</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">
+                <span>🔄</span>
+                <span>Các Bảng CDC Thu Thập Dữ Liệu Chuyển Hàng & Claim Trên StarRocks</span>
+            </div>
+            <div class="cdc-grid">
+                <div class="cdc-item">
+                    <div class="cdc-table-name">__cdc_kfm_kf_inventories_kf_transfer_items</div>
+                    <div class="cdc-desc">Quản lý toàn bộ tiến trình chuyển hàng từ DC đến ST, chứa cờ <code>is_claim</code>, <code>from_claim_fresh</code>, <code>adjustment_type</code> và các mốc kiểm hàng.</div>
+                </div>
+                <div class="cdc-item">
+                    <div class="cdc-table-name">__cdc_kfm_kf_inventories_kf_claim_stock_summaries</div>
+                    <div class="cdc-desc">Tổng hợp biến động số lượng tồn kho theo từng đợt claim của kho và siêu thị (<code>claim_quantity</code>, <code>claim_stock</code>).</div>
+                </div>
+                <div class="cdc-item">
+                    <div class="cdc-table-name">__cdc_kfm_kf_inventories_kf_hrw_quality_tickets___items</div>
+                    <div class="cdc-desc">Ghi nhận phiếu kiểm tra chất lượng hàng tươi sống, kết luận giám định (<code>final_conclusion</code>) và tỷ lệ hỗ trợ đền bù (<code>support_rate</code>).</div>
+                </div>
+                <div class="cdc-item">
+                    <div class="cdc-table-name">__cdc_kfm_597a32ea_...___tl_temperature_images</div>
+                    <div class="cdc-desc">Lưu trữ dữ liệu ảnh chụp đo nhiệt độ thùng lạnh và trạng thái đứt seal (<code>is_lost_seal</code>) nhằm xác định vi phạm giao nhận của Đội xe.</div>
+                </div>
+                <div class="cdc-item">
+                    <div class="cdc-table-name">krc_dashboard_slg_adjustments</div>
+                    <div class="cdc-desc">Bảng chốt số liệu đối soát lệch giữa WMS và KDB (<code>wms</code>, <code>kdb</code>, <code>difference</code>, <code>tra_ton_st</code>, <code>tt_cam_st</code>).</div>
+                </div>
+                <div class="cdc-item">
+                    <div class="cdc-table-name">krc_datapay_records & krc_datapay_summary</div>
+                    <div class="cdc-desc">Hai bảng chuyên dụng vừa khởi tạo trên DB kfm_scm để lưu trữ toàn bộ chi tiết và bảng chốt tài chính Datapay định kỳ.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

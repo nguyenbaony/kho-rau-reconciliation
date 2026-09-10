@@ -8,16 +8,33 @@ if (-not (Test-Path $scriptPath)) {
     exit 1
 }
 
-$taskRun = "powershell.exe -ExecutionPolicy Bypass -WindowStyle Hidden -File `"$scriptPath`""
-
 Write-Host "Dang dang ky lich trinh tu dong vao Windows Task Scheduler..." -ForegroundColor Cyan
 Write-Host "Ten tac vu: $taskName"
-Write-Host "Thoi gian chay: 07:00 AM moi ngay"
+Write-Host "Thoi gian chay: 07:00 AM hang ngay (co che tu chay bu neu may bat muon hon)"
 
-schtasks /Create /SC DAILY /TN $taskName /TR $taskRun /ST 07:00 /F
+# 1. Action
+$action = New-ScheduledTaskAction -Execute "powershell.exe" -Argument "-NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File `"$scriptPath`"" -WorkingDirectory $PSScriptRoot
 
-if ($LASTEXITCODE -eq 0) {
-    Write-Host "`n*** DA DANG KY THANH CONG LICH TRINH 7:00 AM HANG NGAY! ***" -ForegroundColor Green
-} else {
-    Write-Host "`n*** Dang ky that bai. Vui long kiem tra quyen. ***" -ForegroundColor Red
-}
+# 2. Trigger: 7:00 AM daily
+$trigger = New-ScheduledTaskTrigger -Daily -At "07:00"
+
+# 3. Settings: chạy ngầm, pin laptop, tự chạy bù nếu lỡ giờ
+$settings = New-ScheduledTaskSettingsSet `
+    -AllowStartIfOnBatteries `
+    -DontStopIfGoingOnBatteries `
+    -StartWhenAvailable `
+    -ExecutionTimeLimit (New-TimeSpan -Minutes 20)
+
+# Unregister if exists
+Unregister-ScheduledTask -TaskName $taskName -Confirm:$false -ErrorAction SilentlyContinue
+
+# Register
+Register-ScheduledTask `
+    -TaskName $taskName `
+    -Action $action `
+    -Trigger $trigger `
+    -Settings $settings `
+    -Description "Tu dong dong bo so lieu doi soat Kho Rau, tinh Datapay va gui bao cao vao Telegram moi ngay luc 07:00 AM"
+
+Write-Host "`n*** DA DANG KY THANH CONG LICH TRINH 07:00 AM HANG NGAY! ***" -ForegroundColor Green
+

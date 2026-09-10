@@ -1,0 +1,12 @@
+﻿STT,Loại Lỗi Datapay,Số Dòng Phát Sinh,SL Lệch (Kg/Pack),Tổng Giá Trị (VND),Phạt Kho DC (VND),Phạt Siêu Thị (VND),Mô Tả Nghiệp Vụ
+1,DC giao thiếu,10154,22907.44,75786046,75104665,54253,Phiếu xuất kho (PT/TO) có ghi nhận nhưng thực tế mở kiện ra bị thiếu hàng. Kho DC chịu trách nhiệm đền bù.
+2,VT giao sai điểm,1439,5023.18,18714131,18647181,283,Tài xế/đơn vị vận tải trả nhầm kiện hàng của siêu thị này sang siêu thị khác trên tuyến giao.
+3,ST nhập thiếu,1350,4192.38,9829117,307460,9488014,"Kho DC giao đủ hàng nhưng nhân viên ST kiểm đếm sót, nhập thiếu vào hệ thống KDB. ST chịu phạt."
+4,DC giao bù,387,1864.64,9448485,185758,9258654,Hàng giao bù cho các đơn lệch kỳ trước; hệ thống ghi nhận điều chỉnh quy hoàn lại giá trị cho ST.
+5,DC Pick sai,878,3954.1,5775554,5742013,1457,"Nhân viên kho soạn nhầm mã SKU, nhầm chủng loại hoặc sai quy cách đóng gói (Pack vs KG)."
+6,Hao hụt (Vượt ngưỡng),21183,2243.54,15932919,9112,2243666,Chênh lệch trọng lượng rau củ quả vượt quá ngưỡng dung sai tự nhiên theo định mức quy định.
+7,ST kiểm sai QT,287,344.4,438495,20456,418039,"ST không tuân thủ quy trình nghiệm thu hàng tươi sống (không chụp ảnh kiện, kiểm trễ giờ quy định)."
+8,ST thông tin sai/không phản hồi,171,390.33,327142,17892,309250,ST tạo claim nhưng khi DC/KFM đối chất thì không cung cấp được bằng chứng hợp lệ.
+9,DC thao tác sai,65,162.3,198454,2443,195741,"Lỗi quy trình đóng gói, dán nhãn sai mã kiện/thùng tote tại kho DC."
+10,Lỗi hệ thống,387,613.14,10405,10400,5,"Chênh lệch do lỗi kỹ thuật đồng bộ giữa WMS và KDB (xử lý kỹ thuật, không phạt nhân sự)."
+11,Không đạt nhiệt độ,554,0.0,0,0,0,Vi phạm quy chuẩn nhiệt độ bảo quản lạnh lúc giao nhận hàng (theo dữ liệu hình ảnh đo nhiệt độ CDC).
