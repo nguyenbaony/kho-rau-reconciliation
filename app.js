@@ -430,7 +430,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     } else {
       // Try local cache
       try {
-        const cached = localStorage.getItem('KHO_RAU_CACHE_V4');
+        const cached = localStorage.getItem('KHO_RAU_CACHE_V5');
         if (cached) {
           const parsedCache = JSON.parse(cached);
           if (parsedCache && parsedCache.records && parsedCache.records.length > 0) {
@@ -1537,7 +1537,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         // Save to cache
         try {
-          localStorage.setItem('KHO_RAU_CACHE_V4', JSON.stringify({
+          localStorage.setItem('KHO_RAU_CACHE_V5', JSON.stringify({
             records: allRecords,
             summary: summary,
             syncedAt: Date.now()
