@@ -2182,19 +2182,22 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   // Telegram Feed Logic (RAU CỦ vs ABA/DC)
-  let telegramFeedItems = [];
+  let telegramFeedItems = (typeof window !== 'undefined' && window.TELEGRAM_FEED) ? window.TELEGRAM_FEED : [];
   let currentTgFilter = 'ALL';
   const tgCardsGrid = document.getElementById('telegram-cards-grid');
   const tgInputSearch = document.getElementById('tg-input-search');
 
   async function loadTelegramFeed() {
+    if (typeof window !== 'undefined' && window.TELEGRAM_FEED && telegramFeedItems.length === 0) {
+      telegramFeedItems = window.TELEGRAM_FEED;
+    }
     try {
       const res = await fetch('data/telegram_feed.json?t=' + Date.now());
       if (res.ok) {
         telegramFeedItems = await res.json();
       }
     } catch (e) {
-      console.error("Không thể tải telegram_feed.json", e);
+      console.log("Dùng dữ liệu Telegram Feed từ bundle:", e);
     }
     renderTelegramFeed();
   }

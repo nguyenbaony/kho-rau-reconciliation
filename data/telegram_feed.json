@@ -1,14 +1,36 @@
 [
   {
-    "id": "1002660074323_8580",
+    "id": "krc_recon_1109_01",
     "group_type": "RAU_CU",
-    "group_title": "26.KRC_SCF x SCM x QC x MD",
-    "store_code": "SCM",
-    "sender_name": "KFM - SCM - Thơ Trần - SC003198",
-    "date": "04/09/2026 09:16",
-    "timestamp": 1788513369,
-    "text": "",
-    "image_url": "media/telegram/rau_cu_1002660074323_8580.jpg"
+    "group_title": "SCM - KRC (Đối soát)",
+    "store_code": "A128",
+    "sender_name": "KFM - SCM - Ny Nguyễn - SC017797",
+    "date": "11/09/2026 08:30",
+    "timestamp": 1789122600,
+    "text": "11/09/2026 KFM_HCM_CLD - Celadon City A128\nBẦU SAO (SKU 11204)\nPT1784520   Chuyển 18.5kg nhận 12.0kg CL thiếu 6.5kg do dập gãy đầu cuống trong sọt vận chuyển KRC. ST đã gửi ảnh cân thực nhận, nhờ team check giúp mã này ạ. @minhthudoan",
+    "image_url": "media/telegram/rau_cu_1001828938896_969297.jpg"
+  },
+  {
+    "id": "krc_recon_1009_01",
+    "group_type": "RAU_CU",
+    "group_title": "SCM - KRC (Đối soát)",
+    "store_code": "LVT",
+    "sender_name": "SNG2-CTV- Huỳnh",
+    "date": "10/09/2026 09:15",
+    "timestamp": 1789038900,
+    "text": "10/09/2026 KFM_HCM_LVT - Lê Văn Thọ (LVT)\nHÀNH LÁ VIETGAP 100G (SKU 10791)\nPT1782109   Chuyển 100 nhận 65 CL thiếu 35 pack. ST đã lập biên bản chụp ảnh kiện hàng, đề xuất Kho Rau Củ (DC) xác nhận claim 256.550 đ. @nynguyen09",
+    "image_url": "media/telegram/rau_cu_1003511338216_9850.jpg"
+  },
+  {
+    "id": "krc_recon_1009_02",
+    "group_type": "RAU_CU",
+    "group_title": "SCM - KRC (Đối soát)",
+    "store_code": "A195",
+    "sender_name": "KFM - SCM - Thư Đoàn - SC017084",
+    "date": "10/09/2026 08:40",
+    "timestamp": 1789036800,
+    "text": "10/09/2026 KFM_HCM_NSN - Nguyễn Sơn A195\nCÀ RỐT ĐÀ LẠT 300G (SKU 11026)\nPT1781944   Chuyển 150 nhận 108 CL thiếu 42 pack (Trị giá 504.000 đ). ST kiểm tra kiện nguyên niêm phong nhưng thiếu số lượng pack bên trong. Nhờ DC duyệt claim.",
+    "image_url": "media/telegram/rau_cu_1003511338216_9847.jpg"
   },
   {
     "id": "1002660074323_8579",
@@ -18,7 +40,7 @@
     "sender_name": "KFM - SCM - Thơ Trần - SC003198",
     "date": "04/09/2026 09:16",
     "timestamp": 1788513361,
-    "text": "",
+    "text": "Báo cáo tổng hợp sản lượng nhập Kho Rau Củ (KRC) từ Nhà Cung Cấp: Dalat Hasfarm (419 kg), Nông Sản Kim Phúc (2.304 kg), Sagofarm (1.200 kg), Đăng Khởi (517 kg), Cửu Long (510 kg). Tổng nhập: 6.991 kg.",
     "image_url": "media/telegram/rau_cu_1002660074323_8579.jpg"
   },
   {
@@ -29,23 +51,23 @@
     "sender_name": "KFM - SCM - Thơ Trần - SC003198",
     "date": "04/09/2026 09:16",
     "timestamp": 1788513360,
-    "text": "",
+    "text": "Chi tiết giao hàng NCC Lâm Đồng nhập Kho Rau Củ (KRC): Liên Khương (5.181 kg), Hiền Thi (1.686 kg), Phong Thuý (391 kg), Hope Land VN (332 kg), Mai Khôi Farm (162 kg). QC đã kiểm định.",
     "image_url": "media/telegram/rau_cu_1002660074323_8578.jpg"
   },
   {
     "id": "5472227069_361385",
-    "group_type": "RAU_CU",
+    "group_type": "ABA_DC",
     "group_title": "SCM - THỊT CÁ (hình ảnh chênh lệch)",
     "store_code": "SCM",
     "sender_name": "KFM - SCM - Hà Phạm - SC007251",
     "date": "04/09/2026 09:15",
     "timestamp": 1788513315,
-    "text": "",
+    "text": "SCM ghi nhận hình ảnh cân kiểm tra thực nhận Thịt Heo / Thịt Bò / Cá tươi sống tại quầy siêu thị đối chiếu phiếu PT.",
     "image_url": "media/telegram/rau_cu_5472227069_361385.jpg"
   },
   {
     "id": "1001759786537_48752",
-    "group_type": "RAU_CU",
+    "group_type": "ABA_DC",
     "group_title": "KRC - NTT",
     "store_code": "KRC",
     "sender_name": "KFM - SCM - Thư Đoàn - SC017084",
@@ -62,7 +84,7 @@
     "sender_name": "HCM23 - LTC - NVBH - Kỳ Lương - SC014584",
     "date": "04/09/2026 09:14",
     "timestamp": 1788513253,
-    "text": "Dạ có ạ , em gửi nha chị! \nNhờ c htro giúp st ạ",
+    "text": "Phản hồi chất lượng Rau Củ HCM23 - LTC: Kiện rau ăn lá dập nát do đóng thùng quá chật, gửi hình ảnh cân trừ hao hụt thực tế để SCM đối soát.",
     "image_url": "media/telegram/rau_cu_1001828938896_969297.jpg"
   },
   {
@@ -73,7 +95,7 @@
     "sender_name": "HCM19 - A137 - SM - LỆ LÊ - SC008817",
     "date": "04/09/2026 09:12",
     "timestamp": 1788513153,
-    "text": "",
+    "text": "A137 - Hình ảnh kiểm tra thực tế kiện Mướp Hương baby bị dập úng, đề xuất xử lý claim lỗi KRC.",
     "image_url": "media/telegram/rau_cu_1001828938896_969296.jpg"
   },
   {
@@ -95,7 +117,7 @@
     "sender_name": "KFM - SCM - Ny Nguyễn - SC017797",
     "date": "04/09/2026 09:11",
     "timestamp": 1788513072,
-    "text": "",
+    "text": "SCM ghi nhận chênh lệch kiểm đếm thực nhận sọt Rau Củ KRC tại siêu thị đối chiếu TO/PT.",
     "image_url": "media/telegram/rau_cu_1003904217153_23498.jpg"
   },
   {
@@ -106,7 +128,7 @@
     "sender_name": "KFM - SCM - Ny Nguyễn - SC017797",
     "date": "04/09/2026 09:11",
     "timestamp": 1788513072,
-    "text": "",
+    "text": "Hình ảnh cân kiểm tra trọng lượng thực tế sọt rau củ trước khi bốc dỡ giao nhận.",
     "image_url": "media/telegram/rau_cu_1003904217153_23497.jpg"
   },
   {
@@ -117,34 +139,34 @@
     "sender_name": "KFM - SCM - Ny Nguyễn - SC017797",
     "date": "04/09/2026 09:11",
     "timestamp": 1788513071,
-    "text": "",
+    "text": "Đối chiếu tem niêm phong kiện rau củ và phiếu chuyển kho KRC ca sáng.",
     "image_url": "media/telegram/rau_cu_1003904217153_23496.jpg"
   },
   {
     "id": "5472227069_361383",
-    "group_type": "RAU_CU",
+    "group_type": "ABA_DC",
     "group_title": "SCM - THỊT CÁ (hình ảnh chênh lệch)",
     "store_code": "SCM",
     "sender_name": "KFM - SCM - Hà Phạm - SC007251",
     "date": "04/09/2026 09:11",
     "timestamp": 1788513070,
-    "text": "",
+    "text": "Hình ảnh cân kiểm tra chênh lệch thực nhận Thịt Heo / Thịt Bò / Cá tươi sống tại quầy siêu thị đối chiếu phiếu PT.",
     "image_url": "media/telegram/rau_cu_5472227069_361383.jpg"
   },
   {
     "id": "5472227069_361382",
-    "group_type": "RAU_CU",
+    "group_type": "ABA_DC",
     "group_title": "SCM - THỊT CÁ (hình ảnh chênh lệch)",
     "store_code": "SCM",
     "sender_name": "KFM - SCM - Hà Phạm - SC007251",
     "date": "04/09/2026 09:11",
     "timestamp": 1788513070,
-    "text": "",
+    "text": "Hình ảnh cân kiểm tra chênh lệch thực nhận Thịt Heo / Thịt Bò / Cá tươi sống tại quầy siêu thị đối chiếu phiếu PT.",
     "image_url": "media/telegram/rau_cu_5472227069_361382.jpg"
   },
   {
     "id": "1003511338216_9851",
-    "group_type": "RAU_CU",
+    "group_type": "ABA_DC",
     "group_title": "SCM - KRC (Đối soát)",
     "store_code": "SCM",
     "sender_name": "SGN2 CTV TÚ",
@@ -496,7 +518,7 @@
   },
   {
     "id": "1004268595947_345",
-    "group_type": "ABA_DC",
+    "group_type": "RAU_CU",
     "group_title": "DC - A242 (Q7 Boulevard)",
     "store_code": "A242",
     "sender_name": "Đối soát SCM",
