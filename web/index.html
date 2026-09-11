@@ -50,7 +50,12 @@
       </button>
     </div>
 
-    <div class="nav-right">
+    <div class="nav-right" style="display: flex; align-items: center; gap: 10px;">
+      <div class="status-pill live" id="top-sync-pill" style="cursor: pointer; background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.4); padding: 5px 12px; border-radius: 20px;" title="Bấm để đồng bộ dữ liệu Google Sheets ngay">
+        <span class="dot"></span>
+        <span id="top-status-text">Sheets: <b>Realtime</b></span>
+        <span id="top-countdown" style="font-size: 0.72rem; color: #a7f3d0; font-variant-numeric: tabular-nums; margin-left: 3px;">(60s)</span>
+      </div>
       <div class="status-pill live">
         <span class="dot"></span>
         <span>VPN CDC: Connected</span>
@@ -68,7 +73,7 @@
         <div class="timeline-scroll-wrapper">
           <table class="timeline-strip-table">
             <tbody>
-              <tr class="strip-row-header">
+              <tr class="strip-row-header" id="strip-row-days">
                 <td class="strip-label">Ngày</td>
                 <td class="strip-col">01-Thg9</td>
                 <td class="strip-col">02-Thg9</td>
@@ -80,14 +85,14 @@
                 <td class="strip-col">08-Thg9</td>
                 <td class="strip-col">09-Thg9</td>
                 <td class="strip-col">10-Thg9</td>
-                <td class="strip-col future">11-Thg9</td>
+                <td class="strip-col">11-Thg9</td>
                 <td class="strip-col future">12-Thg9</td>
                 <td class="strip-col future">13-Thg9</td>
                 <td class="strip-col future">14-Thg9</td>
                 <td class="strip-col future">15-Thg9</td>
                 <td class="strip-col future">16-Thg9</td>
               </tr>
-              <tr class="strip-row-data">
+              <tr class="strip-row-data" id="strip-row-data">
                 <td class="strip-label font-bold">CL Thiếu</td>
                 <td>49.3</td>
                 <td>829.4</td>
@@ -99,14 +104,14 @@
                 <td>1,335.2</td>
                 <td>1,083.6</td>
                 <td class="text-danger font-bold">3,633.1</td>
-                <td class="future"></td>
+                <td class="text-danger font-bold">754.1</td>
                 <td class="future"></td>
                 <td class="future"></td>
                 <td class="future"></td>
                 <td class="future"></td>
                 <td class="future"></td>
               </tr>
-              <tr class="strip-row-progress">
+              <tr class="strip-row-progress" id="strip-row-progress">
                 <td class="strip-label font-bold">Tiến độ</td>
                 <td><span class="badge-pct pct-100">100%</span></td>
                 <td><span class="badge-pct pct-100">100%</span></td>
@@ -118,7 +123,7 @@
                 <td><span class="badge-pct pct-low">45%</span></td>
                 <td><span class="badge-pct pct-low">37%</span></td>
                 <td><span class="badge-pct pct-alert">7%</span></td>
-                <td class="future"></td>
+                <td><span class="badge-pct pct-alert">0%</span></td>
                 <td class="future"></td>
                 <td class="future"></td>
                 <td class="future"></td>
@@ -134,7 +139,7 @@
       <div class="kpi-quad-grid">
         <div class="kpi-card card-blue">
           <div class="kpi-meta">TỔNG SỐ NGÀY ĐỐI SOÁT</div>
-          <div class="kpi-num" id="s1-kpi-total-days">10</div>
+          <div class="kpi-num" id="s1-kpi-total-days">11</div>
           <div class="kpi-desc">Mốc ngày có phát sinh phiếu</div>
         </div>
 
@@ -146,13 +151,13 @@
 
         <div class="kpi-card card-amber">
           <div class="kpi-meta">ĐANG XỬ LÝ</div>
-          <div class="kpi-num" id="s1-kpi-pending-days">8</div>
+          <div class="kpi-num" id="s1-kpi-pending-days">9</div>
           <div class="kpi-desc">Số ngày còn chênh lệch tồn</div>
         </div>
 
         <div class="kpi-card card-purple">
           <div class="kpi-meta">TỶ LỆ HOÀN THÀNH CHUNG</div>
-          <div class="kpi-num" id="s1-kpi-pct">55%</div>
+          <div class="kpi-num" id="s1-kpi-pct">52%</div>
           <div class="kpi-desc">Tổng đã XL / Tổng chênh lệch</div>
         </div>
       </div>
@@ -163,7 +168,7 @@
           <div class="panel-title">
             <span>📑 DANH SÁCH TIẾN ĐỘ THEO TỪNG NGÀY CHI TIẾT (KHO RAU CỦ)</span>
           </div>
-          <div class="panel-meta">10 mốc ngày đối soát</div>
+          <div class="panel-meta">11 mốc ngày đối soát</div>
         </div>
 
         <div class="table-responsive">

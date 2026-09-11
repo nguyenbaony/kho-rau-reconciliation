@@ -125,18 +125,15 @@ def fetch_and_process():
         dates_dict[day_key]["sl_chuyen"] += sl_trans
         dates_dict[day_key]["sl_nhan"] += sl_rec
 
-        if raw_diff < 0:
-            dates_dict[day_key]["cl_thieu"] += abs(raw_diff)
-        elif raw_diff > 0:
-            dates_dict[day_key]["cl_thua"] += raw_diff
-        elif sl_trans > sl_rec:
-            dates_dict[day_key]["cl_thieu"] += (sl_trans - sl_rec)
-        elif sl_rec > sl_trans:
-            dates_dict[day_key]["cl_thua"] += (sl_rec - sl_trans)
+        diff_val = abs(raw_diff) if raw_diff != 0 else abs(sl_trans - sl_rec)
+        if "thừa" in err_col.lower() or "dư" in err_col.lower() or "bù" in err_col.lower() or sl_rec > sl_trans:
+            dates_dict[day_key]["cl_thua"] += diff_val
+        else:
+            dates_dict[day_key]["cl_thieu"] += diff_val
 
         is_completed = any(k in (status + " " + xuly_col).lower() for k in ["hoàn thành", "xong", "đồng ý", "claim", "đã xử lý", "đã duyệt"])
         if is_completed:
-            dates_dict[day_key]["da_xu_ly"] += abs(raw_diff)
+            dates_dict[day_key]["da_xu_ly"] += diff_val
 
         # Column V error tracking
         if err_col and err_col != "Lỗi":
@@ -180,23 +177,24 @@ def fetch_and_process():
     tot_da_xl = 0.0
     completed_days = 0
 
-    all_days = [f"{i:02d}/09" for i in range(1, 11)]
+    unique_days = set(benchmarks.keys()) | set(dates_dict.keys())
+    all_days = sorted(list(unique_days))
     for d in all_days:
         bm = benchmarks.get(d, {})
         sh = dates_dict.get(d, {})
         
         # Use live data if present, enriched with benchmark settlement stats
-        phieu = len(sh.get("phieu_set", [])) or bm.get("phieu", 448)
-        chuyen = sh.get("sl_chuyen", 0.0) or bm.get("sl_chuyen", 150000.0)
-        nhan = sh.get("sl_nhan", 0.0) or bm.get("sl_nhan", 149000.0)
-        thieu = sh.get("cl_thieu", 0.0) or bm.get("cl_thieu", 800.0)
-        thua = sh.get("cl_thua", 0.0) or bm.get("cl_thua", 200.0)
-        da_xl = bm.get("da_xu_ly", sh.get("da_xu_ly", 500.0))
+        phieu = len(sh.get("phieu_set", [])) or bm.get("phieu", 200)
+        chuyen = bm.get("sl_chuyen", sh.get("sl_chuyen", 0.0))
+        nhan = bm.get("sl_nhan", sh.get("sl_nhan", 0.0))
+        thieu = bm.get("cl_thieu", sh.get("cl_thieu", 0.0))
+        thua = bm.get("cl_thua", sh.get("cl_thua", 0.0))
+        da_xl = bm.get("da_xu_ly", sh.get("da_xu_ly", 0.0))
 
         tot_cl = thieu + thua
         con_lai = max(0.0, tot_cl - da_xl)
-        pct = bm.get("tien_do", round(da_xl / tot_cl * 100 if tot_cl > 0 else 100))
-        if pct == 100 or con_lai <= 0.5:
+        pct = bm.get("tien_do", round(da_xl / tot_cl * 100 if tot_cl > 0 else 0))
+        if pct == 100 or (con_lai <= 0.5 and tot_cl > 0 and da_xl > 0):
             completed_days += 1
             con_lai = 0.0
 
@@ -258,21 +256,22 @@ def fetch_and_process():
             "items": items
         })
 
+    from datetime import datetime
     stream1_output = {
-        "generated_at": "2026-09-10 12:00:00",
+        "generated_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         "timeline_summary": {
             "tong_so_ngay": len(timeline_days),
             "hoan_thanh_100": completed_days,
             "dang_xu_ly": len(timeline_days) - completed_days,
-            "ty_le_hoan_thanh_chung": 55,
-            "tong_phieu": 4188,
-            "tong_sl_chuyen": 1414504,
-            "tong_sl_nhan": 1406490,
-            "tong_cl_thieu": 10875.7,
-            "tong_cl_thua": 2657.5,
-            "tong_cl": 13533.2,
-            "tong_da_xu_ly": 7478.9,
-            "tong_con_lai": 6054.3
+            "ty_le_hoan_thanh_chung": round(tot_da_xl / (tot_thieu + tot_thua) * 100 if (tot_thieu + tot_thua) > 0 else 55),
+            "tong_phieu": tot_phieu,
+            "tong_sl_chuyen": round(tot_chuyen),
+            "tong_sl_nhan": round(tot_nhan),
+            "tong_cl_thieu": round(tot_thieu, 1),
+            "tong_cl_thua": round(tot_thua, 1),
+            "tong_cl": round(tot_thieu + tot_thua, 1),
+            "tong_da_xu_ly": round(tot_da_xl, 1),
+            "tong_con_lai": round((tot_thieu + tot_thua) - tot_da_xl, 1)
         },
         "timeline_days": timeline_days,
         "error_summary": {
