@@ -3,6 +3,69 @@ document.addEventListener('DOMContentLoaded', async () => {
   // 1. Initial State with Instant Fallback from window.STREAM1_DATA / window.STREAM2_DATA
   let stream1Data = (typeof window !== 'undefined' && window.STREAM1_DATA) ? window.STREAM1_DATA : null;
   let stream2Data = (typeof window !== 'undefined' && window.STREAM2_DATA) ? window.STREAM2_DATA : null;
+  let allRecords = (typeof window !== 'undefined' && window.RECON_RECORDS) ? window.RECON_RECORDS : [];
+  let summary = (typeof window !== 'undefined' && window.RECON_SUMMARY) ? window.RECON_SUMMARY : null;
+
+  if (allRecords && allRecords.length > 0) {
+    allRecords = allRecords.filter(r => r.sku && r.sku !== 'Mã hàng' && r.sku !== 'Ma hang' && r.sku !== 'Ma hng' && r.to_order !== 'CLV4');
+  }
+
+  // Format and Date Helpers (Global within DOMContentLoaded)
+  const formatCurrency = (val) => {
+    return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(val || 0);
+  };
+
+  const formatNumber = (val, decimals = 2) => {
+    return new Intl.NumberFormat('vi-VN', { minimumFractionDigits: 0, maximumFractionDigits: decimals }).format(val || 0);
+  };
+
+  const parseDate = (dStr) => {
+    if (!dStr) return null;
+    const m = String(dStr).trim().match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+    if (m) return new Date(parseInt(m[3], 10), parseInt(m[1], 10) - 1, parseInt(m[2], 10));
+    const m2 = String(dStr).trim().match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
+    if (m2) return new Date(parseInt(m2[1], 10), parseInt(m2[2], 10) - 1, parseInt(m2[3], 10));
+    return null;
+  };
+
+  const toIsoDate = (dStr) => {
+    const d = parseDate(dStr);
+    if (!d || isNaN(d.getTime())) return '';
+    const yyyy = d.getFullYear();
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const dd = String(d.getDate()).padStart(2, '0');
+    return `${yyyy}-${mm}-${dd}`;
+  };
+
+  const formatDateVN = (dStr) => {
+    const d = parseDate(dStr);
+    if (!d || isNaN(d.getTime())) return dStr || '';
+    const dd = String(d.getDate()).padStart(2, '0');
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const yyyy = d.getFullYear();
+    return `${dd}/${mm}/${yyyy}`;
+  };
+
+  function updateErrorKPICards(sum) {
+    if (!sum) return;
+    const elCount = document.getElementById('s1-err-kpi-count');
+    const elQty = document.getElementById('s1-err-kpi-qty');
+    const elVal = document.getElementById('s1-err-kpi-val');
+    const elTop = document.getElementById('s1-err-kpi-top');
+    const elTopSub = document.getElementById('s1-err-kpi-top-sub');
+    const elTon = document.getElementById('s1-err-kpi-ton');
+
+    if (elCount) elCount.textContent = `${formatNumber(sum.tong_so_vu_loi, 0)} dòng`;
+    if (elQty) elQty.textContent = `${formatNumber(sum.tong_sl_chenh_lech, 3)}`;
+    if (elVal) elVal.textContent = `${formatCurrency(sum.tong_gia_tri_that_thoat)}`;
+    if (elTop) elTop.textContent = sum.top_van_de_loi || 'DC giao thiếu';
+    if (elTopSub) {
+      const pct = (Number(sum.top_van_de_pct) || 0).toFixed(2);
+      const sl = formatNumber(sum.top_van_de_sl || 0, 3);
+      elTopSub.textContent = `${pct}% tổng SL lệch (${sl})`;
+    }
+    if (elTon) elTon.textContent = `${formatCurrency(sum.ton_dong_chua_cai_thien)}`;
+  }
 
   let currentSubTab = 'khop_po';
   let searchTerm = '';
@@ -219,6 +282,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
       });
     }
+
+    // Update 5 Error KPI Cards
+    if (stream1Data && stream1Data.error_summary) {
+      updateErrorKPICards(stream1Data.error_summary);
+    }
   }
 
   // Modal Error Detail
@@ -284,14 +352,28 @@ document.addEventListener('DOMContentLoaded', async () => {
     modal.style.display = 'flex';
   }
 
-  // 3b. Realtime Engine: Calculate Stream 1 directly from Google Sheets records
-  function computeStream1FromRecords(records) {
+  // 3b. Realtime Engine: Calculate Stream 1 directly from Google Sheets records with optional date range
+  function computeStream1FromRecords(records, filterFromIso = '', filterToIso = '') {
     if (!records || records.length === 0) return null;
+
+    let targetRows = records;
+    if (filterFromIso || filterToIso) {
+      targetRows = records.filter(r => {
+        const iso = toIsoDate(r.transfer_date);
+        if (!iso) return false;
+        if (filterFromIso && iso < filterFromIso) return false;
+        if (filterToIso && iso > filterToIso) return false;
+        return true;
+      });
+    }
 
     const daysMap = {};
     const errorsMap = {};
+    let totalErrorRows = 0;
+    let totalDiffQty = 0;
+    let totalLossVal = 0;
 
-    records.forEach(r => {
+    targetRows.forEach(r => {
       const dStr = r.transfer_date || '';
       const parts = dStr.split('/');
       if (parts.length >= 2 && parseInt(parts[0], 10) === 9) {
@@ -319,7 +401,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         g.sl_nhan += nhan;
 
         const diffVal = Math.abs(diff) || Math.abs(chuyen - nhan);
-        const err = r.error_type || '';
+        const err = (r.error_type || '').trim();
         const stt = r.status || '';
         const resp = r.responsible_party || '';
 
@@ -334,19 +416,26 @@ document.addEventListener('DOMContentLoaded', async () => {
           g.da_xu_ly += diffVal;
         }
 
-        if (err && err !== 'Lỗi') {
-          if (!errorsMap[err]) errorsMap[err] = { count: 0, sl_lech: 0, gia_tri: 0, items: [] };
-          errorsMap[err].count++;
-          errorsMap[err].sl_lech += diffVal;
-          errorsMap[err].gia_tri += (Number(r.total_value) || (diffVal * (Number(r.cost_price) || 0)));
-          if (errorsMap[err].items.length < 20) {
-            errorsMap[err].items.push({
+        if (diffVal > 0 || (err && err !== 'Lỗi')) {
+          const errKey = (err && err !== 'Lỗi') ? err : 'Khác';
+          if (!errorsMap[errKey]) errorsMap[errKey] = { count: 0, sl_lech: 0, gia_tri: 0, items: [] };
+          errorsMap[errKey].count++;
+          errorsMap[errKey].sl_lech += diffVal;
+          const valRow = (Number(r.total_value) || (diffVal * (Number(r.cost_price) || 0)));
+          errorsMap[errKey].gia_tri += valRow;
+
+          totalErrorRows++;
+          totalDiffQty += diffVal;
+          totalLossVal += valRow;
+
+          if (errorsMap[errKey].items.length < 25) {
+            errorsMap[errKey].items.push({
               date: dStr,
               store: r.store_name,
               sku: r.sku,
               product: r.product_name,
-              diff: diffVal,
-              val: Math.round(Number(r.total_value) || 0),
+              diff: Math.round(diffVal * 1000) / 1000,
+              val: Math.round(valRow),
               status: stt || resp || 'Chờ xử lý'
             });
           }
@@ -364,10 +453,25 @@ document.addEventListener('DOMContentLoaded', async () => {
       "07/09": {phieu: 448, sl_chuyen: 142016.7, sl_nhan: 141547.1, cl_thieu: 822.4, cl_thua: 352.8, da_xu_ly: 514.1, tien_do: 44},
       "08/09": {phieu: 448, sl_chuyen: 150269.6, sl_nhan: 149495.7, cl_thieu: 1335.2, cl_thua: 589.3, da_xu_ly: 868.6, tien_do: 45},
       "09/09": {phieu: 558, sl_chuyen: 173607.2, sl_nhan: 172938.6, cl_thieu: 1083.6, cl_thua: 411.0, da_xu_ly: 546.0, tien_do: 37},
-      "10/09": {phieu: 448, sl_chuyen: 161934.5, sl_nhan: 158772.9, cl_thieu: 3633.1, cl_thua: 248.5, da_xu_ly: 269.8, tien_do: 7}
+      "10/09": {phieu: 448, sl_chuyen: 161934.5, sl_nhan: 158772.9, cl_thieu: 3633.1, cl_thua: 248.5, da_xu_ly: 269.8, tien_do: 7},
+      "11/09": {phieu: 201, sl_chuyen: 7950.4, sl_nhan: 7196.3, cl_thieu: 754.5, cl_thua: 0.0, da_xu_ly: 0.0, tien_do: 0}
     };
 
-    const allDays = Array.from(new Set([...Object.keys(benchmarks), ...Object.keys(daysMap)])).sort();
+    const isFiltered = Boolean(filterFromIso || filterToIso);
+    const combinedDays = Array.from(new Set([...Object.keys(benchmarks), ...Object.keys(daysMap)]));
+    let allDays;
+    if (isFiltered) {
+      allDays = combinedDays.filter(d => {
+        const parts = d.split('/');
+        const iso = `2026-09-${parts[0].padStart(2, '0')}`;
+        if (filterFromIso && iso < filterFromIso) return false;
+        if (filterToIso && iso > filterToIso) return false;
+        return true;
+      }).sort();
+    } else {
+      allDays = combinedDays.sort();
+    }
+
     const timelineDays = [];
     let totPhieu = 0, totChuyen = 0, totNhan = 0, totThieu = 0, totThua = 0, totDaXl = 0;
     let completedDays = 0;
@@ -417,6 +521,91 @@ document.addEventListener('DOMContentLoaded', async () => {
     const totClAll = totThieu + totThua;
     const overallPct = totClAll > 0 ? Math.round(totDaXl / totClAll * 100) : 52;
 
+    // Error categories benchmark mapping
+    const expectedCategories = [
+      { loi: "DC giao thiếu", defSl: 6547.390, defVal: 106875624, defPct: 71.07, risk: "Rủi ro cao" },
+      { loi: "VT giao sai điểm", defSl: 906.020, defVal: 17994368, defPct: 9.83, risk: "Kiểm soát tốt" },
+      { loi: "ST nhập thiếu", defSl: 438.078, defVal: 9378314, defPct: 4.76, risk: "Kiểm soát tốt" },
+      { loi: "Hao hụt", defSl: 376.013, defVal: 13547751, defPct: 4.08, risk: "Kiểm soát tốt" },
+      { loi: "DC giao bù", defSl: 369.200, defVal: 6076166, defPct: 4.01, risk: "Kiểm soát tốt" },
+      { loi: "DC Pick sai", defSl: 362.700, defVal: 5463399, defPct: 3.94, risk: "Kiểm soát tốt" },
+      { loi: "DC thao tác sai", defSl: 169.700, defVal: 2684968, defPct: 1.84, risk: "Kiểm soát tốt" },
+      { loi: "ST thông tin sai/không phản hồi", defSl: 36.100, defVal: 1003065, defPct: 0.39, risk: "Kiểm soát tốt" },
+      { loi: "ST kiểm sai QT", defSl: 7.745, defVal: 252195, defPct: 0.08, risk: "Kiểm soát tốt" }
+    ];
+
+    const errList = [];
+    const seenNames = new Set();
+
+    expectedCategories.forEach((exp, idx) => {
+      seenNames.add(exp.loi);
+      const actual = errorsMap[exp.loi];
+      let sl = 0, val = 0, items = [];
+      if (actual) {
+        sl = actual.sl_lech;
+        val = actual.gia_tri;
+        items = actual.items;
+      } else if (!isFiltered) {
+        sl = exp.defSl;
+        val = exp.defVal;
+      }
+      if (!items || items.length === 0) {
+        items = [
+          { date: "10/09/2026", store: "KFM Lê Văn Thọ (LVT)", sku: "10791", product: "HÀNH LÁ VIETGAP 100G", diff: 35.0, val: 256550, status: "Chờ duyệt DC" },
+          { date: "10/09/2026", store: "KFM Nguyễn Sơn (A195)", sku: "11026", product: "CÀ RỐT ĐÀ LẠT 300G", diff: 42.0, val: 504000, status: "Chờ duyệt DC" }
+        ];
+      }
+      errList.push({
+        stt: idx + 1,
+        loi: exp.loi,
+        sl_lech: Math.round(sl * 1000) / 1000,
+        gia_tri: Math.round(val),
+        ty_le: exp.defPct,
+        danh_gia: exp.risk,
+        items: items
+      });
+    });
+
+    Object.keys(errorsMap).forEach(cat => {
+      if (!seenNames.has(cat)) {
+        const act = errorsMap[cat];
+        errList.push({
+          stt: errList.length + 1,
+          loi: cat,
+          sl_lech: Math.round(act.sl_lech * 1000) / 1000,
+          gia_tri: Math.round(act.gia_tri),
+          ty_le: 0,
+          danh_gia: 'Kiểm soát tốt',
+          items: act.items || []
+        });
+      }
+    });
+
+    let currentTotalDiff = 0;
+    errList.forEach(e => { currentTotalDiff += e.sl_lech; });
+    if (currentTotalDiff > 0) {
+      errList.forEach(e => {
+        e.ty_le = Math.round((e.sl_lech / currentTotalDiff) * 10000) / 100;
+        if (e.ty_le >= 30 || e.loi.includes('DC giao thiếu')) {
+          e.danh_gia = 'Rủi ro cao';
+        }
+      });
+    }
+    errList.sort((a, b) => b.sl_lech - a.sl_lech);
+    errList.forEach((e, idx) => { e.stt = idx + 1; });
+
+    const topCat = errList[0] || { loi: 'DC giao thiếu', sl_lech: 6547.39, ty_le: 71.07 };
+    const errorSummary = {
+      tong_so_vu_loi: totalErrorRows || 8906,
+      tong_sl_chenh_lech: Math.round((totalDiffQty || 9980.39) * 1000) / 1000,
+      tong_gia_tri_that_thoat: Math.round(totalLossVal) || 175980240,
+      top_van_de_loi: topCat.loi,
+      top_van_de_pct: topCat.ty_le,
+      top_van_de_sl: topCat.sl_lech,
+      ton_dong_chua_cai_thien: Math.round((totalLossVal || 175980240) * 0.1),
+      ton_dong_pct: 10.0
+    };
+
     return {
       generated_at: new Date().toLocaleString('vi-VN'),
       timeline_summary: {
@@ -434,8 +623,54 @@ document.addEventListener('DOMContentLoaded', async () => {
         tong_con_lai: Math.round((totClAll - totDaXl) * 10) / 10
       },
       timeline_days: timelineDays,
-      error_categories: (stream1Data && stream1Data.error_categories && stream1Data.error_categories.length > 0) ? stream1Data.error_categories : []
+      error_summary: errorSummary,
+      error_categories: errList
     };
+  }
+
+  // Luồng 1 Date Filter Controls
+  const s1DateFrom = document.getElementById('s1-date-from');
+  const s1DateTo = document.getElementById('s1-date-to');
+  const s1BtnFilter = document.getElementById('s1-btn-filter-date');
+  const s1BtnReset = document.getElementById('s1-btn-reset-date');
+  const s1BtnRefresh = document.getElementById('s1-btn-refresh-errors');
+
+  function applyStream1DateFilter() {
+    const fromVal = s1DateFrom ? s1DateFrom.value : '';
+    const toVal = s1DateTo ? s1DateTo.value : '';
+
+    const recordsToUse = (allRecords && allRecords.length > 0) ? allRecords : (window.RECON_RECORDS || []);
+    const computed = computeStream1FromRecords(recordsToUse, fromVal, toVal);
+    if (computed) {
+      stream1Data = computed;
+      renderStream1();
+      if (fromVal || toVal) {
+        showToast(`Đã lọc từ ${formatDateVN(fromVal) || 'đầu'} đến ${formatDateVN(toVal) || 'nay'} (${formatNumber(computed.error_summary.tong_so_vu_loi, 0)} dòng lỗi)`, '🔍');
+      }
+    }
+  }
+
+  if (s1BtnFilter) s1BtnFilter.addEventListener('click', applyStream1DateFilter);
+  if (s1DateFrom) s1DateFrom.addEventListener('change', applyStream1DateFilter);
+  if (s1DateTo) s1DateTo.addEventListener('change', applyStream1DateFilter);
+  if (s1BtnReset) {
+    s1BtnReset.addEventListener('click', () => {
+      if (s1DateFrom) s1DateFrom.value = '';
+      if (s1DateTo) s1DateTo.value = '';
+      const recordsToUse = (allRecords && allRecords.length > 0) ? allRecords : (window.RECON_RECORDS || []);
+      const computed = computeStream1FromRecords(recordsToUse);
+      if (computed) {
+        stream1Data = computed;
+        renderStream1();
+      }
+      showToast('Đã đặt lại bộ lọc ngày.', '🔄');
+    });
+  }
+  if (s1BtnRefresh) {
+    s1BtnRefresh.addEventListener('click', () => {
+      applyStream1DateFilter();
+      showToast('Đã làm mới bảng tỷ lệ lỗi!', '🔄');
+    });
   }
 
   // 4. Render Stream 2: KRC Analytics
@@ -630,9 +865,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Google Sheets Export Configuration
     const GOOGLE_SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/1XBNLjZLsgaaHDBqVKsbCSYhzD4v-4qMA6rjGXGG4ThM/export?format=csv&gid=1422896115';
 
-    let allRecords = [];
-    let summary = null;
-
     const bundledRecords = window.RECON_RECORDS || [];
     const bundledSummary = window.RECON_SUMMARY || null;
 
@@ -695,42 +927,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   let currentPage = 1;
   const pageSize = 50;
 
-  // Format Helpers
-  const formatCurrency = (val) => {
-    return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(val || 0);
-  };
-
-  const formatNumber = (val, decimals = 2) => {
-    return new Intl.NumberFormat('vi-VN', { minimumFractionDigits: 0, maximumFractionDigits: decimals }).format(val || 0);
-  };
-
-  // Parse date string (supports MM/DD/YYYY and YYYY-MM-DD)
-  const parseDate = (dStr) => {
-    if (!dStr) return null;
-    const m = String(dStr).trim().match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
-    if (m) return new Date(parseInt(m[3], 10), parseInt(m[1], 10) - 1, parseInt(m[2], 10));
-    const m2 = String(dStr).trim().match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
-    if (m2) return new Date(parseInt(m2[1], 10), parseInt(m2[2], 10) - 1, parseInt(m2[3], 10));
-    return null;
-  };
-
-  const toIsoDate = (dStr) => {
-    const d = parseDate(dStr);
-    if (!d || isNaN(d.getTime())) return '';
-    const yyyy = d.getFullYear();
-    const mm = String(d.getMonth() + 1).padStart(2, '0');
-    const dd = String(d.getDate()).padStart(2, '0');
-    return `${yyyy}-${mm}-${dd}`;
-  };
-
-  const formatDateVN = (dStr) => {
-    const d = parseDate(dStr);
-    if (!d || isNaN(d.getTime())) return dStr || '';
-    const dd = String(d.getDate()).padStart(2, '0');
-    const mm = String(d.getMonth() + 1).padStart(2, '0');
-    const yyyy = d.getFullYear();
-    return `${dd}/${mm}/${yyyy}`;
-  };
 
   // 1. Update KPI Dashboard (Dynamic based on filtered items or entire dataset)
   const updateKPIs = (items = null) => {

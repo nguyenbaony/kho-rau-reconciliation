@@ -203,47 +203,47 @@
         <!-- Date Filters -->
         <div class="filter-bar">
           <div class="filter-item">
-            <label>Từ ngày:</label>
-            <input type="text" placeholder="mm/dd/yyyy" class="input-date" value="09/01/2026">
+            <label for="s1-date-from">Từ ngày:</label>
+            <input type="date" id="s1-date-from" class="input-date">
           </div>
           <div class="filter-item">
-            <label>Đến ngày:</label>
-            <input type="text" placeholder="mm/dd/yyyy" class="input-date" value="09/10/2026">
+            <label for="s1-date-to">Đến ngày:</label>
+            <input type="date" id="s1-date-to" class="input-date">
           </div>
-          <button class="btn btn-primary">🔍 Lọc theo ngày</button>
-          <button class="btn btn-ghost">🔄 Reset</button>
+          <button id="s1-btn-filter-date" class="btn btn-primary">🔍 Lọc theo ngày</button>
+          <button id="s1-btn-reset-date" class="btn btn-ghost">🔄 Reset</button>
         </div>
 
         <!-- 5 Error KPI Cards -->
         <div class="kpi-error-grid">
           <div class="kpi-error-card border-blue">
             <div class="err-kpi-label">🎯 TỔNG SỐ VỤ/DÒNG LỖI</div>
-            <div class="err-kpi-val text-blue">7,987 dòng</div>
-            <div class="err-kpi-sub">Số dòng chênh lệch ghi nhận</div>
+            <div class="err-kpi-val text-blue" id="s1-err-kpi-count">8,906 dòng</div>
+            <div class="err-kpi-sub" id="s1-err-kpi-count-sub">Số dòng chênh lệch ghi nhận</div>
           </div>
 
           <div class="kpi-error-card border-cyan">
             <div class="err-kpi-label">📦 TỔNG SL CHÊNH LỆCH (CỘT J)</div>
-            <div class="err-kpi-val text-cyan">9,212.946</div>
-            <div class="err-kpi-sub">Số lượng chênh lệch thực tế</div>
+            <div class="err-kpi-val text-cyan" id="s1-err-kpi-qty">9,980.390</div>
+            <div class="err-kpi-sub" id="s1-err-kpi-qty-sub">Số lượng chênh lệch thực tế</div>
           </div>
 
           <div class="kpi-error-card border-red">
             <div class="err-kpi-label">💰 TỔNG GIÁ TRỊ THẤT THOÁT</div>
-            <div class="err-kpi-val text-red">163,275,850 VNĐ</div>
-            <div class="err-kpi-sub">Giá trị chênh lệch phát sinh</div>
+            <div class="err-kpi-val text-red" id="s1-err-kpi-val">175,980,240 VNĐ</div>
+            <div class="err-kpi-sub" id="s1-err-kpi-val-sub">Giá trị chênh lệch phát sinh</div>
           </div>
 
           <div class="kpi-error-card border-amber">
             <div class="err-kpi-label">📈 TOP VẤN ĐỀ LỖI CAO NHẤT</div>
-            <div class="err-kpi-val text-amber">DC giao thiếu</div>
-            <div class="err-kpi-sub">71.07% tổng SL lệch (6,547.390)</div>
+            <div class="err-kpi-val text-amber" id="s1-err-kpi-top">DC giao thiếu</div>
+            <div class="err-kpi-sub" id="s1-err-kpi-top-sub">71.07% tổng SL lệch (6,547.390)</div>
           </div>
 
           <div class="kpi-error-card border-purple">
             <div class="err-kpi-label">🚨 TỒN ĐỌNG CHƯA CẢI THIỆN</div>
-            <div class="err-kpi-val text-purple">16,328,252 VNĐ</div>
-            <div class="err-kpi-sub">10% tổng phát sinh</div>
+            <div class="err-kpi-val text-purple" id="s1-err-kpi-ton">17,598,024 VNĐ</div>
+            <div class="err-kpi-sub" id="s1-err-kpi-ton-sub">10% tổng phát sinh</div>
           </div>
         </div>
 
@@ -254,7 +254,7 @@
               <span>📊 BẢNG THÔNG TIN THEO DÕI TỶ LỆ LỖI (CỘT V GSHEET)</span>
               <span class="panel-sub">Thống kê SL Chênh lệch (Cột J), Giá trị lệch & Tỷ lệ lỗi (%) theo Cột V (Lỗi)</span>
             </div>
-            <button class="btn btn-sm btn-outline">🔄 Làm mới</button>
+            <button class="btn btn-sm btn-outline" id="s1-btn-refresh-errors">🔄 Làm mới</button>
           </div>
 
           <div class="table-responsive">
