@@ -204,11 +204,11 @@
         <div class="filter-bar">
           <div class="filter-item">
             <label for="s1-date-from">Từ ngày:</label>
-            <input type="date" id="s1-date-from" class="input-date">
+            <input type="date" id="s1-date-from" class="input-date" value="2026-09-01" placeholder="MM/DD/YYYY">
           </div>
           <div class="filter-item">
             <label for="s1-date-to">Đến ngày:</label>
-            <input type="date" id="s1-date-to" class="input-date">
+            <input type="date" id="s1-date-to" class="input-date" value="2026-09-11" placeholder="MM/DD/YYYY">
           </div>
           <button id="s1-btn-filter-date" class="btn btn-primary">🔍 Lọc theo ngày</button>
           <button id="s1-btn-reset-date" class="btn btn-ghost">🔄 Reset</button>
@@ -290,17 +290,17 @@
       <div class="krc-controls-card">
         <div class="krc-header-meta">
           <span class="krc-title">📑 Báo cáo & Phân tích KRC</span>
-          <span class="krc-meta-tag">345 SKU | 2.5s | 2026-09-10 03:57:10</span>
+          <span class="krc-meta-tag">345 SKU | 2.5s | 2026-09-11 15:49:17</span>
         </div>
 
         <div class="krc-filters-row">
           <div class="filter-item">
             <label>Từ:</label>
-            <input type="text" id="krc-date-from" class="input-date" value="09/01/2026">
+            <input type="text" id="krc-date-from" class="input-date" value="09/01/2026" placeholder="MM/DD/YYYY">
           </div>
           <div class="filter-item">
             <label>Đến:</label>
-            <input type="text" id="krc-date-to" class="input-date" value="09/10/2026">
+            <input type="text" id="krc-date-to" class="input-date" value="09/11/2026" placeholder="MM/DD/YYYY">
           </div>
 
           <div class="action-buttons-group">
@@ -312,18 +312,19 @@
 
           <div class="filter-item">
             <label>Ngày xuất:</label>
-            <select class="select-box">
-              <option>Tất cả ngày</option>
-              <option>01/09</option>
-              <option>02/09</option>
-              <option>03/09</option>
-              <option>04/09</option>
-              <option>05/09</option>
-              <option>06/09</option>
-              <option>07/09</option>
-              <option>08/09</option>
-              <option>09/09</option>
-              <option>10/09</option>
+            <select class="select-box" id="krc-select-export-day">
+              <option value="">Tất cả ngày</option>
+              <option value="01/09">01/09</option>
+              <option value="02/09">02/09</option>
+              <option value="03/09">03/09</option>
+              <option value="04/09">04/09</option>
+              <option value="05/09">05/09</option>
+              <option value="06/09">06/09</option>
+              <option value="07/09">07/09</option>
+              <option value="08/09">08/09</option>
+              <option value="09/09">09/09</option>
+              <option value="10/09">10/09</option>
+              <option value="11/09">11/09</option>
             </select>
           </div>
 
@@ -542,6 +543,11 @@
               <option value="09/09/2026">Ngày 09/09/2026</option>
               <option value="09/08/2026">Ngày 08/09/2026</option>
               <option value="09/07/2026">Ngày 07/09/2026</option>
+              <option value="09/11/2026">Ngày 11/09/2026</option>
+              <option value="09/10/2026">Ngày 10/09/2026</option>
+              <option value="09/09/2026">Ngày 09/09/2026</option>
+              <option value="09/08/2026">Ngày 08/09/2026</option>
+              <option value="09/07/2026">Ngày 07/09/2026</option>
               <option value="09/06/2026">Ngày 06/09/2026</option>
               <option value="09/05/2026">Ngày 05/09/2026</option>
               <option value="09/04/2026">Ngày 04/09/2026</option>
@@ -562,12 +568,12 @@
           <div class="date-range-box" id="date-range-container" style="display: none;">
             <div class="date-input-group">
               <span class="date-label">Từ:</span>
-              <input type="date" id="input-date-from" class="date-picker-input">
+              <input type="date" id="input-date-from" class="date-picker-input" value="2026-09-01">
             </div>
             <span class="date-sep">→</span>
             <div class="date-input-group">
               <span class="date-label">Đến:</span>
-              <input type="date" id="input-date-to" class="date-picker-input">
+              <input type="date" id="input-date-to" class="date-picker-input" value="2026-09-11">
             </div>
             <button id="btn-apply-date-range" class="btn-mini btn-mini-primary" title="Áp dụng lọc">Lọc</button>
             <button id="btn-close-date-range" class="btn-mini btn-mini-ghost" title="Đóng">&times;</button>

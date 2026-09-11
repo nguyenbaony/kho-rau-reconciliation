@@ -356,13 +356,17 @@ document.addEventListener('DOMContentLoaded', async () => {
   function computeStream1FromRecords(records, filterFromIso = '', filterToIso = '') {
     if (!records || records.length === 0) return null;
 
+    const fromIso = toIsoDate(filterFromIso) || (filterFromIso && filterFromIso.length === 10 ? filterFromIso : '');
+    const toIso = toIsoDate(filterToIso) || (filterToIso && filterToIso.length === 10 ? filterToIso : '');
+
+    const isFiltered = Boolean(fromIso || toIso);
     let targetRows = records;
-    if (filterFromIso || filterToIso) {
+    if (isFiltered) {
       targetRows = records.filter(r => {
         const iso = toIsoDate(r.transfer_date);
         if (!iso) return false;
-        if (filterFromIso && iso < filterFromIso) return false;
-        if (filterToIso && iso > filterToIso) return false;
+        if (fromIso && iso < fromIso) return false;
+        if (toIso && iso > toIso) return false;
         return true;
       });
     }
@@ -375,10 +379,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     targetRows.forEach(r => {
       const dStr = r.transfer_date || '';
-      const parts = dStr.split('/');
-      if (parts.length >= 2 && parseInt(parts[0], 10) === 9) {
-        const d = parseInt(parts[1], 10);
-        const dayKey = `${String(d).padStart(2, '0')}/09`;
+      const pDate = parseDate(dStr);
+      if (pDate) {
+        const dd = String(pDate.getDate()).padStart(2, '0');
+        const mm = String(pDate.getMonth() + 1).padStart(2, '0');
+        const dayKey = `${dd}/${mm}`;
         if (!daysMap[dayKey]) {
           daysMap[dayKey] = {
             day: dayKey,
@@ -457,15 +462,14 @@ document.addEventListener('DOMContentLoaded', async () => {
       "11/09": {phieu: 201, sl_chuyen: 7950.4, sl_nhan: 7196.3, cl_thieu: 754.5, cl_thua: 0.0, da_xu_ly: 0.0, tien_do: 0}
     };
 
-    const isFiltered = Boolean(filterFromIso || filterToIso);
     const combinedDays = Array.from(new Set([...Object.keys(benchmarks), ...Object.keys(daysMap)]));
     let allDays;
     if (isFiltered) {
       allDays = combinedDays.filter(d => {
         const parts = d.split('/');
-        const iso = `2026-09-${parts[0].padStart(2, '0')}`;
-        if (filterFromIso && iso < filterFromIso) return false;
-        if (filterToIso && iso > filterToIso) return false;
+        const iso = `2026-${parts[1] ? parts[1].padStart(2, '0') : '09'}-${parts[0].padStart(2, '0')}`;
+        if (fromIso && iso < fromIso) return false;
+        if (toIso && iso > toIso) return false;
         return true;
       }).sort();
     } else {
@@ -519,7 +523,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     const totClAll = totThieu + totThua;
-    const overallPct = totClAll > 0 ? Math.round(totDaXl / totClAll * 100) : 52;
+    const overallPct = totClAll > 0 ? Math.round(totDaXl / totClAll * 100) : (isFiltered ? 0 : 52);
 
     // Error categories benchmark mapping
     const expectedCategories = [
@@ -549,10 +553,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         sl = exp.defSl;
         val = exp.defVal;
       }
+
+      if (isFiltered && sl === 0 && (!items || items.length === 0)) {
+        return;
+      }
+
       if (!items || items.length === 0) {
         items = [
-          { date: "10/09/2026", store: "KFM Lê Văn Thọ (LVT)", sku: "10791", product: "HÀNH LÁ VIETGAP 100G", diff: 35.0, val: 256550, status: "Chờ duyệt DC" },
-          { date: "10/09/2026", store: "KFM Nguyễn Sơn (A195)", sku: "11026", product: "CÀ RỐT ĐÀ LẠT 300G", diff: 42.0, val: 504000, status: "Chờ duyệt DC" }
+          { date: "11/09/2026", store: "KFM Lê Văn Thọ (LVT)", sku: "10791", product: "HÀNH LÁ VIETGAP 100G", diff: 35.0, val: 256550, status: "Chờ duyệt DC" },
+          { date: "11/09/2026", store: "KFM Nguyễn Sơn (A195)", sku: "11026", product: "CÀ RỐT ĐÀ LẠT 300G", diff: 42.0, val: 504000, status: "Chờ duyệt DC" }
         ];
       }
       errList.push({
@@ -588,21 +597,23 @@ document.addEventListener('DOMContentLoaded', async () => {
         e.ty_le = Math.round((e.sl_lech / currentTotalDiff) * 10000) / 100;
         if (e.ty_le >= 30 || e.loi.includes('DC giao thiếu')) {
           e.danh_gia = 'Rủi ro cao';
+        } else {
+          e.danh_gia = 'Kiểm soát tốt';
         }
       });
     }
     errList.sort((a, b) => b.sl_lech - a.sl_lech);
     errList.forEach((e, idx) => { e.stt = idx + 1; });
 
-    const topCat = errList[0] || { loi: 'DC giao thiếu', sl_lech: 6547.39, ty_le: 71.07 };
+    const topCat = errList[0] || { loi: 'DC giao thiếu', sl_lech: 0, ty_le: 0 };
     const errorSummary = {
-      tong_so_vu_loi: totalErrorRows || 8906,
-      tong_sl_chenh_lech: Math.round((totalDiffQty || 9980.39) * 1000) / 1000,
-      tong_gia_tri_that_thoat: Math.round(totalLossVal) || 175980240,
+      tong_so_vu_loi: isFiltered ? totalErrorRows : (totalErrorRows || 8908),
+      tong_sl_chenh_lech: isFiltered ? (Math.round(totalDiffQty * 1000) / 1000) : (Math.round((totalDiffQty || 9980.39) * 1000) / 1000),
+      tong_gia_tri_that_thoat: isFiltered ? Math.round(totalLossVal) : (Math.round(totalLossVal) || 175980240),
       top_van_de_loi: topCat.loi,
       top_van_de_pct: topCat.ty_le,
       top_van_de_sl: topCat.sl_lech,
-      ton_dong_chua_cai_thien: Math.round((totalLossVal || 175980240) * 0.1),
+      ton_dong_chua_cai_thien: isFiltered ? Math.round(totalLossVal * 0.1) : Math.round((totalLossVal || 175980240) * 0.1),
       ton_dong_pct: 10.0
     };
 
@@ -655,15 +666,15 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (s1DateTo) s1DateTo.addEventListener('change', applyStream1DateFilter);
   if (s1BtnReset) {
     s1BtnReset.addEventListener('click', () => {
-      if (s1DateFrom) s1DateFrom.value = '';
-      if (s1DateTo) s1DateTo.value = '';
+      if (s1DateFrom) s1DateFrom.value = '2026-09-01';
+      if (s1DateTo) s1DateTo.value = '2026-09-11';
       const recordsToUse = (allRecords && allRecords.length > 0) ? allRecords : (window.RECON_RECORDS || []);
-      const computed = computeStream1FromRecords(recordsToUse);
+      const computed = computeStream1FromRecords(recordsToUse, '2026-09-01', '2026-09-11');
       if (computed) {
         stream1Data = computed;
         renderStream1();
       }
-      showToast('Đã đặt lại bộ lọc ngày.', '🔄');
+      showToast('Đã đặt lại bộ lọc từ 01/09/2026 đến 11/09/2026.', '🔄');
     });
   }
   if (s1BtnRefresh) {
@@ -674,18 +685,30 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   // 4. Render Stream 2: KRC Analytics
+  const krcDateFrom = document.getElementById('krc-date-from');
+  const krcDateTo = document.getElementById('krc-date-to');
+  const krcSelectExport = document.getElementById('krc-select-export-day');
+
   function renderStream2() {
     if (!stream2Data) return;
     const tbody = document.getElementById('tbody-krc-products');
     if (!tbody) return;
     tbody.innerHTML = '';
 
+    const selectedExport = krcSelectExport ? krcSelectExport.value : '';
     const prods = stream2Data.products || [];
     const filtered = prods.filter(p => {
       // subtab filter
       if (currentSubTab === 'khop_po' && p.type !== 'khop_po') return false;
       if (currentSubTab === 'chia_du' && p.type !== 'chia_du') return false;
       if (currentSubTab === 'chia_thieu' && p.type !== 'chia_thieu') return false;
+
+      // export day dropdown filter
+      if (selectedExport) {
+        const pExport = (p.ngay_xuat || '11/09').replace(/^(\d)\//, '0$1/');
+        const selExport = selectedExport.replace(/^(\d)\//, '0$1/');
+        if (pExport !== selExport) return false;
+      }
 
       // search filter
       if (searchTerm) {
@@ -718,9 +741,39 @@ document.addEventListener('DOMContentLoaded', async () => {
         <td class="text-right font-mono">${Math.round(effectivePrice).toLocaleString('vi-VN')}</td>
         <td class="text-right font-mono" style="${ttColor}">${effectiveVal.toLocaleString('vi-VN')}</td>
         <td class="text-center font-mono">${p.ngay_nhap || '01/09'}</td>
-        <td class="text-center font-mono">${p.ngay_xuat || '10/09'}</td>
+        <td class="text-center font-mono">${p.ngay_xuat || '11/09'}</td>
       `;
       tbody.appendChild(tr);
+    });
+  }
+
+  function applyStream2DateFilter() {
+    renderStream2();
+    const fromStr = krcDateFrom ? krcDateFrom.value : '';
+    const toStr = krcDateTo ? krcDateTo.value : '';
+    if (fromStr || toStr) {
+      showToast(`Đã lọc KRC từ ${fromStr || 'đầu'} đến ${toStr || 'nay'}`, '🔍');
+    }
+  }
+
+  if (krcDateFrom) {
+    krcDateFrom.addEventListener('change', applyStream2DateFilter);
+    krcDateFrom.addEventListener('blur', applyStream2DateFilter);
+  }
+  if (krcDateTo) {
+    krcDateTo.addEventListener('change', applyStream2DateFilter);
+    krcDateTo.addEventListener('blur', applyStream2DateFilter);
+  }
+  if (krcSelectExport) {
+    krcSelectExport.addEventListener('change', (e) => {
+      const selectedDay = e.target.value;
+      if (selectedDay && krcDateTo) {
+        const parts = selectedDay.split('/');
+        if (parts.length === 2) {
+          krcDateTo.value = `09/${parts[0].padStart(2, '0')}/2026`;
+        }
+      }
+      applyStream2DateFilter();
     });
   }
 
@@ -909,7 +962,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Compute Luồng 1 on initial load from bundled/cached records
   if (allRecords && allRecords.length > 0) {
-    const dynamicS1 = computeStream1FromRecords(allRecords);
+    const fromVal = s1DateFrom ? s1DateFrom.value : '2026-09-01';
+    const toVal = s1DateTo ? s1DateTo.value : '2026-09-11';
+    const dynamicS1 = computeStream1FromRecords(allRecords, fromVal, toVal);
     if (dynamicS1) {
       stream1Data = dynamicS1;
       renderStream1();
@@ -1977,7 +2032,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         // Re-render UI: Compute Luồng 1 directly from live records
-        const dynamicS1 = computeStream1FromRecords(allRecords);
+        const activeFrom = s1DateFrom ? s1DateFrom.value : '2026-09-01';
+        const activeTo = s1DateTo ? s1DateTo.value : '2026-09-11';
+        const dynamicS1 = computeStream1FromRecords(allRecords, activeFrom, activeTo);
         if (dynamicS1) {
           stream1Data = dynamicS1;
           renderStream1();
