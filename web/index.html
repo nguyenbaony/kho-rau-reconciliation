@@ -8,8 +8,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Roboto+Mono:wght@500;600;700&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <link rel="stylesheet" href="style.css">
-  <link rel="stylesheet" href="style_legacy.css">
+  <link rel="stylesheet" href="style.css?v=20260911_v5">
+  <link rel="stylesheet" href="style_legacy.css?v=20260911_v5">
 </head>
 <body>
   <!-- Top Global Header -->
@@ -50,7 +50,12 @@
       </button>
     </div>
 
-    <div class="nav-right">
+    <div class="nav-right" style="display: flex; align-items: center; gap: 10px;">
+      <div class="status-pill live" id="top-sync-pill" style="cursor: pointer; background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.4); padding: 5px 12px; border-radius: 20px;" title="Bấm để đồng bộ dữ liệu Google Sheets ngay">
+        <span class="dot"></span>
+        <span id="top-status-text">Sheets: <b>Realtime</b></span>
+        <span id="top-countdown" style="font-size: 0.72rem; color: #a7f3d0; font-variant-numeric: tabular-nums; margin-left: 3px;">(60s)</span>
+      </div>
       <div class="status-pill live">
         <span class="dot"></span>
         <span>VPN CDC: Connected</span>
@@ -68,7 +73,7 @@
         <div class="timeline-scroll-wrapper">
           <table class="timeline-strip-table">
             <tbody>
-              <tr class="strip-row-header">
+              <tr class="strip-row-header" id="strip-row-days">
                 <td class="strip-label">Ngày</td>
                 <td class="strip-col">01-Thg9</td>
                 <td class="strip-col">02-Thg9</td>
@@ -80,14 +85,14 @@
                 <td class="strip-col">08-Thg9</td>
                 <td class="strip-col">09-Thg9</td>
                 <td class="strip-col">10-Thg9</td>
-                <td class="strip-col future">11-Thg9</td>
+                <td class="strip-col">11-Thg9</td>
                 <td class="strip-col future">12-Thg9</td>
                 <td class="strip-col future">13-Thg9</td>
                 <td class="strip-col future">14-Thg9</td>
                 <td class="strip-col future">15-Thg9</td>
                 <td class="strip-col future">16-Thg9</td>
               </tr>
-              <tr class="strip-row-data">
+              <tr class="strip-row-data" id="strip-row-data">
                 <td class="strip-label font-bold">CL Thiếu</td>
                 <td>49.3</td>
                 <td>829.4</td>
@@ -99,14 +104,14 @@
                 <td>1,335.2</td>
                 <td>1,083.6</td>
                 <td class="text-danger font-bold">3,633.1</td>
-                <td class="future"></td>
+                <td class="text-danger font-bold">754.1</td>
                 <td class="future"></td>
                 <td class="future"></td>
                 <td class="future"></td>
                 <td class="future"></td>
                 <td class="future"></td>
               </tr>
-              <tr class="strip-row-progress">
+              <tr class="strip-row-progress" id="strip-row-progress">
                 <td class="strip-label font-bold">Tiến độ</td>
                 <td><span class="badge-pct pct-100">100%</span></td>
                 <td><span class="badge-pct pct-100">100%</span></td>
@@ -118,7 +123,7 @@
                 <td><span class="badge-pct pct-low">45%</span></td>
                 <td><span class="badge-pct pct-low">37%</span></td>
                 <td><span class="badge-pct pct-alert">7%</span></td>
-                <td class="future"></td>
+                <td><span class="badge-pct pct-alert">0%</span></td>
                 <td class="future"></td>
                 <td class="future"></td>
                 <td class="future"></td>
@@ -134,7 +139,7 @@
       <div class="kpi-quad-grid">
         <div class="kpi-card card-blue">
           <div class="kpi-meta">TỔNG SỐ NGÀY ĐỐI SOÁT</div>
-          <div class="kpi-num" id="s1-kpi-total-days">10</div>
+          <div class="kpi-num" id="s1-kpi-total-days">11</div>
           <div class="kpi-desc">Mốc ngày có phát sinh phiếu</div>
         </div>
 
@@ -146,123 +151,205 @@
 
         <div class="kpi-card card-amber">
           <div class="kpi-meta">ĐANG XỬ LÝ</div>
-          <div class="kpi-num" id="s1-kpi-pending-days">8</div>
+          <div class="kpi-num" id="s1-kpi-pending-days">9</div>
           <div class="kpi-desc">Số ngày còn chênh lệch tồn</div>
         </div>
 
         <div class="kpi-card card-purple">
           <div class="kpi-meta">TỶ LỆ HOÀN THÀNH CHUNG</div>
-          <div class="kpi-num" id="s1-kpi-pct">55%</div>
+          <div class="kpi-num" id="s1-kpi-pct">52%</div>
           <div class="kpi-desc">Tổng đã XL / Tổng chênh lệch</div>
         </div>
       </div>
 
-      <!-- TABLE 1: Danh Sách Tiến Độ Theo Từng Ngày Chi Tiết (Kho Rau Củ) -->
-      <div class="content-panel">
-        <div class="panel-header">
-          <div class="panel-title">
-            <span>📑 DANH SÁCH TIẾN ĐỘ THEO TỪNG NGÀY CHI TIẾT (KHO RAU CỦ)</span>
+      <!-- SCM TABLE 1: By Quantity (Số lượng) -->
+      <div class="scm-table-card">
+        <div class="scm-table-header">
+          <div class="scm-table-title">
+            <span>📦 By Quantity</span>
+            <span class="scm-table-sub">Số lượng (01/09 - 15/09/2026)</span>
           </div>
-          <div class="panel-meta">10 mốc ngày đối soát</div>
+          <div class="panel-meta">15 ngày đối soát SCM</div>
         </div>
 
         <div class="table-responsive">
-          <table class="data-table" id="table-timeline-days">
+          <table class="table-scm-dual" id="table-scm-quantity">
             <thead>
               <tr>
-                <th>NGÀY</th>
-                <th class="text-right">PHIẾU</th>
-                <th class="text-right">SL CHUYỂN</th>
-                <th class="text-right">SL NHẬN</th>
-                <th class="text-right">CL THIẾU</th>
-                <th class="text-right">CL THỪA</th>
-                <th class="text-right font-bold">TỔNG CL</th>
-                <th class="text-right">ĐÃ XỬ LÝ</th>
-                <th class="text-right">CÒN LẠI</th>
-                <th class="text-center">TRẠNG THÁI</th>
-                <th class="text-center">TIẾN ĐỘ XỬ LÝ</th>
+                <th rowspan="2" style="width: 70px;">NGÀY</th>
+                <th rowspan="2" style="width: 65px;">PHIẾU</th>
+                <th rowspan="2">SL CHUYỂN</th>
+                <th rowspan="2">SL NHẬN</th>
+                <th colspan="3" class="group-header">CHÊNH LỆCH GIAO/NHẬN</th>
+                <th colspan="6" class="group-header" style="background: rgba(16, 185, 129, 0.2); color: #34d399;">XỬ LÝ CHÊNH LỆCH</th>
+              </tr>
+              <tr>
+                <th>CL THIẾU</th>
+                <th>CL THỪA</th>
+                <th style="font-weight: 800;">TỔNG CL</th>
+                <th>HAO HỤT</th>
+                <th>BS CHO ST</th>
+                <th>TRẢ TỒN DC</th>
+                <th>RÚT TỒN ST</th>
+                <th>WRITE - OFF</th>
+                <th>CHƯA XỬ LÝ</th>
               </tr>
             </thead>
-            <tbody id="tbody-timeline-days">
+            <tbody id="tbody-scm-quantity">
               <!-- Rendered by JS -->
             </tbody>
-            <tfoot id="tfoot-timeline-days">
+            <tfoot id="tfoot-scm-quantity">
               <!-- Rendered by JS -->
             </tfoot>
           </table>
         </div>
       </div>
 
-      <!-- SECTION 2: BẢNG THÔNG TIN THEO DÕI TỶ LỆ LỖI (CỘT V GSHEET) -->
-      <div class="error-tracking-section">
-        <!-- Date Filters -->
-        <div class="filter-bar">
-          <div class="filter-item">
-            <label>Từ ngày:</label>
-            <input type="text" placeholder="mm/dd/yyyy" class="input-date" value="09/01/2026">
+      <!-- SCM TABLE 2: By Amount (Giá nhập theo 1985 SKU) -->
+      <div class="scm-table-card">
+        <div class="scm-table-header">
+          <div class="scm-table-title">
+            <span>💰 By Amount</span>
+            <span class="scm-table-sub">Giá nhập theo 1985 SKU (Đơn vị: VNĐ)</span>
           </div>
-          <div class="filter-item">
-            <label>Đến ngày:</label>
-            <input type="text" placeholder="mm/dd/yyyy" class="input-date" value="09/10/2026">
-          </div>
-          <button class="btn btn-primary">🔍 Lọc theo ngày</button>
-          <button class="btn btn-ghost">🔄 Reset</button>
+          <div class="panel-meta">Đối soát tài chính SCM</div>
         </div>
 
-        <!-- 5 Error KPI Cards -->
-        <div class="kpi-error-grid">
+        <div class="table-responsive">
+          <table class="table-scm-dual" id="table-scm-amount">
+            <thead>
+              <tr>
+                <th rowspan="2" style="width: 70px;">NGÀY</th>
+                <th rowspan="2" style="width: 65px;">PHIẾU</th>
+                <th rowspan="2">GT CHUYỂN</th>
+                <th rowspan="2">GT NHẬN</th>
+                <th colspan="3" class="group-header">CHÊNH LỆCH GIAO/NHẬN</th>
+                <th colspan="4" class="group-header" style="background: rgba(16, 185, 129, 0.2); color: #34d399;">XỬ LÝ CHÊNH LỆCH</th>
+              </tr>
+              <tr>
+                <th>CL THIẾU</th>
+                <th>CL THỪA</th>
+                <th style="font-weight: 800;">TỔNG CL</th>
+                <th>HAO HỤT</th>
+                <th>BS CHO ST</th>
+                <th>TRẢ TỒN DC</th>
+                <th>RÚT TỒN ST</th>
+              </tr>
+            </thead>
+            <tbody id="tbody-scm-amount">
+              <!-- Rendered by JS -->
+            </tbody>
+            <tfoot id="tfoot-scm-amount">
+              <!-- Rendered by JS -->
+            </tfoot>
+          </table>
+        </div>
+      </div>
+
+      <!-- SECTION 2: BỘ LỌC TỔNG HỢP THEO NGÀY & TUẦN (CỘT V GSHEET) -->
+      <div class="error-tracking-section">
+        <!-- Date Filters -->
+        <div class="filter-bar" style="display: flex; flex-direction: column; gap: 10px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+            <div style="font-weight: 700; font-size: 0.95rem; color: #f8fafc; display: flex; align-items: center; gap: 8px;">
+              <span>🔍 BỘ LỌC TỔNG HỢP THEO NGÀY & TUẦN</span>
+            </div>
+            <div class="auto-sync-badge" style="background: rgba(14, 165, 233, 0.15); border-color: rgba(14, 165, 233, 0.4); color: #38bdf8;">
+              <span>📅 Đang xem: 01/09/2026 → 15/09/2026 (Tuần 36-38)</span>
+            </div>
+          </div>
+
+          <div style="display: flex; flex-wrap: wrap; gap: 12px; align-items: center;">
+            <div class="filter-item">
+              <label for="s1-select-week">📅 LỌC THEO TUẦN</label>
+              <select id="s1-select-week" class="select-box">
+                <option selected>Tùy chỉnh khoảng ngày...</option>
+                <option value="w36">Tuần 36 (01/09 - 06/09)</option>
+                <option value="w37">Tuần 37 (07/09 - 13/09)</option>
+                <option value="w38">Tuần 38 (14/09 - 20/09)</option>
+                <option value="all">Toàn bộ Tuần 36-38 (01/09 - 15/09)</option>
+              </select>
+            </div>
+            <div class="filter-item">
+              <label for="s1-date-from">📅 TỪ NGÀY</label>
+              <input type="text" id="s1-date-from" class="input-date" value="09/01/2026" placeholder="MM/DD/YYYY">
+            </div>
+            <div class="filter-item">
+              <label for="s1-date-to">📅 ĐẾN NGÀY</label>
+              <input type="text" id="s1-date-to" class="input-date" value="09/15/2026" placeholder="MM/DD/YYYY">
+            </div>
+            <button id="s1-btn-filter-date" class="btn btn-primary">🔍 Lọc</button>
+            <button id="s1-btn-reset-date" class="btn btn-ghost">🔄 Mặc định</button>
+          </div>
+
+          <!-- Quick Select Bar -->
+          <div class="quick-filter-bar">
+            <span>⚡ Chọn nhanh:</span>
+            <span class="quick-filter-tag">Hôm nay</span>
+            <span class="quick-filter-tag">Hôm qua</span>
+            <span class="quick-filter-tag">Tuần này</span>
+            <span class="quick-filter-tag">Tuần trước</span>
+            <span class="quick-filter-tag">7 ngày qua</span>
+            <span class="quick-filter-tag active">Tháng này</span>
+          </div>
+        </div>
+
+        <!-- 5 Error KPI Cards (Hình 2) -->
+        <div class="kpi-error-grid" style="margin-top: 20px;">
           <div class="kpi-error-card border-blue">
             <div class="err-kpi-label">🎯 TỔNG SỐ VỤ/DÒNG LỖI</div>
-            <div class="err-kpi-val text-blue">7,987 dòng</div>
-            <div class="err-kpi-sub">Số dòng chênh lệch ghi nhận</div>
+            <div class="err-kpi-val text-blue" id="s1-err-kpi-count">21,765 dòng</div>
+            <div class="err-kpi-sub" id="s1-err-kpi-count-sub">Số dòng chênh lệch ghi nhận</div>
           </div>
 
           <div class="kpi-error-card border-cyan">
             <div class="err-kpi-label">📦 TỔNG SL CHÊNH LỆCH (CỘT J)</div>
-            <div class="err-kpi-val text-cyan">9,212.946</div>
-            <div class="err-kpi-sub">Số lượng chênh lệch thực tế</div>
+            <div class="err-kpi-val text-cyan" id="s1-err-kpi-qty">23,719.988</div>
+            <div class="err-kpi-sub" id="s1-err-kpi-qty-sub">Số lượng chênh lệch thực tế</div>
           </div>
 
           <div class="kpi-error-card border-red">
             <div class="err-kpi-label">💰 TỔNG GIÁ TRỊ THẤT THOÁT</div>
-            <div class="err-kpi-val text-red">163,275,850 VNĐ</div>
-            <div class="err-kpi-sub">Giá trị chênh lệch phát sinh</div>
+            <div class="err-kpi-val text-red" id="s1-err-kpi-val">422,248,231 VNĐ</div>
+            <div class="err-kpi-sub" id="s1-err-kpi-val-sub">Giá trị chênh lệch phát sinh</div>
           </div>
 
           <div class="kpi-error-card border-amber">
             <div class="err-kpi-label">📈 TOP VẤN ĐỀ LỖI CAO NHẤT</div>
-            <div class="err-kpi-val text-amber">DC giao thiếu</div>
-            <div class="err-kpi-sub">71.07% tổng SL lệch (6,547.390)</div>
+            <div class="err-kpi-val text-amber" id="s1-err-kpi-top">DC giao thiếu</div>
+            <div class="err-kpi-sub" id="s1-err-kpi-top-sub">69.57% tổng SL lệch (16,502.901)</div>
           </div>
 
           <div class="kpi-error-card border-purple">
             <div class="err-kpi-label">🚨 TỒN ĐỌNG CHƯA CẢI THIỆN</div>
-            <div class="err-kpi-val text-purple">16,328,252 VNĐ</div>
-            <div class="err-kpi-sub">10% tổng phát sinh</div>
+            <div class="err-kpi-val text-purple" id="s1-err-kpi-ton">9,158,392 VNĐ</div>
+            <div class="err-kpi-sub" id="s1-err-kpi-ton-sub">2% tổng phát sinh</div>
           </div>
         </div>
 
-        <!-- TABLE 2: Bảng Thống Kê Tỷ Lệ Lỗi (Cột V GSheet) -->
-        <div class="content-panel">
-          <div class="panel-header">
-            <div class="panel-title">
+        <!-- TABLE 3: Bảng Thống Kê Tỷ Lệ Lỗi (Cột V GSheet) -->
+        <div class="scm-table-card" style="margin-top: 24px;">
+          <div class="scm-table-header">
+            <div class="scm-table-title">
               <span>📊 BẢNG THÔNG TIN THEO DÕI TỶ LỆ LỖI (CỘT V GSHEET)</span>
-              <span class="panel-sub">Thống kê SL Chênh lệch (Cột J), Giá trị lệch & Tỷ lệ lỗi (%) theo Cột V (Lỗi)</span>
+              <span class="scm-table-sub">Thống kê SL Chênh lệch (Cột J), Giá trị lệch & Tỷ lệ lỗi (%) theo Cột V (Lỗi)</span>
             </div>
-            <button class="btn btn-sm btn-outline">🔄 Làm mới</button>
+            <button class="btn btn-sm btn-outline" id="s1-btn-refresh-errors">🔄 Làm mới</button>
           </div>
 
           <div class="table-responsive">
-            <table class="data-table" id="table-error-categories">
+            <table class="table-scm-dual" id="table-error-categories">
               <thead>
                 <tr>
-                  <th class="text-center" style="width: 60px;">STT</th>
-                  <th>PHÂN LOẠI LỖI (CỘT V GSHEET)</th>
-                  <th class="text-right">SL CHÊNH LỆCH</th>
-                  <th class="text-right">TỔNG GIÁ TRỊ LỆCH (VNĐ)</th>
-                  <th class="text-right">TỶ LỆ LỖI (%)</th>
-                  <th class="text-center">ĐÁNH GIÁ RỦI RO</th>
-                  <th class="text-center">CHI TIẾT</th>
+                  <th style="width: 50px;">STT</th>
+                  <th style="text-align: left; padding-left: 14px;">PHÂN LOẠI LỖI (CỘT V GSHEET)</th>
+                  <th style="width: 170px;">TUẦN</th>
+                  <th style="width: 110px;">SL CASE LỖI</th>
+                  <th style="width: 130px;">SL CHÊNH LỆCH</th>
+                  <th style="width: 170px;">TỔNG GIÁ TRỊ LỆCH (VNĐ)</th>
+                  <th style="width: 110px;">TỶ LỆ LỖI (%)</th>
+                  <th style="width: 140px;">% CẢI THIỆN (TUẦN)</th>
+                  <th style="width: 130px;">ĐÁNH GIÁ RỦI RO</th>
                 </tr>
               </thead>
               <tbody id="tbody-error-categories">
@@ -271,6 +358,45 @@
               <tfoot id="tfoot-error-categories">
                 <!-- Rendered by JS -->
               </tfoot>
+            </table>
+          </div>
+        </div>
+
+        <!-- TABLE 4: TOP CÁC VẤN ĐỀ LỖI TĂNG / CHƯA CẢI THIỆN (HÌNH 2) -->
+        <div class="scm-table-card" style="margin-top: 24px;">
+          <div class="scm-table-header">
+            <div class="scm-table-title">
+              <span style="color: #f43f5e;">🔥 TOP CÁC VẤN ĐỀ LỖI TĂNG / CHƯA CẢI THIỆN</span>
+              <span class="scm-table-sub">Danh sách các nhóm lỗi phát sinh tồn đọng lớn chưa được xử lý</span>
+            </div>
+          </div>
+
+          <div class="table-responsive">
+            <table class="table-scm-dual" id="table-unresolved-issues">
+              <thead>
+                <tr>
+                  <th style="width: 80px;">HẠNG</th>
+                  <th style="text-align: left; padding-left: 14px;">PHÂN LOẠI LỖI</th>
+                  <th>SỐ PHIẾU ẢNH HƯỞNG</th>
+                  <th>SỐ CH ẢNH HƯỞNG</th>
+                  <th>GIÁ TRỊ CHƯA CẢI THIỆN (VNĐ)</th>
+                  <th>TỶ LỆ CHƯA XL (%)</th>
+                  <th>MỨC ĐỘ ƯU TIÊN</th>
+                  <th style="width: 100px;">THAO TÁC</th>
+                </tr>
+              </thead>
+              <tbody id="tbody-unresolved-issues">
+                <tr>
+                  <td class="col-date font-bold" style="color: #f43f5e;">TOP 1</td>
+                  <td class="font-bold" style="text-align: left; padding-left: 14px;">DC giao thiếu</td>
+                  <td class="font-mono">1,893</td>
+                  <td class="font-mono">224</td>
+                  <td class="font-mono font-bold" style="color: #f43f5e;">9,158,392 VNĐ</td>
+                  <td class="font-mono font-bold">3.5%</td>
+                  <td style="text-align: center;"><span class="badge-pill-priority">🚨 Ưu tiên 1 (Gấp)</span></td>
+                  <td style="text-align: center;"><button class="btn btn-sm btn-outline btn-view-err-detail" data-idx="0">🔍 Chi tiết</button></td>
+                </tr>
+              </tbody>
             </table>
           </div>
         </div>
@@ -285,17 +411,17 @@
       <div class="krc-controls-card">
         <div class="krc-header-meta">
           <span class="krc-title">📑 Báo cáo & Phân tích KRC</span>
-          <span class="krc-meta-tag">345 SKU | 2.5s | 2026-09-10 03:57:10</span>
+          <span class="krc-meta-tag">345 SKU | 2.5s | 2026-09-11 15:49:17</span>
         </div>
 
         <div class="krc-filters-row">
           <div class="filter-item">
             <label>Từ:</label>
-            <input type="text" id="krc-date-from" class="input-date" value="09/01/2026">
+            <input type="text" id="krc-date-from" class="input-date" value="09/01/2026" placeholder="MM/DD/YYYY">
           </div>
           <div class="filter-item">
             <label>Đến:</label>
-            <input type="text" id="krc-date-to" class="input-date" value="09/10/2026">
+            <input type="text" id="krc-date-to" class="input-date" value="09/11/2026" placeholder="MM/DD/YYYY">
           </div>
 
           <div class="action-buttons-group">
@@ -307,18 +433,19 @@
 
           <div class="filter-item">
             <label>Ngày xuất:</label>
-            <select class="select-box">
-              <option>Tất cả ngày</option>
-              <option>01/09</option>
-              <option>02/09</option>
-              <option>03/09</option>
-              <option>04/09</option>
-              <option>05/09</option>
-              <option>06/09</option>
-              <option>07/09</option>
-              <option>08/09</option>
-              <option>09/09</option>
-              <option>10/09</option>
+            <select class="select-box" id="krc-select-export-day">
+              <option value="">Tất cả ngày</option>
+              <option value="01/09">01/09</option>
+              <option value="02/09">02/09</option>
+              <option value="03/09">03/09</option>
+              <option value="04/09">04/09</option>
+              <option value="05/09">05/09</option>
+              <option value="06/09">06/09</option>
+              <option value="07/09">07/09</option>
+              <option value="08/09">08/09</option>
+              <option value="09/09">09/09</option>
+              <option value="10/09">10/09</option>
+              <option value="11/09">11/09</option>
             </select>
           </div>
 
@@ -532,7 +659,13 @@
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="date-icon"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
             <select id="filter-date" class="select-input date-select" title="Lọc theo ngày giao nhận">
               <option value="">Tất cả các ngày</option>
-              <option value="10/09/2026">Ngày 10/09/2026</option>
+              <option value="09/11/2026">Ngày 11/09/2026 (Mới nhất)</option>
+              <option value="09/10/2026">Ngày 10/09/2026</option>
+              <option value="09/09/2026">Ngày 09/09/2026</option>
+              <option value="09/08/2026">Ngày 08/09/2026</option>
+              <option value="09/07/2026">Ngày 07/09/2026</option>
+              <option value="09/11/2026">Ngày 11/09/2026</option>
+              <option value="09/10/2026">Ngày 10/09/2026</option>
               <option value="09/09/2026">Ngày 09/09/2026</option>
               <option value="09/08/2026">Ngày 08/09/2026</option>
               <option value="09/07/2026">Ngày 07/09/2026</option>
@@ -556,12 +689,12 @@
           <div class="date-range-box" id="date-range-container" style="display: none;">
             <div class="date-input-group">
               <span class="date-label">Từ:</span>
-              <input type="date" id="input-date-from" class="date-picker-input">
+              <input type="date" id="input-date-from" class="date-picker-input" value="2026-09-01">
             </div>
             <span class="date-sep">→</span>
             <div class="date-input-group">
               <span class="date-label">Đến:</span>
-              <input type="date" id="input-date-to" class="date-picker-input">
+              <input type="date" id="input-date-to" class="date-picker-input" value="2026-09-11">
             </div>
             <button id="btn-apply-date-range" class="btn-mini btn-mini-primary" title="Áp dụng lọc">Lọc</button>
             <button id="btn-close-date-range" class="btn-mini btn-mini-ghost" title="Đóng">&times;</button>
@@ -890,8 +1023,9 @@
   </div>
 
   <div id="toast-container" class="toast-container"></div>
-  <script src="data/data_bundle.js"></script>
-  <script src="data/reconciliation_data.js"></script>
-  <script src="app.js"></script>
+  <script src="data/data_bundle.js?v=20260911_v5"></script>
+  <script src="data/reconciliation_data.js?v=20260911_v5"></script>
+  <script src="app.js?v=20260911_v5"></script>
+<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v31edd6df95cf4e85bb4c19e7a9bdbcba1788362987495" integrity="sha512-iIg7k2xntmwu6/uSb5tpc/hySgZc4eoL31yB29W6tJFo2akwjPWcEqnCEdJvGexCL0KEQwVYv5BlowfhVz26hg==" data-cf-beacon='{"version":"2024.11.0","token":"c8dbae3184f749839a4b976bf5120675","r":1,"spa":2}' crossorigin="anonymous"></script>
 </body>
 </html>

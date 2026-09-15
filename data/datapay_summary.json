@@ -1,14 +1,14 @@
 ﻿{
-    "generated_at":  "2026-09-10 10:31:21",
-    "total_records":  11150,
-    "total_qty_transferred":  86615.21,
-    "total_qty_received":  73896.75,
-    "total_qty_diff":  12722.92,
+    "generated_at":  "2026-09-13 09:33:01",
+    "total_records":  13875,
+    "total_qty_transferred":  112109.81,
+    "total_qty_received":  96864.06,
+    "total_qty_diff":  15251.16,
     "financial_summary":  {
-                              "total_natural_loss_vnd":  25527802,
-                              "total_store_penalty_vnd":  30413601,
-                              "total_warehouse_penalty_vnd":  172948502,
-                              "total_undetermined_vnd":  0,
-                              "grand_total_penalty_vnd":  203362103
+                              "total_natural_loss_vnd":  31317076,
+                              "total_store_penalty_vnd":  33886064,
+                              "total_warehouse_penalty_vnd":  199179272,
+                              "total_undetermined_vnd":  7245048,
+                              "grand_total_penalty_vnd":  233065336
                           }
 }
