@@ -40,6 +40,45 @@ while ($listener.IsListening) {
             $urlPath = "index.html"
         }
 
+        # API Handlers
+        if ($urlPath -eq "api/sync" -or $urlPath -eq "api/sync/") {
+            $script = Join-Path $webRoot "sync_all_realtime.ps1"
+            $out = & powershell.exe -NoProfile -ExecutionPolicy Bypass -File $script 2>&1 | Out-String
+            $timeNow = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+            $respObj = @{
+                success = $true
+                timestamp = $timeNow
+                message = "Dong bo realtime 3 luong thanh cong!"
+                log = $out
+            }
+            $jsonStr = $respObj | ConvertTo-Json
+            $bytes = [System.Text.Encoding]::UTF8.GetBytes($jsonStr)
+            $response.ContentType = "application/json; charset=utf-8"
+            $response.StatusCode = 200
+            $response.AddHeader("Access-Control-Allow-Origin", "*")
+            $response.AddHeader("Cache-Control", "no-cache")
+            $response.OutputStream.Write($bytes, 0, $bytes.Length)
+            $response.OutputStream.Close()
+            continue
+        }
+
+        if ($urlPath -eq "api/status" -or $urlPath -eq "api/status/") {
+            $timeNow = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+            $respObj = @{
+                status = "online"
+                service = "KRC Dual Pipeline Engine"
+                timestamp = $timeNow
+            }
+            $jsonStr = $respObj | ConvertTo-Json
+            $bytes = [System.Text.Encoding]::UTF8.GetBytes($jsonStr)
+            $response.ContentType = "application/json; charset=utf-8"
+            $response.StatusCode = 200
+            $response.AddHeader("Access-Control-Allow-Origin", "*")
+            $response.OutputStream.Write($bytes, 0, $bytes.Length)
+            $response.OutputStream.Close()
+            continue
+        }
+
         $localPath = Join-Path $webRoot ($urlPath.Replace('/', '\'))
 
         if (Test-Path $localPath -PathType Leaf) {

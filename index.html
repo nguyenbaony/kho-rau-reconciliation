@@ -11,7 +11,7 @@
   <link rel="stylesheet" href="style.css?v=20260911_v5">
   <link rel="stylesheet" href="style_legacy.css?v=20260911_v5">
 </head>
-<body>
+<body class="theme-light">
   <!-- Top Global Header -->
   <header class="top-nav">
     <div class="nav-left">
@@ -24,7 +24,7 @@
       </div>
     </div>
 
-    <!-- 2 Independent Stream Tabs -->
+    <!-- 3 Independent Stream Tabs -->
     <div class="stream-switcher">
       <button class="stream-btn active" id="tab-stream1" data-stream="stream1">
         <span class="stream-icon">⏱️</span>
@@ -41,6 +41,7 @@
           <div class="stream-sub">Xuất - Nhập - Tồn - GAP - Khớp PO từ CDC StarRocks</div>
         </div>
       </button>
+
       <button class="stream-btn" id="tab-stream3" data-stream="stream3">
         <span class="stream-icon">📑</span>
         <div class="stream-text">
@@ -50,11 +51,17 @@
       </button>
     </div>
 
-    <div class="nav-right" style="display: flex; align-items: center; gap: 10px;">
-      <div class="status-pill live" id="top-sync-pill" style="cursor: pointer; background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.4); padding: 5px 12px; border-radius: 20px;" title="Bấm để đồng bộ dữ liệu Google Sheets ngay">
+    <div class="nav-right" style="display: flex; align-items: center; gap: 8px;">
+      <button id="btn-top-sync-all" class="btn btn-sm btn-primary" style="padding: 6px 14px; font-weight: 700; font-size: 0.82rem; display: flex; align-items: center; gap: 6px;" title="Chạy đồng bộ toàn bộ 3 luồng dữ liệu realtime">
+        <span>⚡ Đồng bộ Realtime</span>
+      </button>
+      <button id="btn-toggle-theme" class="btn btn-sm btn-ghost" style="padding: 6px 10px; font-size: 0.82rem;" title="Chuyển đổi giao diện Sáng / Tối">
+        <span id="theme-btn-icon">☀️</span> <span id="theme-btn-text">Sáng</span>
+      </button>
+      <div class="status-pill live" id="top-sync-pill" style="cursor: pointer;" title="Bấm để đồng bộ dữ liệu Google Sheets ngay">
         <span class="dot"></span>
         <span id="top-status-text">Sheets: <b>Realtime</b></span>
-        <span id="top-countdown" style="font-size: 0.72rem; color: #a7f3d0; font-variant-numeric: tabular-nums; margin-left: 3px;">(60s)</span>
+        <span id="top-countdown" style="font-size: 0.72rem; font-variant-numeric: tabular-nums; margin-left: 3px;">(60s)</span>
       </div>
       <div class="status-pill live">
         <span class="dot"></span>
@@ -68,99 +75,6 @@
     <!-- STREAM 1: TIMELINE TIẾN ĐỘ & THEO DÕI TỶ LỆ LỖI -->
     <!-- ============================================================ -->
     <section id="view-stream1" class="stream-view active">
-      <!-- Top Date Progress Bar (01-Thg9 -> 16-Thg9) -->
-      <div class="timeline-bar-card">
-        <div class="timeline-scroll-wrapper">
-          <table class="timeline-strip-table">
-            <tbody>
-              <tr class="strip-row-header" id="strip-row-days">
-                <td class="strip-label">Ngày</td>
-                <td class="strip-col">01-Thg9</td>
-                <td class="strip-col">02-Thg9</td>
-                <td class="strip-col">03-Thg9</td>
-                <td class="strip-col">04-Thg9</td>
-                <td class="strip-col">05-Thg9</td>
-                <td class="strip-col">06-Thg9</td>
-                <td class="strip-col">07-Thg9</td>
-                <td class="strip-col">08-Thg9</td>
-                <td class="strip-col">09-Thg9</td>
-                <td class="strip-col">10-Thg9</td>
-                <td class="strip-col">11-Thg9</td>
-                <td class="strip-col future">12-Thg9</td>
-                <td class="strip-col future">13-Thg9</td>
-                <td class="strip-col future">14-Thg9</td>
-                <td class="strip-col future">15-Thg9</td>
-                <td class="strip-col future">16-Thg9</td>
-              </tr>
-              <tr class="strip-row-data" id="strip-row-data">
-                <td class="strip-label font-bold">CL Thiếu</td>
-                <td>49.3</td>
-                <td>829.4</td>
-                <td>874.7</td>
-                <td>626.7</td>
-                <td>854</td>
-                <td>767.3</td>
-                <td>822.4</td>
-                <td>1,335.2</td>
-                <td>1,083.6</td>
-                <td class="text-danger font-bold">3,633.1</td>
-                <td class="text-danger font-bold">754.1</td>
-                <td class="future"></td>
-                <td class="future"></td>
-                <td class="future"></td>
-                <td class="future"></td>
-                <td class="future"></td>
-              </tr>
-              <tr class="strip-row-progress" id="strip-row-progress">
-                <td class="strip-label font-bold">Tiến độ</td>
-                <td><span class="badge-pct pct-100">100%</span></td>
-                <td><span class="badge-pct pct-100">100%</span></td>
-                <td><span class="badge-pct pct-high">95%</span></td>
-                <td><span class="badge-pct pct-high">98%</span></td>
-                <td><span class="badge-pct pct-mid">82%</span></td>
-                <td><span class="badge-pct pct-high">92%</span></td>
-                <td><span class="badge-pct pct-low">44%</span></td>
-                <td><span class="badge-pct pct-low">45%</span></td>
-                <td><span class="badge-pct pct-low">37%</span></td>
-                <td><span class="badge-pct pct-alert">7%</span></td>
-                <td><span class="badge-pct pct-alert">0%</span></td>
-                <td class="future"></td>
-                <td class="future"></td>
-                <td class="future"></td>
-                <td class="future"></td>
-                <td class="future"></td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <!-- 4 KPI Metrics Cards -->
-      <div class="kpi-quad-grid">
-        <div class="kpi-card card-blue">
-          <div class="kpi-meta">TỔNG SỐ NGÀY ĐỐI SOÁT</div>
-          <div class="kpi-num" id="s1-kpi-total-days">11</div>
-          <div class="kpi-desc">Mốc ngày có phát sinh phiếu</div>
-        </div>
-
-        <div class="kpi-card card-green">
-          <div class="kpi-meta">HOÀN THÀNH 100%</div>
-          <div class="kpi-num" id="s1-kpi-completed-days">2</div>
-          <div class="kpi-desc">Số ngày đối soát xong</div>
-        </div>
-
-        <div class="kpi-card card-amber">
-          <div class="kpi-meta">ĐANG XỬ LÝ</div>
-          <div class="kpi-num" id="s1-kpi-pending-days">9</div>
-          <div class="kpi-desc">Số ngày còn chênh lệch tồn</div>
-        </div>
-
-        <div class="kpi-card card-purple">
-          <div class="kpi-meta">TỶ LỆ HOÀN THÀNH CHUNG</div>
-          <div class="kpi-num" id="s1-kpi-pct">52%</div>
-          <div class="kpi-desc">Tổng đã XL / Tổng chênh lệch</div>
-        </div>
-      </div>
 
       <!-- SCM TABLE 1: By Quantity (Số lượng) -->
       <div class="scm-table-card">
@@ -180,19 +94,19 @@
                 <th rowspan="2" style="width: 65px;">PHIẾU</th>
                 <th rowspan="2">SL CHUYỂN</th>
                 <th rowspan="2">SL NHẬN</th>
-                <th colspan="3" class="group-header">CHÊNH LỆCH GIAO/NHẬN</th>
-                <th colspan="6" class="group-header" style="background: rgba(16, 185, 129, 0.2); color: #34d399;">XỬ LÝ CHÊNH LỆCH</th>
+                <th colspan="3" class="group-header group-header-blue">CHÊNH LỆCH GIAO/NHẬN</th>
+                <th colspan="6" class="group-header group-header-teal">XỬ LÝ CHÊNH LỆCH</th>
               </tr>
               <tr>
-                <th>CL THIẾU</th>
-                <th>CL THỪA</th>
-                <th style="font-weight: 800;">TỔNG CL</th>
-                <th>HAO HỤT</th>
-                <th>BS CHO ST</th>
-                <th>TRẢ TỒN DC</th>
-                <th>RÚT TỒN ST</th>
-                <th>WRITE - OFF</th>
-                <th>CHƯA XỬ LÝ</th>
+                <th class="th-sub-blue">CL THIẾU</th>
+                <th class="th-sub-blue">CL THỪA</th>
+                <th class="th-sub-blue" style="font-weight: 800;">TỔNG CL</th>
+                <th class="th-sub-teal">HAO HỤT</th>
+                <th class="th-sub-teal">BS CHO ST</th>
+                <th class="th-sub-teal">TRẢ TỒN DC</th>
+                <th class="th-sub-teal">RÚT TỒN ST</th>
+                <th class="th-sub-teal">WRITE - OFF</th>
+                <th class="th-sub-teal">CHƯA XỬ LÝ</th>
               </tr>
             </thead>
             <tbody id="tbody-scm-quantity">
@@ -223,17 +137,17 @@
                 <th rowspan="2" style="width: 65px;">PHIẾU</th>
                 <th rowspan="2">GT CHUYỂN</th>
                 <th rowspan="2">GT NHẬN</th>
-                <th colspan="3" class="group-header">CHÊNH LỆCH GIAO/NHẬN</th>
-                <th colspan="4" class="group-header" style="background: rgba(16, 185, 129, 0.2); color: #34d399;">XỬ LÝ CHÊNH LỆCH</th>
+                <th colspan="3" class="group-header group-header-blue">CHÊNH LỆCH GIAO/NHẬN</th>
+                <th colspan="4" class="group-header group-header-teal">XỬ LÝ CHÊNH LỆCH</th>
               </tr>
               <tr>
-                <th>CL THIẾU</th>
-                <th>CL THỪA</th>
-                <th style="font-weight: 800;">TỔNG CL</th>
-                <th>HAO HỤT</th>
-                <th>BS CHO ST</th>
-                <th>TRẢ TỒN DC</th>
-                <th>RÚT TỒN ST</th>
+                <th class="th-sub-blue">CL THIẾU</th>
+                <th class="th-sub-blue">CL THỪA</th>
+                <th class="th-sub-blue" style="font-weight: 800;">TỔNG CL</th>
+                <th class="th-sub-teal">HAO HỤT</th>
+                <th class="th-sub-teal">BS CHO ST</th>
+                <th class="th-sub-teal">TRẢ TỒN DC</th>
+                <th class="th-sub-teal">RÚT TỒN ST</th>
               </tr>
             </thead>
             <tbody id="tbody-scm-amount">
@@ -249,17 +163,17 @@
       <!-- SECTION 2: BỘ LỌC TỔNG HỢP THEO NGÀY & TUẦN (CỘT V GSHEET) -->
       <div class="error-tracking-section">
         <!-- Date Filters -->
-        <div class="filter-bar" style="display: flex; flex-direction: column; gap: 10px;">
-          <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-            <div style="font-weight: 700; font-size: 0.95rem; color: #f8fafc; display: flex; align-items: center; gap: 8px;">
+        <div class="filter-card">
+          <div class="filter-card-header">
+            <div class="filter-title">
               <span>🔍 BỘ LỌC TỔNG HỢP THEO NGÀY & TUẦN</span>
             </div>
-            <div class="auto-sync-badge" style="background: rgba(14, 165, 233, 0.15); border-color: rgba(14, 165, 233, 0.4); color: #38bdf8;">
-              <span>📅 Đang xem: 01/09/2026 → 15/09/2026 (Tuần 36-38)</span>
+            <div class="filter-badge">
+              <span>🗓️ Đang xem: 01/09/2026 → 15/09/2026 (Tuần 36-38)</span>
             </div>
           </div>
 
-          <div style="display: flex; flex-wrap: wrap; gap: 12px; align-items: center;">
+          <div class="filter-inputs-row">
             <div class="filter-item">
               <label for="s1-select-week">📅 LỌC THEO TUẦN</label>
               <select id="s1-select-week" class="select-box">
