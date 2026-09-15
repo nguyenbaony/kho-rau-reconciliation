@@ -3,3 +3,4 @@ telegram_auth_state.json
 __pycache__/
 *.pyc
 logs/
+push_kayo.ps1

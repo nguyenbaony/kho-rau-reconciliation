@@ -2537,6 +2537,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Start Realtime Auto Sync countdown immediately
   if (typeof resetAutoSyncTimer === 'function') resetAutoSyncTimer();
 
+  // Start Realtime Auto Sync countdown immediately
+  resetAutoSyncTimer();
+
   }
 
   // Stream 3 is initialized on-demand when user clicks 'tab-stream3'

@@ -33,10 +33,12 @@ def extract_store_code(title, text=""):
 
 def classify_group(title):
     t = title.upper()
-    if any(k in t for k in ["KRC", "RAU", "CHẤT LƯỢNG", "HÌNH ẢNH CHÊNH LỆCH"]):
-        return "RAU_CU"
-    if any(k in t for k in ["ABA", "ĐÔNG MÁT", "THỊT CÁ", "DC"]):
+    if any(k in t for k in ["THỊT CÁ", "THIT CA", "ABA", "ĐÔNG MÁT", "DC -"]):
         return "ABA_DC"
+    if any(k in t for k in ["KRC", "RAU", "CHẤT LƯỢNG", "KHO RAU"]):
+        return "RAU_CU"
+    if "HÌNH ẢNH CHÊNH LỆCH" in t:
+        return "RAU_CU" if "KRC" in t else "ABA_DC"
     return None
 
 feed_items = []
