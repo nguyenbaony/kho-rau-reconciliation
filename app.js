@@ -538,6 +538,195 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   };
 
+  // 3c. Báo Cáo Chênh Lệch Hằng Ngày (5 Chỉ Tiêu KRC & KRCBT)
+  const renderDailyDiscrepancy = () => {
+    const list = filterRecords();
+    const dayMap = {};
+
+    list.forEach(item => {
+      const d = item.transfer_date || 'Chưa rõ';
+      const isBanh = (item.product_name || '').toUpperCase().includes('BÁNH') ||
+                     (item.product_name || '').toUpperCase().includes('BANH') ||
+                     (item.product_name || '').toUpperCase().includes('SANDWICH') ||
+                     (item.product_name || '').toUpperCase().includes('BREAD') ||
+                     (item.product_name || '').toUpperCase().includes('CROISSANT') ||
+                     (item.warehouse_id || '').toUpperCase().includes('KRCBT') ||
+                     (item.to_order || '').toUpperCase().includes('KRCBT') ||
+                     (item.unit || '').toUpperCase() === 'KHAY' ||
+                     (item.unit || '').toUpperCase() === 'CÁI';
+      const whKey = isBanh ? 'KRCBT' : 'KRC';
+      const key = `${d}__${whKey}`;
+
+      if (!dayMap[key]) {
+        dayMap[key] = {
+          date: d,
+          warehouse_code: whKey,
+          warehouse_name: isBanh ? '🥖 Kho Bánh Tươi' : '🥦 Kho Rau Củ',
+          ticketSet: new Set(),
+          discrepancyTicketSet: new Set(),
+          total_transferred: 0,
+          total_received: 0,
+          total_diff_abs: 0,
+          total_surplus: 0,
+          total_shortage: 0,
+          natural_loss_qty: 0,
+          natural_loss_vnd: 0,
+          warehouse_penalty_vnd: 0,
+          store_penalty_vnd: 0,
+          total_loss_val: 0
+        };
+      }
+
+      const entry = dayMap[key];
+      const ticketId = item.to_order || item.pt_transfer || item.id;
+      entry.ticketSet.add(ticketId);
+
+      const qTrans = Number(item.qty_transferred) || 0;
+      const qRecv = Number(item.qty_received) || 0;
+      const qDiff = Number(item.qty_diff) || 0;
+
+      entry.total_transferred += qTrans;
+      entry.total_received += qRecv;
+      entry.total_diff_abs += Math.abs(qDiff);
+
+      if (qDiff !== 0 || Number(item.natural_loss_qty || 0) > 0) {
+        entry.discrepancyTicketSet.add(ticketId);
+      }
+
+      // 3. SL Dư (Thừa)
+      if (qRecv > qTrans) {
+        entry.total_surplus += (qRecv - qTrans);
+      }
+
+      // 4. SL Thiếu (đã trừ hao hụt)
+      if (qTrans > qRecv) {
+        const lossQ = Number(item.natural_loss_qty) || 0;
+        const netShortage = Math.max(0, (qTrans - qRecv) - lossQ);
+        entry.total_shortage += netShortage;
+      }
+
+      // 5. Hao hụt
+      entry.natural_loss_qty += (Number(item.natural_loss_qty) || 0);
+      entry.natural_loss_vnd += (Number(item.loss_value) || 0);
+
+      // Chế tài
+      entry.warehouse_penalty_vnd += (Number(item.warehouse_penalty) || 0);
+      entry.store_penalty_vnd += (Number(item.store_penalty) || 0);
+      entry.total_loss_val += (Number(item.warehouse_penalty || 0) + Number(item.store_penalty || 0) + Number(item.loss_value || 0) + Number(item.undetermined_value || 0));
+    });
+
+    const entries = Object.values(dayMap).sort((a, b) => {
+      const da = parseDate(a.date);
+      const db = parseDate(b.date);
+      return (db ? db.getTime() : 0) - (da ? da.getTime() : 0);
+    });
+
+    // Compute Overall Daily KPI Cards
+    let grandTickets = 0, krcTickets = 0, krcbtTickets = 0;
+    let grandDiffQty = 0, grandDiffVal = 0;
+    let grandSurplusQty = 0;
+    let grandShortageQty = 0, grandWhPenalty = 0, grandStPenalty = 0;
+    let grandLossQty = 0, grandLossVal = 0;
+
+    entries.forEach(e => {
+      const tCnt = e.ticketSet.size;
+      grandTickets += tCnt;
+      if (e.warehouse_code === 'KRC') krcTickets += tCnt;
+      else krcbtTickets += tCnt;
+
+      grandDiffQty += e.total_diff_abs;
+      grandDiffVal += e.total_loss_val;
+      grandSurplusQty += e.total_surplus;
+      grandShortageQty += e.total_shortage;
+      grandWhPenalty += e.warehouse_penalty_vnd;
+      grandStPenalty += e.store_penalty_vnd;
+      grandLossQty += e.natural_loss_qty;
+      grandLossVal += e.natural_loss_vnd;
+    });
+
+    // Update 5 KPI Cards in UI
+    const elTickets = document.getElementById('daily-kpi-tickets');
+    const elTicketsSub = document.getElementById('daily-kpi-tickets-sub');
+    const elDiffQty = document.getElementById('daily-kpi-diff-qty');
+    const elDiffVal = document.getElementById('daily-kpi-diff-val');
+    const elSurplusQty = document.getElementById('daily-kpi-surplus-qty');
+    const elShortageQty = document.getElementById('daily-kpi-shortage-qty');
+    const elShortageSub = document.getElementById('daily-kpi-shortage-sub');
+    const elLossQty = document.getElementById('daily-kpi-loss-qty');
+    const elLossSub = document.getElementById('daily-kpi-loss-sub');
+
+    if (elTickets) elTickets.textContent = `${formatNumber(grandTickets, 0)} Phiếu`;
+    if (elTicketsSub) elTicketsSub.textContent = `🥦 KRC: ${formatNumber(krcTickets, 0)} | 🥖 KRCBT: ${formatNumber(krcbtTickets, 0)}`;
+    if (elDiffQty) elDiffQty.textContent = `${formatNumber(grandDiffQty, 2)} Kg/Khay`;
+    if (elDiffVal) elDiffVal.textContent = `Trị giá: ${formatCurrency(grandDiffVal)}`;
+    if (elSurplusQty) elSurplusQty.textContent = `+${formatNumber(grandSurplusQty, 2)} Kg/Khay`;
+    if (elShortageQty) elShortageQty.textContent = `-${formatNumber(grandShortageQty, 2)} Kg/Khay`;
+    if (elShortageSub) elShortageSub.textContent = `Phạt DC: ${formatCurrency(grandWhPenalty)} | ST: ${formatCurrency(grandStPenalty)}`;
+    if (elLossQty) elLossQty.textContent = `${formatNumber(grandLossQty, 2)} Kg`;
+    if (elLossSub) elLossSub.textContent = `Định mức: ${formatCurrency(grandLossVal)}`;
+
+    // Render Table
+    const tbody = document.getElementById('daily-discrepancy-tbody');
+    if (!tbody) return;
+    tbody.innerHTML = '';
+
+    if (entries.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="13" style="text-align: center; padding: 36px; color: var(--text-muted);">Không có dữ liệu chốt sổ hằng ngày cho bộ lọc hiện tại.</td></tr>`;
+      return;
+    }
+
+    entries.forEach(e => {
+      const tr = document.createElement('tr');
+      const tTotal = e.ticketSet.size;
+      const tDisc = e.discrepancyTicketSet.size;
+      const tPerf = Math.max(0, tTotal - tDisc);
+      const perfPct = tTotal > 0 ? ((tPerf / tTotal) * 100).toFixed(1) : '100.0';
+
+      const whBadge = e.warehouse_code === 'KRCBT'
+        ? `<span class="badge badge-purple" style="font-weight: 600;">🥖 KRCBT</span>`
+        : `<span class="badge badge-green" style="font-weight: 600;">🥦 KRC</span>`;
+
+      tr.innerHTML = `
+        <td style="font-weight: 700; color: #fff;">${formatDateVN(e.date)}</td>
+        <td>${whBadge}</td>
+        <td style="text-align: center;">
+          <span style="font-weight: 700; color: #38bdf8;">${tTotal}</span> 
+          <span style="font-size: 0.73rem; color: var(--text-muted);">(${tPerf} khớp / <b style="color: #f87171;">${tDisc} lệch</b>)</span>
+          <div style="font-size: 0.72rem; color: #34d399;">Khớp: ${perfPct}%</div>
+        </td>
+        <td class="text-right" style="font-weight: 500;">${formatNumber(e.total_transferred, 2)}</td>
+        <td class="text-right" style="font-weight: 500;">${formatNumber(e.total_received, 2)}</td>
+        <td class="text-right" style="font-weight: 700; color: #f87171;">${formatNumber(e.total_diff_abs, 2)}</td>
+        <td class="text-right" style="font-weight: 700; color: #34d399;">+${formatNumber(e.total_surplus, 2)}</td>
+        <td class="text-right" style="font-weight: 700; color: #fb923c;">-${formatNumber(e.total_shortage, 2)}</td>
+        <td class="text-right" style="color: #f87171; font-weight: 600;">${formatCurrency(e.warehouse_penalty_vnd)}</td>
+        <td class="text-right" style="color: #c084fc; font-weight: 600;">${formatCurrency(e.store_penalty_vnd)}</td>
+        <td class="text-right" style="color: #fde047; font-weight: 600;">${formatNumber(e.natural_loss_qty, 2)}</td>
+        <td class="text-right" style="color: #38bdf8; font-weight: 700;">${formatCurrency(e.total_loss_val)}</td>
+        <td style="text-align: center;">
+          <button class="btn btn-outline btn-filter-day" data-date="${e.date}" data-wh="${e.warehouse_code}" style="padding: 4px 8px; font-size: 0.74rem;">
+            🔍 Xem Lệch
+          </button>
+        </td>
+      `;
+      tbody.appendChild(tr);
+    });
+
+    // Drill-down button handler
+    document.querySelectorAll('.btn-filter-day').forEach(btn => {
+      btn.addEventListener('click', (ev) => {
+        const d = ev.currentTarget.getAttribute('data-date');
+        const wh = ev.currentTarget.getAttribute('data-wh');
+        selectedDate = d;
+        selectedWarehouse = wh;
+        const selWh = document.getElementById('filter-warehouse');
+        if (selWh) selWh.value = wh;
+        switchViewMode('recon');
+        showToast(`Đang mở chi tiết các phiếu lệch ngày ${formatDateVN(d)} - Kho ${wh}`, '🔍');
+      });
+    });
+  };
+
   // 4. Render Table Rows
   const renderTable = () => {
     const tbody = document.getElementById('recon-tbody');
@@ -675,21 +864,24 @@ document.addEventListener('DOMContentLoaded', async () => {
   const modeAnalyticsBtn = document.getElementById('mode-tab-analytics');
   const modeReconBtn = document.getElementById('mode-tab-recon');
   const modeTelegramBtn = document.getElementById('mode-tab-telegram');
+  const modeDailyBtn = document.getElementById('mode-tab-daily');
 
   const analyticsView = document.getElementById('analytics-view-section');
   const reconView = document.getElementById('recon-view-section');
   const telegramView = document.getElementById('telegram-feed-section');
+  const dailyView = document.getElementById('daily-view-section');
 
   let currentViewMode = 'analytics';
   const switchViewMode = (mode) => {
     currentViewMode = mode;
-    [modeAnalyticsBtn, modeReconBtn, modeTelegramBtn].forEach(b => {
+    [modeAnalyticsBtn, modeReconBtn, modeTelegramBtn, modeDailyBtn].forEach(b => {
       if (b) b.classList.remove('active');
     });
 
     if (analyticsView) analyticsView.style.display = 'none';
     if (reconView) reconView.style.display = 'none';
     if (telegramView) telegramView.style.display = 'none';
+    if (dailyView) dailyView.style.display = 'none';
 
     if (mode === 'analytics') {
       if (modeAnalyticsBtn) modeAnalyticsBtn.classList.add('active');
@@ -704,12 +896,17 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (modeTelegramBtn) modeTelegramBtn.classList.add('active');
       if (telegramView) telegramView.style.display = 'block';
       loadTelegramFeed();
+    } else if (mode === 'daily') {
+      if (modeDailyBtn) modeDailyBtn.classList.add('active');
+      if (dailyView) dailyView.style.display = 'block';
+      renderDailyDiscrepancy();
     }
   };
 
   if (modeAnalyticsBtn) modeAnalyticsBtn.addEventListener('click', () => switchViewMode('analytics'));
   if (modeReconBtn) modeReconBtn.addEventListener('click', () => switchViewMode('recon'));
   if (modeTelegramBtn) modeTelegramBtn.addEventListener('click', () => switchViewMode('telegram'));
+  if (modeDailyBtn) modeDailyBtn.addEventListener('click', () => switchViewMode('daily'));
 
   // Step Navigation Tabs (Inside Reconciliation View)
   document.querySelectorAll('.step-btn').forEach(btn => {
@@ -917,6 +1114,64 @@ document.addEventListener('DOMContentLoaded', async () => {
       const text = `🥦 BÁO CÁO ĐỐI SOÁT KHO RAU (${nowStr})\n━━━━━━━━━━━━━━━━━━━\n📦 Tổng dòng đối soát: ${totalRecs}\n📉 Hao hụt tự nhiên: ${lossVal}\n🏭 Phạt Kho Rau (DC): ${dcVal}\n🏪 Phạt Siêu Thị (ST): ${stVal}\n━━━━━━━━━━━━━━━━━━━\n🌐 Xem bảng chi tiết: https://nguyenbaony.github.io/kho-rau-reconciliation/`;
       const shareUrl = `https://t.me/share/url?url=https://nguyenbaony.github.io/kho-rau-reconciliation/&text=${encodeURIComponent(text)}`;
       window.open(shareUrl, '_blank');
+    });
+  }
+
+  // Daily Report Action Handlers (5 chỉ tiêu)
+  const btnCopyDailyTg = document.getElementById('btn-copy-daily-telegram');
+  if (btnCopyDailyTg) {
+    btnCopyDailyTg.addEventListener('click', () => {
+      const ticketsTxt = document.getElementById('daily-kpi-tickets')?.textContent || '248 Phiếu';
+      const ticketsSub = document.getElementById('daily-kpi-tickets-sub')?.textContent || '';
+      const diffQtyTxt = document.getElementById('daily-kpi-diff-qty')?.textContent || '142.5 Kg';
+      const diffValTxt = document.getElementById('daily-kpi-diff-val')?.textContent || '';
+      const surplusTxt = document.getElementById('daily-kpi-surplus-qty')?.textContent || '+28.4 Kg';
+      const shortageTxt = document.getElementById('daily-kpi-shortage-qty')?.textContent || '-86.2 Kg';
+      const shortageSub = document.getElementById('daily-kpi-shortage-sub')?.textContent || '';
+      const lossTxt = document.getElementById('daily-kpi-loss-qty')?.textContent || '27.9 Kg';
+      const lossSub = document.getElementById('daily-kpi-loss-sub')?.textContent || '';
+      const nowStr = new Date().toLocaleDateString('vi-VN');
+
+      const telegramMsg = `🥦🥖 BÁO CÁO CHÊNH LỆCH GIAO NHẬN HẰNG NGÀY (${nowStr})
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+1️⃣ SỐ PHIẾU ĐIỀU CHUYỂN: ${ticketsTxt} (${ticketsSub})
+2️⃣ TỔNG SL CHÊNH LỆCH: ${diffQtyTxt} (${diffValTxt})
+3️⃣ SẢN LƯỢNG DƯ (THỪA): ${surplusTxt} (ST nhận thừa)
+4️⃣ SẢN LƯỢNG THIẾU: ${shortageTxt} (${shortageSub})
+5️⃣ HAO HỤT: ${lossTxt} (${lossSub})
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🌐 Tra cứu & đối soát chi tiết TO/PT: https://app-scm.kfm.vn/rau-cu-kfm`;
+
+      navigator.clipboard.writeText(telegramMsg).then(() => {
+        showToast('Đã sao chép mẫu bản tin Telegram 7:30 AM vào bộ nhớ tạm!', '📋');
+      }).catch(() => {
+        prompt('Sao chép bản tin Telegram:', telegramMsg);
+      });
+    });
+  }
+
+  const btnExportDailyCsv = document.getElementById('btn-export-daily-csv');
+  if (btnExportDailyCsv) {
+    btnExportDailyCsv.addEventListener('click', () => {
+      const rows = document.querySelectorAll('#daily-discrepancy-tbody tr');
+      if (!rows || rows.length === 0) {
+        showToast('Không có dữ liệu ngày để xuất!', '⚠️');
+        return;
+      }
+      const headers = ['Ngày Giao', 'Phân Hệ Kho', 'Số Phiếu', 'Tổng Xuất', 'Tổng Nhận', 'SL Lệch', 'SL Dư', 'SL Thiếu', 'Phạt Kho DC', 'Phạt Siêu Thị', 'Hao Hụt Kg', 'Trị Giá Thất Thoát'];
+      let csv = '\uFEFF' + headers.join(',') + '\n';
+      rows.forEach(r => {
+        const cols = Array.from(r.querySelectorAll('td')).map(c => `"${c.innerText.replace(/"/g, '""').replace(/\n/g, ' ')}"`);
+        if (cols.length >= 12) {
+          csv += cols.slice(0, 12).join(',') + '\n';
+        }
+      });
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = `Bao_Cao_Chenh_Lech_Hang_Ngay_KRC_KRCBT_${new Date().toISOString().slice(0, 10)}.csv`;
+      link.click();
+      showToast('Đã xuất file CSV Báo cáo chênh lệch hằng ngày thành công!', '📥');
     });
   }
 

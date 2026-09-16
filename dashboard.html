@@ -88,6 +88,10 @@
         <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 0 0-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.75-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .38z"/></svg>
         <span>📱 3. TELEGRAM FEED (459 NHÓM ĐIỀU PHỐI)</span>
       </button>
+      <button class="view-tab-btn" id="mode-tab-daily" data-view="daily">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+        <span>📅 4. CHÊNH LỆCH HẰNG NGÀY (5 CHỈ TIÊU KRC/KRCBT)</span>
+      </button>
     </nav>
 
     <!-- KPI Metrics Grid -->
@@ -447,8 +451,110 @@
           </div>
         </div>
       </div>
-    </section>
+    <!-- ===================================================================
+         VIEW 4: BÁO CÁO CHÊNH LỆCH HẰNG NGÀY (5 CHỈ TIÊU KRC/KRCBT)
+         =================================================================== -->
+    <div id="daily-view-section" class="view-panel" style="display: none;">
+      <!-- 5 Daily KPI Cards -->
+      <section class="kpi-grid" style="margin-bottom: 22px;">
+        <div class="kpi-card glass-panel" style="border-left: 4px solid #38bdf8;">
+          <div class="kpi-icon-wrap icon-blue">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+          </div>
+          <div class="kpi-details">
+            <span class="kpi-label">1. SỐ PHIẾU ĐIỀU CHUYỂN</span>
+            <span class="kpi-value" id="daily-kpi-tickets">--</span>
+            <span class="kpi-trend positive" id="daily-kpi-tickets-sub">🥦 KRC: -- | 🥖 KRCBT: --</span>
+          </div>
+        </div>
 
+        <div class="kpi-card glass-panel" style="border-left: 4px solid #f43f5e;">
+          <div class="kpi-icon-wrap icon-rose">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+          </div>
+          <div class="kpi-details">
+            <span class="kpi-label">2. TỔNG SL CHÊNH LỆCH</span>
+            <span class="kpi-value" id="daily-kpi-diff-qty">--</span>
+            <span class="kpi-trend alert" id="daily-kpi-diff-val">Trị giá: -- ₫</span>
+          </div>
+        </div>
+
+        <div class="kpi-card glass-panel" style="border-left: 4px solid #10b981;">
+          <div class="kpi-icon-wrap" style="background: rgba(16, 185, 129, 0.15); color: #34d399;">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>
+          </div>
+          <div class="kpi-details">
+            <span class="kpi-label">3. SẢN LƯỢNG DƯ (THỪA)</span>
+            <span class="kpi-value" id="daily-kpi-surplus-qty" style="color: #34d399;">--</span>
+            <span class="kpi-trend positive" id="daily-kpi-surplus-val">Trị giá: -- ₫</span>
+          </div>
+        </div>
+
+        <div class="kpi-card glass-panel" style="border-left: 4px solid #f97316;">
+          <div class="kpi-icon-wrap icon-amber">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 18 13.5 8.5 8.5 13.5 1 6"></polyline><polyline points="17 18 23 18 23 12"></polyline></svg>
+          </div>
+          <div class="kpi-details">
+            <span class="kpi-label">4. SẢN LƯỢNG THIẾU</span>
+            <span class="kpi-value" id="daily-kpi-shortage-qty" style="color: #fb923c;">--</span>
+            <span class="kpi-trend negative" id="daily-kpi-shortage-sub">Phạt DC: -- ₫</span>
+          </div>
+        </div>
+
+        <div class="kpi-card glass-panel" style="border-left: 4px solid #eab308;">
+          <div class="kpi-icon-wrap icon-amber">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+          </div>
+          <div class="kpi-details">
+            <span class="kpi-label">5. HAO HỤT (ĐỊNH MỨC & HỦY)</span>
+            <span class="kpi-value" id="daily-kpi-loss-qty" style="color: #fde047;">--</span>
+            <span class="kpi-trend neutral" id="daily-kpi-loss-sub">Trị giá: -- ₫</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Action Toolbar for Daily Report -->
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 10px;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <span style="font-weight: 700; color: #fff; font-size: 1.05rem;">📋 BẢNG ĐỐI SOÁT CHỐT SỔ HẰNG NGÀY THEO KHO (DAILY CUT-OFF)</span>
+          <span class="badge badge-blue">Tự động tổng hợp từ 4 Bảng CDC</span>
+        </div>
+        <div style="display: flex; gap: 8px;">
+          <button id="btn-copy-daily-telegram" class="btn btn-outline" style="color: #38bdf8; border-color: rgba(56, 189, 248, 0.4);">
+            📲 Sao Chép Bản Tin Telegram 7:30 AM
+          </button>
+          <button id="btn-export-daily-csv" class="btn btn-outline">
+            📥 Xuất CSV Báo Cáo Ngày
+          </button>
+        </div>
+      </div>
+
+      <!-- Daily Breakdown Table -->
+      <div class="table-responsive glass-panel" style="border-radius: 12px; overflow: hidden; padding: 0;">
+        <table class="recon-table" style="width: 100%; margin: 0;">
+          <thead>
+            <tr>
+              <th style="width: 105px;">Ngày Giao</th>
+              <th style="width: 125px;">Phân Hệ Kho</th>
+              <th style="width: 140px; text-align: center;">1. Số Phiếu (Khớp / Lệch)</th>
+              <th class="text-right" style="width: 105px;">Tổng Xuất</th>
+              <th class="text-right" style="width: 105px;">Tổng Nhận</th>
+              <th class="text-right" style="width: 120px;">2. SL Lệch (Kg/Khay)</th>
+              <th class="text-right" style="width: 110px; color: #34d399;">3. SL Dư (+)</th>
+              <th class="text-right" style="width: 110px; color: #fb923c;">4. SL Thiếu (-)</th>
+              <th class="text-right" style="width: 120px;">Phạt Kho DC (₫)</th>
+              <th class="text-right" style="width: 120px;">Phạt Siêu Thị (₫)</th>
+              <th class="text-right" style="width: 110px; color: #fde047;">5. Hao Hụt (Kg)</th>
+              <th class="text-right" style="width: 120px;">Trị Giá Thất Thoát</th>
+              <th style="text-align: center; width: 100px;">Chi Tiết</th>
+            </tr>
+          </thead>
+          <tbody id="daily-discrepancy-tbody">
+            <!-- Rendered by app.js -->
+          </tbody>
+        </table>
+      </div>
+    </div>
   </main>
 
 <!-- Image Lightbox Modal -->
