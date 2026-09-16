@@ -1986,23 +1986,43 @@ document.addEventListener('DOMContentLoaded', async () => {
     } else if (!telegramFeedItems || telegramFeedItems.length === 0) {
       telegramFeedItems = DEFAULT_TELEGRAM_ITEMS;
     }
-    // Render ngay lập tức dữ liệu sẵn có (không phụ thuộc vào fetch mạng hay file:///)
     renderTelegramFeed();
 
-    // Thử fetch phiên bản mới nhất từ JSON nếu có server
+    // 1. Thử fetch từ telegram_feed.json nếu chạy web server
     try {
       const res = await fetch('data/telegram_feed.json?t=' + Date.now());
       if (res.ok) {
         const freshData = await res.json();
         if (Array.isArray(freshData) && freshData.length > 0) {
-          telegramFeedItems = freshData;
+          if (freshData.length !== telegramFeedItems.length || (freshData[0] && telegramFeedItems[0] && freshData[0].id !== telegramFeedItems[0].id)) {
+            telegramFeedItems = freshData;
+            renderTelegramFeed();
+          }
+          return;
+        }
+      }
+    } catch (e) {}
+
+    // 2. Chế độ file:/// : Dynamic script reload để nhận Realtime từ telegram_data.js
+    reloadTelegramDataScript();
+  }
+
+  function reloadTelegramDataScript() {
+    const existing = document.getElementById('dynamic-telegram-data-sync');
+    if (existing) existing.remove();
+    const s = document.createElement('script');
+    s.id = 'dynamic-telegram-data-sync';
+    s.src = 'data/telegram_data.js?t=' + Date.now();
+    s.onload = () => {
+      if (typeof window !== 'undefined' && Array.isArray(window.TELEGRAM_FEED) && window.TELEGRAM_FEED.length > 0) {
+        if (window.TELEGRAM_FEED.length !== telegramFeedItems.length || 
+            (window.TELEGRAM_FEED[0] && telegramFeedItems[0] && window.TELEGRAM_FEED[0].id !== telegramFeedItems[0].id)) {
+          telegramFeedItems = window.TELEGRAM_FEED;
           renderTelegramFeed();
         }
       }
-    } catch (e) {
-      // Offline hoặc mở file:/// trực tiếp trên trình duyệt
-      console.log("Đang chạy chế độ Offline / file:/// - sử dụng bộ dữ liệu tích hợp.");
-    }
+    };
+    document.body.appendChild(s);
   }
 
   function renderTelegramFeed() {
