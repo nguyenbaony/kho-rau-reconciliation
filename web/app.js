@@ -1382,10 +1382,107 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   // Telegram Feed Logic (RAU CỦ vs ABA/DC)
+  // ==========================================================================
+  // TELEGRAM MONITORING ENGINE (KRC, ABA, DC & CẢNH BÁO KHẨN CẤP WEB A)
+  // ==========================================================================
   let telegramFeedItems = (typeof window !== 'undefined' && window.TELEGRAM_FEED) ? window.TELEGRAM_FEED : [];
-  let currentTgFilter = 'ALL';
+  let currentTgFilter = 'ALL'; // 'ALL', 'URGENT', 'KRC', 'ABA', 'DC'
+  let tgViewMode = 'cards'; // 'cards' | 'table'
+  let audioAlertEnabled = true;
+  let lastUrgentCount = 0;
+
   const tgCardsGrid = document.getElementById('telegram-cards-grid');
+  const tgTableView = document.getElementById('telegram-table-view');
+  const tgTableTbody = document.getElementById('telegram-table-tbody');
   const tgInputSearch = document.getElementById('tg-input-search');
+  const btnTgToggleView = document.getElementById('btn-tg-toggle-view');
+  const btnToggleAudio = document.getElementById('btn-toggle-audio');
+
+  // Danh sách từ khóa khẩn cấp cần bắt (ưu tiên cụm dài trước)
+  const URGENT_KEYWORDS = [
+    'điều chuyển',
+    'vượt sức',
+    'giao nhầm',
+    'giao sai',
+    'chuyển',
+    '@@nynguyen09',
+    '@nynguyen09'
+  ];
+
+  // Phát hiện mức độ khẩn cấp và các từ khóa có trong tin nhắn
+  function detectUrgent(text) {
+    if (!text) return { isUrgent: false, matchedKeys: [], isNyTagged: false };
+    const lower = text.toLowerCase();
+    const matchedKeys = [];
+    let isNyTagged = false;
+
+    if (lower.includes('@nynguyen09') || lower.includes('@@nynguyen09')) {
+      isNyTagged = true;
+      matchedKeys.push('@nynguyen09');
+    }
+
+    const checkList = ['điều chuyển', 'vượt sức', 'giao nhầm', 'giao sai', 'chuyển'];
+    checkList.forEach(kw => {
+      if (lower.includes(kw)) {
+        matchedKeys.push(kw);
+      }
+    });
+
+    return {
+      isUrgent: matchedKeys.length > 0,
+      matchedKeys,
+      isNyTagged
+    };
+  }
+
+  // Highlight từ khóa khẩn cấp trong nội dung văn bản
+  function highlightTelegramText(rawText) {
+    if (!rawText) return '';
+    let html = escapeHtml(rawText);
+
+    // Highlight tag Ny (@nynguyen09, @@nynguyen09)
+    html = html.replace(/(@{1,2}nynguyen09)/gi, '<mark class="tg-hl-tag">$1</mark>');
+
+    // Highlight các từ khóa khẩn cấp
+    const kws = ['điều chuyển', 'vượt sức', 'giao nhầm', 'giao sai', 'chuyển'];
+    kws.forEach(kw => {
+      const regex = new RegExp(`(${kw})`, 'gi');
+      html = html.replace(regex, '<mark class="tg-hl-keyword">$1</mark>');
+    });
+
+    // Giữ định dạng xuống dòng
+    return html.replace(/\n/g, '<br>');
+  }
+
+  // Tạo URL Deep Link chuyển thẳng đến đúng vị trí tin nhắn trên Telegram Web A
+  function getTelegramWebAUrl(item) {
+    if (item.web_url) return item.web_url;
+    const chatId = item.chat_id || (item.id && item.id.includes('_') ? item.id.split('_')[0] : '1828938896');
+    const msgId = item.message_id || (item.id && item.id.includes('_') ? item.id.split('_')[1] : '1');
+    const cleanChatId = String(chatId).replace(/^-100/, '').replace(/^-/, '');
+    return `https://web.telegram.org/a/#-100${cleanChatId}?message=${msgId}`;
+  }
+
+  // Chuông thông báo âm thanh khi phát hiện tin khẩn cấp mới
+  function playUrgentAlertSound() {
+    if (!audioAlertEnabled) return;
+    try {
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (!AudioCtx) return;
+      const ctx = new AudioCtx();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(987.77, ctx.currentTime); // B5
+      osc.frequency.setValueAtTime(1318.51, ctx.currentTime + 0.12); // E6
+      gain.gain.setValueAtTime(0.2, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.35);
+      osc.start(ctx.currentTime);
+      osc.stop(ctx.currentTime + 0.35);
+    } catch (e) {}
+  }
 
   async function loadTelegramFeed() {
     if (typeof window !== 'undefined' && window.TELEGRAM_FEED && telegramFeedItems.length === 0) {
@@ -1397,99 +1494,287 @@ document.addEventListener('DOMContentLoaded', async () => {
         telegramFeedItems = await res.json();
       }
     } catch (e) {
-      console.log("Dùng dữ liệu Telegram Feed từ bundle:", e);
+      console.log("Dùng dữ liệu Telegram Feed hiện hành:", e);
     }
     renderTelegramFeed();
   }
 
   function renderTelegramFeed() {
-    if (!tgCardsGrid) return;
     const query = (tgInputSearch ? tgInputSearch.value : '').toLowerCase().trim();
 
-    let filtered = telegramFeedItems;
-    if (currentTgFilter !== 'ALL') {
-      filtered = filtered.filter(item => item.group_type === currentTgFilter);
+    // Tính toán phân loại cho toàn bộ tin nhắn
+    const processedItems = telegramFeedItems.map(item => {
+      const urgentInfo = detectUrgent(item.text);
+      const normGroup = (item.group_type === 'RAU_CU' || item.group_type === 'KRC') ? 'KRC'
+                      : (item.group_type === 'ABA' || (item.group_type === 'ABA_DC' && (item.group_title || '').includes('THỊT CÁ'))) ? 'ABA'
+                      : 'DC';
+      const webUrl = getTelegramWebAUrl(item);
+      return {
+        ...item,
+        normGroup,
+        isUrgent: urgentInfo.isUrgent,
+        matchedKeys: urgentInfo.matchedKeys,
+        isNyTagged: urgentInfo.isNyTagged,
+        webUrl
+      };
+    });
+
+    // Cập nhật số lượng trên các tab
+    const countAll = processedItems.length;
+    const countUrgent = processedItems.filter(x => x.isUrgent).length;
+    const countKrc = processedItems.filter(x => x.normGroup === 'KRC').length;
+    const countAba = processedItems.filter(x => x.normGroup === 'ABA').length;
+    const countDc = processedItems.filter(x => x.normGroup === 'DC').length;
+
+    const elCountAll = document.getElementById('tg-count-all');
+    const elCountUrgent = document.getElementById('tg-count-urgent');
+    const elCountKrc = document.getElementById('tg-count-krc');
+    const elCountAba = document.getElementById('tg-count-aba');
+    const elCountDc = document.getElementById('tg-count-dc');
+
+    if (elCountAll) elCountAll.textContent = countAll;
+    if (elCountUrgent) elCountUrgent.textContent = countUrgent;
+    if (elCountKrc) elCountKrc.textContent = countKrc;
+    if (elCountAba) elCountAba.textContent = countAba;
+    if (elCountDc) elCountDc.textContent = countDc;
+
+    // Kêu chuông nếu số lượng tin khẩn cấp tăng
+    if (countUrgent > lastUrgentCount && lastUrgentCount > 0) {
+      playUrgentAlertSound();
+      showToast(`Có ${countUrgent - lastUrgentCount} tin nhắn khẩn cấp mới cần xử lý!`, '🚨');
     }
+    lastUrgentCount = countUrgent;
+
+    // Lọc theo Tab đã chọn
+    let filtered = processedItems;
+    if (currentTgFilter === 'URGENT') {
+      filtered = filtered.filter(x => x.isUrgent);
+    } else if (currentTgFilter === 'KRC') {
+      filtered = filtered.filter(x => x.normGroup === 'KRC');
+    } else if (currentTgFilter === 'ABA') {
+      filtered = filtered.filter(x => x.normGroup === 'ABA');
+    } else if (currentTgFilter === 'DC') {
+      filtered = filtered.filter(x => x.normGroup === 'DC');
+    }
+
+    // Lọc theo ô tìm kiếm
     if (query) {
       filtered = filtered.filter(item => 
         (item.group_title && item.group_title.toLowerCase().includes(query)) ||
         (item.store_code && item.store_code.toLowerCase().includes(query)) ||
         (item.text && item.text.toLowerCase().includes(query)) ||
-        (item.sender_name && item.sender_name.toLowerCase().includes(query))
+        (item.sender_name && item.sender_name.toLowerCase().includes(query)) ||
+        (item.matchedKeys && item.matchedKeys.some(k => k.toLowerCase().includes(query)))
       );
     }
 
-    const totalCount = telegramFeedItems.length;
-    const krcCount = telegramFeedItems.filter(x => x.group_type === 'RAU_CU').length;
-    const abaCount = telegramFeedItems.filter(x => x.group_type === 'ABA_DC').length;
-
-    const btnAll = document.getElementById('tg-filter-all');
-    const btnKrc = document.getElementById('tg-filter-krc');
-    const btnAba = document.getElementById('tg-filter-aba');
-    if (btnAll) btnAll.innerText = `Tất Cả (${totalCount})`;
-    if (btnKrc) btnKrc.innerText = `🥦 1. RAU CỦ (${krcCount})`;
-    if (btnAba) btnAba.innerText = `❄️ 2. ABA / DC (${abaCount})`;
-
+    // Xử lý Empty State
     if (filtered.length === 0) {
-      tgCardsGrid.innerHTML = `
-        <div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #94a3b8; background: rgba(15,23,42,0.6); border-radius: 12px; border: 1px dashed var(--border-glass);">
-          <div style="font-size: 2rem; margin-bottom: 8px;">📭</div>
-          <div style="font-weight: 600; color: #f1f5f9;">Không tìm thấy tin nhắn/hình ảnh phù hợp</div>
-          <div style="font-size: 0.8rem; margin-top: 4px;">Thử chọn lại tab <b>RAU CỦ</b> hoặc <b>ABA/DC</b></div>
+      const emptyHtml = `
+        <div style="grid-column: 1/-1; text-align: center; padding: 50px 20px; color: #94a3b8; background: rgba(15,23,42,0.6); border-radius: 12px; border: 1px dashed var(--border-glass);">
+          <div style="font-size: 2.4rem; margin-bottom: 8px;">📭</div>
+          <div style="font-weight: 700; font-size: 1rem; color: #f1f5f9;">Không tìm thấy tin nhắn nào phù hợp</div>
+          <div style="font-size: 0.82rem; margin-top: 6px; color: #94a3b8;">Thử chọn lại phân loại nhóm <b>Tất Cả</b>, <b>KRC</b>, <b>ABA</b> hoặc <b>DC</b></div>
         </div>
       `;
+      if (tgCardsGrid) tgCardsGrid.innerHTML = emptyHtml;
+      if (tgTableTbody) tgTableTbody.innerHTML = `<tr><td colspan="8" style="text-align: center; padding: 30px; color: #94a3b8;">Không có dữ liệu tin nhắn</td></tr>`;
       return;
     }
 
-    let html = '';
-    filtered.forEach(item => {
-      const isRau = item.group_type === 'RAU_CU';
-      const badgeBg = isRau ? 'rgba(16, 185, 129, 0.15)' : 'rgba(56, 189, 248, 0.15)';
-      const badgeBorder = isRau ? 'rgba(16, 185, 129, 0.4)' : 'rgba(56, 189, 248, 0.4)';
-      const badgeColor = isRau ? '#34d399' : '#38bdf8';
-      const groupIcon = isRau ? '🥦' : '❄️';
-      const groupTag = isRau ? 'RAU CỦ' : 'ABA / DC';
+    // Render Cards View
+    if (tgCardsGrid) {
+      let cardsHtml = '';
+      filtered.forEach(item => {
+        const isKrc = item.normGroup === 'KRC';
+        const isAba = item.normGroup === 'ABA';
+        const groupIcon = isKrc ? '🥦' : (isAba ? '❄️' : '🏢');
+        const badgeColor = isKrc ? '#34d399' : (isAba ? '#38bdf8' : '#c084fc');
+        const badgeBg = isKrc ? 'rgba(16, 185, 129, 0.15)' : (isAba ? 'rgba(56, 189, 248, 0.15)' : 'rgba(168, 85, 247, 0.15)');
+        const badgeBorder = isKrc ? 'rgba(16, 185, 129, 0.4)' : (isAba ? 'rgba(56, 189, 248, 0.4)' : 'rgba(168, 85, 247, 0.4)');
 
-      html += `
-        <div class="tg-feed-card" style="background: rgba(15, 23, 42, 0.8); border: 1px solid var(--border-glass); border-radius: 14px; overflow: hidden; display: flex; flex-direction: column; transition: transform 0.2s, border-color 0.2s; box-shadow: 0 4px 20px rgba(0,0,0,0.25);">
-          <div style="padding: 14px 16px 10px; display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; border-bottom: 1px solid rgba(255,255,255,0.05);">
-            <div style="display: flex; gap: 10px; align-items: center;">
-              <div style="width: 36px; height: 36px; border-radius: 10px; background: ${badgeBg}; border: 1px solid ${badgeBorder}; display: flex; align-items: center; justify-content: center; font-size: 1.1rem;">
-                ${groupIcon}
-              </div>
-              <div>
-                <div style="font-weight: 700; font-size: 0.86rem; color: #f8fafc; line-height: 1.25;">${escapeHtml(item.group_title)}</div>
-                <div style="font-size: 0.73rem; color: #94a3b8; margin-top: 2px;">
-                  <span style="color: ${badgeColor}; font-weight: 700; background: ${badgeBg}; padding: 1px 6px; border-radius: 4px;">${groupTag}</span> • ${escapeHtml(item.sender_name)}
+        // Thẻ từ khóa khẩn cấp phát hiện được
+        let kwBadgesHtml = '';
+        if (item.matchedKeys && item.matchedKeys.length > 0) {
+          kwBadgesHtml = `
+            <div style="display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px;">
+              ${item.matchedKeys.map(kw => {
+                const isTag = kw.includes('nynguyen09');
+                return `<span class="tg-kw-badge ${isTag ? 'tag-ny' : ''}">${isTag ? '🚨' : '⚠️'} ${escapeHtml(kw)}</span>`;
+              }).join('')}
+            </div>
+          `;
+        }
+
+        const highlightedText = highlightTelegramText(item.text);
+
+        cardsHtml += `
+          <div class="tg-feed-card ${item.isUrgent ? 'urgent-card' : ''}" 
+               style="background: rgba(15, 23, 42, 0.85); border: 1px solid var(--border-glass); border-radius: 14px; overflow: hidden; display: flex; flex-direction: column; transition: all 0.2s ease; box-shadow: 0 4px 20px rgba(0,0,0,0.25);"
+               title="Bấm để mở tin nhắn trên Telegram Web A">
+            
+            <!-- Card Header -->
+            <div style="padding: 14px 16px 10px; display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; border-bottom: 1px solid rgba(255,255,255,0.06);">
+              <div style="display: flex; gap: 10px; align-items: center;">
+                <div style="width: 38px; height: 38px; border-radius: 10px; background: ${badgeBg}; border: 1px solid ${badgeBorder}; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; flex-shrink: 0;">
+                  ${groupIcon}
+                </div>
+                <div>
+                  <div style="font-weight: 700; font-size: 0.88rem; color: #f8fafc; line-height: 1.3;">
+                    ${escapeHtml(item.group_title)}
+                  </div>
+                  <div style="font-size: 0.73rem; color: #94a3b8; margin-top: 3px; display: flex; gap: 6px; align-items: center;">
+                    <span style="color: ${badgeColor}; font-weight: 700; background: ${badgeBg}; padding: 1px 6px; border-radius: 4px;">${item.normGroup}</span>
+                    <span>•</span>
+                    <span>${escapeHtml(item.sender_name)}</span>
+                  </div>
                 </div>
               </div>
-            </div>
-            <span style="font-size: 0.72rem; color: #64748b; white-space: nowrap;">${item.date}</span>
-          </div>
-
-          <div style="padding: 12px 16px; font-size: 0.83rem; color: #cbd5e1; flex: 1; line-height: 1.45;">
-            ${escapeHtml(item.text)}
-          </div>
-
-          <div style="padding: 0 16px 16px;">
-            <div class="tg-img-wrapper" data-img="${item.image_url}" data-cap="${escapeHtml(item.group_title)} - ${escapeHtml(item.date)}" style="position: relative; border-radius: 10px; overflow: hidden; height: 210px; background: #000; border: 1px solid rgba(255,255,255,0.1); cursor: pointer;">
-              <img src="${item.image_url}" loading="lazy" style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.25s;" onmouseover="this.style.transform='scale(1.03)'" onmouseout="this.style.transform='scale(1)'">
-              <div style="position: absolute; bottom: 8px; right: 8px; background: rgba(15,23,42,0.85); backdrop-filter: blur(4px); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.4); padding: 4px 10px; border-radius: 6px; font-size: 0.72rem; font-weight: 600; display: flex; align-items: center; gap: 4px;">
-                🔍 Xem ảnh lớn
+              
+              <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 4px;">
+                ${item.isUrgent ? '<span class="badge-urgent-pulse">🚨 KHẨN CẤP</span>' : ''}
+                <span style="font-size: 0.72rem; color: #64748b; white-space: nowrap;">${item.date}</span>
               </div>
             </div>
+
+            <!-- Urgent Keywords Strip -->
+            ${kwBadgesHtml ? `<div style="padding: 6px 16px 0;">${kwBadgesHtml}</div>` : ''}
+
+            <!-- Message Content -->
+            <div style="padding: 12px 16px; font-size: 0.84rem; color: #cbd5e1; flex: 1; line-height: 1.5; word-break: break-word;">
+              ${highlightedText}
+            </div>
+
+            <!-- Attached Image (if any) -->
+            ${item.image_url ? `
+              <div style="padding: 0 16px 12px;">
+                <div class="tg-img-wrapper" data-img="${item.image_url}" data-cap="${escapeHtml(item.group_title)} - ${escapeHtml(item.date)}" style="position: relative; border-radius: 10px; overflow: hidden; height: 190px; background: #000; border: 1px solid rgba(255,255,255,0.1); cursor: pointer;">
+                  <img src="${item.image_url}" loading="lazy" style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.25s;" onmouseover="this.style.transform='scale(1.03)'" onmouseout="this.style.transform='scale(1)'">
+                  <div style="position: absolute; bottom: 8px; right: 8px; background: rgba(15,23,42,0.85); backdrop-filter: blur(4px); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.4); padding: 4px 10px; border-radius: 6px; font-size: 0.72rem; font-weight: 600; display: flex; align-items: center; gap: 4px;">
+                    🔍 Xem ảnh lớn
+                  </div>
+                </div>
+              </div>
+            ` : ''}
+
+            <!-- Direct Link Action Button -->
+            <div style="padding: 0 16px 14px; margin-top: auto;">
+              <a href="${item.webUrl}" target="_blank" rel="noopener noreferrer" class="btn-open-tele-web" onclick="event.stopPropagation();">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                <span>Chuyển Đến Tin Nhắn (Telegram Web A)</span>
+              </a>
+            </div>
           </div>
-        </div>
-      `;
-    });
-    tgCardsGrid.innerHTML = html;
+        `;
+      });
+      tgCardsGrid.innerHTML = cardsHtml;
+    }
+
+    // Render Table View
+    if (tgTableTbody) {
+      let tableHtml = '';
+      filtered.forEach((item, idx) => {
+        const isKrc = item.normGroup === 'KRC';
+        const isAba = item.normGroup === 'ABA';
+        const badgeColor = isKrc ? '#34d399' : (isAba ? '#38bdf8' : '#c084fc');
+        const badgeBg = isKrc ? 'rgba(16, 185, 129, 0.15)' : (isAba ? 'rgba(56, 189, 248, 0.15)' : 'rgba(168, 85, 247, 0.15)');
+
+        const highlightedText = highlightTelegramText(item.text);
+
+        tableHtml += `
+          <tr style="border-bottom: 1px solid rgba(255,255,255,0.05); ${item.isUrgent ? 'background: rgba(239, 68, 68, 0.05);' : ''}">
+            <td style="text-align: center; color: #64748b;">${idx + 1}</td>
+            <td style="text-align: center;">
+              ${item.isUrgent 
+                ? '<span class="badge-urgent-pulse">🚨 KHẨN CẤP</span>' 
+                : '<span style="color: #64748b; font-size: 0.74rem;">Bình thường</span>'}
+            </td>
+            <td style="text-align: center;">
+              <span style="color: ${badgeColor}; font-weight: 700; background: ${badgeBg}; padding: 2px 7px; border-radius: 4px; font-size: 0.74rem;">
+                ${item.normGroup}
+              </span>
+            </td>
+            <td>
+              <div style="font-weight: 700; color: #f8fafc; font-size: 0.82rem;">${escapeHtml(item.group_title)}</div>
+              ${item.store_code ? `<div style="font-size: 0.72rem; color: #94a3b8;">Mã ST: <b style="color: #38bdf8;">${escapeHtml(item.store_code)}</b></div>` : ''}
+            </td>
+            <td>
+              <div style="font-weight: 600; color: #e2e8f0; font-size: 0.8rem;">${escapeHtml(item.sender_name)}</div>
+              ${item.sender_role ? `<div style="font-size: 0.7rem; color: #64748b;">${escapeHtml(item.sender_role)}</div>` : ''}
+            </td>
+            <td style="text-align: center; font-size: 0.74rem; color: #94a3b8; white-space: nowrap;">
+              ${item.date}
+            </td>
+            <td style="line-height: 1.45; font-size: 0.8rem; color: #cbd5e1; max-width: 420px;">
+              ${highlightedText}
+            </td>
+            <td style="text-align: center; white-space: nowrap;">
+              <a href="${item.webUrl}" target="_blank" rel="noopener noreferrer" class="btn btn-outline btn-sm" style="font-size: 0.76rem; border-color: rgba(56, 189, 248, 0.4); color: #38bdf8; text-decoration: none; padding: 5px 12px; border-radius: 6px; display: inline-flex; align-items: center; gap: 4px;">
+                <span>✈️ Mở Web A</span>
+              </a>
+            </td>
+          </tr>
+        `;
+      });
+      tgTableTbody.innerHTML = tableHtml;
+    }
   }
 
-  // Delegated click on images in feed
+  // Toggle giữa Dạng Thẻ và Dạng Bảng
+  if (btnTgToggleView) {
+    btnTgToggleView.addEventListener('click', () => {
+      if (tgViewMode === 'cards') {
+        tgViewMode = 'table';
+        if (tgCardsGrid) tgCardsGrid.style.display = 'none';
+        if (tgTableView) tgTableView.style.display = 'block';
+        btnTgToggleView.innerHTML = '📇 Xem Dạng Thẻ';
+        btnTgToggleView.style.borderColor = 'rgba(168, 85, 247, 0.5)';
+        btnTgToggleView.style.color = '#c084fc';
+      } else {
+        tgViewMode = 'cards';
+        if (tgCardsGrid) tgCardsGrid.style.display = 'grid';
+        if (tgTableView) tgTableView.style.display = 'none';
+        btnTgToggleView.innerHTML = '📋 Xem Dạng Bảng';
+        btnTgToggleView.style.borderColor = 'rgba(56, 189, 248, 0.4)';
+        btnTgToggleView.style.color = '#38bdf8';
+      }
+    });
+  }
+
+  // Bật/Tắt Chuông báo
+  if (btnToggleAudio) {
+    btnToggleAudio.addEventListener('click', () => {
+      audioAlertEnabled = !audioAlertEnabled;
+      btnToggleAudio.innerHTML = audioAlertEnabled ? '🔔 Chuông Báo: Bật' : '🔕 Chuông Báo: Tắt';
+      btnToggleAudio.style.color = audioAlertEnabled ? '#fbbf24' : '#64748b';
+      btnToggleAudio.style.borderColor = audioAlertEnabled ? 'rgba(245, 158, 11, 0.4)' : 'rgba(100, 116, 139, 0.3)';
+      showToast(audioAlertEnabled ? 'Đã BẬT chuông báo tin khẩn cấp' : 'Đã TẮT chuông báo', audioAlertEnabled ? '🔔' : '🔕');
+      if (audioAlertEnabled) playUrgentAlertSound();
+    });
+  }
+
+  // Delegated click on card to open Telegram Web A
+  if (tgCardsGrid) {
+    tgCardsGrid.addEventListener('click', (e) => {
+      // Nếu click vào nút xem ảnh lớn thì không mở link
+      if (e.target.closest('.tg-img-wrapper')) return;
+
+      const card = e.target.closest('.tg-feed-card');
+      if (card) {
+        const link = card.querySelector('.btn-open-tele-web');
+        if (link && link.href) {
+          window.open(link.href, '_blank');
+        }
+      }
+    });
+  }
+
+  // Delegated click on images in feed (Lightbox)
   if (tgCardsGrid) {
     tgCardsGrid.addEventListener('click', (e) => {
       const wrap = e.target.closest('.tg-img-wrapper');
       if (wrap) {
+        e.stopPropagation();
         const imgUrl = wrap.getAttribute('data-img');
         const cap = wrap.getAttribute('data-cap');
         openLightbox(imgUrl, cap);
@@ -1537,18 +1822,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   });
 
-  // Sub-filter button clicks
+  // Group Filter Tabs Click Events
   document.querySelectorAll('.tg-tab-btn').forEach(btn => {
     btn.addEventListener('click', () => {
-      document.querySelectorAll('.tg-tab-btn').forEach(b => {
-        b.classList.remove('active');
-        b.style.background = 'transparent';
-        b.style.color = '#94a3b8';
-      });
+      document.querySelectorAll('.tg-tab-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
-      btn.style.background = 'var(--accent-blue)';
-      btn.style.color = '#fff';
-
       currentTgFilter = btn.getAttribute('data-tg-group');
       renderTelegramFeed();
     });
@@ -1562,6 +1840,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       btnRefreshTg.innerText = '⏳ Đang làm mới...';
       loadTelegramFeed().then(() => {
         btnRefreshTg.innerText = '🔄 Làm Mới';
+        showToast('Đã cập nhật danh sách tin nhắn Telegram mới nhất!', '🔄');
       });
     });
   }

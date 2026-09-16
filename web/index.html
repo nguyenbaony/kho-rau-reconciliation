@@ -363,29 +363,46 @@
       </section>
     </div>
 
-      <!-- Telegram Realtime Feed Section (Tab 6) -->
+      <!-- Telegram Realtime Feed Section (Giám Sát Khẩn Cấp KRC, ABA, DC) -->
       <div id="telegram-feed-section" style="display: none; padding: 20px 24px;">
-        <div class="telegram-feed-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 16px;">
-          <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
-            <div class="group-toggle-tabs" style="display: flex; background: rgba(15, 23, 42, 0.8); border: 1px solid var(--border-glass); border-radius: 10px; padding: 4px;">
-              <button id="tg-filter-all" class="tg-tab-btn active" data-tg-group="ALL" style="padding: 8px 18px; border-radius: 8px; border: none; cursor: pointer; font-weight: 700; font-size: 0.85rem; background: var(--accent-blue); color: #fff; transition: all 0.2s;">
-                Tất Cả (29+)
+        <!-- Header Controls & Filters -->
+        <div class="telegram-feed-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; flex-wrap: wrap; gap: 14px;">
+          <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+            <div class="group-toggle-tabs" style="display: flex; background: rgba(15, 23, 42, 0.85); border: 1px solid var(--border-glass); border-radius: 10px; padding: 4px; gap: 4px; flex-wrap: wrap;">
+              <button id="tg-filter-all" class="tg-tab-btn active" data-tg-group="ALL">
+                Tất Cả (<span id="tg-count-all">0</span>)
               </button>
-              <button id="tg-filter-krc" class="tg-tab-btn" data-tg-group="RAU_CU" style="padding: 8px 18px; border-radius: 8px; border: none; cursor: pointer; font-weight: 700; font-size: 0.85rem; background: transparent; color: #94a3b8; transition: all 0.2s;">
-                🥦 1. RAU CỦ (Kho Rau Củ)
+              <button id="tg-filter-urgent" class="tg-tab-btn tg-urgent-pill" data-tg-group="URGENT">
+                🚨 Cần Xử Lý Ngay (<span id="tg-count-urgent">0</span>)
               </button>
-              <button id="tg-filter-aba" class="tg-tab-btn" data-tg-group="ABA_DC" style="padding: 8px 18px; border-radius: 8px; border: none; cursor: pointer; font-weight: 700; font-size: 0.85rem; background: transparent; color: #94a3b8; transition: all 0.2s;">
-                ❄️ 2. ABA / DC (Kho Đông Mát & DC)
+              <button id="tg-filter-krc" class="tg-tab-btn" data-tg-group="KRC">
+                🥦 KRC (<span id="tg-count-krc">0</span>)
+              </button>
+              <button id="tg-filter-aba" class="tg-tab-btn" data-tg-group="ABA">
+                ❄️ ABA (<span id="tg-count-aba">0</span>)
+              </button>
+              <button id="tg-filter-dc" class="tg-tab-btn" data-tg-group="DC">
+                🏢 DC (<span id="tg-count-dc">0</span>)
               </button>
             </div>
-            <div style="display: flex; align-items: center; gap: 8px; background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); padding: 6px 14px; border-radius: 20px;">
+
+            <div style="display: flex; align-items: center; gap: 8px; background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); padding: 6px 12px; border-radius: 20px;">
               <span class="status-indicator live"></span>
-              <span style="font-size: 0.8rem; color: #34d399; font-weight: 700;">Realtime Sync: Đang kết nối</span>
+              <span style="font-size: 0.78rem; color: #34d399; font-weight: 700;">Realtime Web A: Đang kết nối</span>
             </div>
           </div>
 
-          <div style="display: flex; gap: 10px; align-items: center;">
-            <input type="text" id="tg-input-search" placeholder="🔍 Tìm theo siêu thị (A128, Midtown...) hoặc nội dung chat..." style="background: rgba(15, 23, 42, 0.8); border: 1px solid var(--border-glass); padding: 8px 16px; border-radius: 8px; color: #fff; width: 340px; font-size: 0.85rem; outline: none;">
+          <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+            <div class="tg-kw-hint" style="font-size: 0.73rem; color: #94a3b8; background: rgba(30, 41, 59, 0.7); padding: 5px 10px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.08);">
+              Key khẩn cấp: <span style="color: #fbbf24; font-weight: 600;">"chuyển" • "vượt sức" • "giao sai" • "giao nhầm" • "điều chuyển" • "@nynguyen09"</span>
+            </div>
+            <button id="btn-toggle-audio" class="btn btn-outline" style="padding: 7px 12px; font-size: 0.8rem; border-color: rgba(245, 158, 11, 0.4); color: #fbbf24;" title="Bật/Tắt chuông báo tin khẩn cấp">
+              🔔 Chuông Báo: Bật
+            </button>
+            <button id="btn-tg-toggle-view" class="btn btn-outline" style="padding: 7px 12px; font-size: 0.8rem; color: #38bdf8; border-color: rgba(56, 189, 248, 0.4);">
+              📋 Xem Dạng Bảng
+            </button>
+            <input type="text" id="tg-input-search" placeholder="🔍 Tìm theo siêu thị (ECG, A128, LVT...) hoặc nội dung..." style="background: rgba(15, 23, 42, 0.8); border: 1px solid var(--border-glass); padding: 8px 14px; border-radius: 8px; color: #fff; width: 280px; font-size: 0.83rem; outline: none;">
             <button id="btn-refresh-telegram" class="btn btn-outline" style="padding: 8px 14px; font-size: 0.82rem;">
               🔄 Làm Mới
             </button>
@@ -393,11 +410,33 @@
         </div>
 
         <!-- Cards Grid of Telegram Messages & Photos -->
-        <div id="telegram-cards-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 20px;">
+        <div id="telegram-cards-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 20px;">
           <!-- Dynamically populated by app.js -->
         </div>
+
+        <!-- Table View of Telegram Messages -->
+        <div id="telegram-table-view" style="display: none; background: rgba(15, 23, 42, 0.8); border: 1px solid var(--border-glass); border-radius: 12px; overflow: hidden; margin-top: 10px;">
+          <div class="table-responsive">
+            <table class="data-table" style="width: 100%; font-size: 0.82rem;">
+              <thead>
+                <tr>
+                  <th style="width: 45px; text-align: center;">#</th>
+                  <th style="width: 125px; text-align: center;">Mức Độ</th>
+                  <th style="width: 85px; text-align: center;">Phân Loại</th>
+                  <th style="width: 220px;">Nhóm Telegram & Siêu Thị</th>
+                  <th style="width: 170px;">Người Gửi</th>
+                  <th style="width: 130px; text-align: center;">Thời Gian</th>
+                  <th>Nội Dung Tin Nhắn (Highlight Từ Khóa)</th>
+                  <th style="width: 160px; text-align: center;">Thao Tác</th>
+                </tr>
+              </thead>
+              <tbody id="telegram-table-tbody">
+                <!-- Dynamically populated by app.js -->
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
-    </section>
     </section>
 
   </main>
