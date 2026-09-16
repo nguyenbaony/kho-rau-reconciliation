@@ -1,4 +1,4 @@
-﻿// Auto-generated Realtime Data Bundle for KRC Dual Pipeline Engine
+// Auto-generated Realtime Data Bundle for KRC Dual Pipeline Engine
 // Generated at: 2026-09-11 11:26:46 | CDC Status: Connected
 window.STREAM1_DATA = {
   "generated_at": "2026-09-11 11:26:46",
