@@ -168,6 +168,12 @@
         <button id="btn-reset-date-range" class="btn btn-ghost" title="Đặt lại bộ lọc ngày">🔄 Reset</button>
         <select id="filter-date" style="display: none;"></select>
 
+        <select id="filter-warehouse" class="select-input" style="border-color: #38bdf8; font-weight: 600;">
+          <option value="">🏢 Tất cả kho (KRC & KRCBT)</option>
+          <option value="KRC">🥦 KRC (Kho Rau Củ)</option>
+          <option value="KRCBT">🥖 KRCBT (Kho Bánh Tươi)</option>
+        </select>
+
         <select id="filter-store" class="select-input">
           <option value="">Tất cả siêu thị</option>
           <option value="LVT">KFM Lê Văn Thọ (LVT)</option>
@@ -516,7 +522,8 @@
   </div>
 
   <div id="toast-container" class="toast-container"></div>
-  <script src="data/reconciliation_data.js?v=20260911_v6"></script>
-  <script src="app.js?v=20260911_v6"></script>
+  <script src="data/reconciliation_data.js?v=20260911_v7"></script>
+  <script src="data/telegram_data.js?v=20260911_v7"></script>
+  <script src="app.js?v=20260911_v7"></script>
 </body>
 </html>

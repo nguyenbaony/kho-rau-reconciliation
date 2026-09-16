@@ -1,4 +1,6 @@
-[
+// Auto-generated Telegram Feed Data for KRC, ABA, DC Groups
+// Synchronously loaded for file:/// and https:// environments
+window.TELEGRAM_FEED = [
   {
     "id": "msg-krc-01",
     "chat_id": "1828938896",
@@ -203,4 +205,4 @@
     "web_url": "https://web.telegram.org/a/#-1002019284711?message=58190",
     "tme_url": "https://t.me/c/2019284711/58190"
   }
-]
+];

@@ -128,6 +128,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   let selectedStore = '';
   let selectedError = '';
   let selectedStatus = '';
+  let selectedWarehouse = '';
   let dateRange = { from: '', to: '' };
 
   let currentPage = 1;
@@ -247,6 +248,19 @@ document.addEventListener('DOMContentLoaded', async () => {
           if (dateRange.from && itemIso < dateRange.from) return false;
           if (dateRange.to && itemIso > dateRange.to) return false;
         }
+      // Warehouse Filter (KRC vs KRCBT)
+      if (selectedWarehouse) {
+        const isBanh = (item.product_name || '').toUpperCase().includes('BÁNH') ||
+                       (item.product_name || '').toUpperCase().includes('BANH') ||
+                       (item.product_name || '').toUpperCase().includes('SANDWICH') ||
+                       (item.product_name || '').toUpperCase().includes('BREAD') ||
+                       (item.product_name || '').toUpperCase().includes('CROISSANT') ||
+                       (item.warehouse_id || '').toUpperCase().includes('KRCBT') ||
+                       (item.to_order || '').toUpperCase().includes('KRCBT') ||
+                       (item.unit || '').toUpperCase() === 'KHAY' ||
+                       (item.unit || '').toUpperCase() === 'CÁI';
+        if (selectedWarehouse === 'KRCBT' && !isBanh) return false;
+        if (selectedWarehouse === 'KRC' && isBanh) return false;
       }
 
       // Store Filter
@@ -760,6 +774,17 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   }
 
+  const filterWarehouse = document.getElementById('filter-warehouse');
+  if (filterWarehouse) {
+    filterWarehouse.addEventListener('change', (e) => {
+      selectedWarehouse = e.target.value;
+      currentPage = 1;
+      renderTable();
+      const label = selectedWarehouse === 'KRCBT' ? '🥖 Kho Bánh Tươi (KRCBT)' : (selectedWarehouse === 'KRC' ? '🥦 Kho Rau Củ (KRC)' : 'Tất cả kho (KRC & KRCBT)');
+      showToast(`Đang lọc: ${label}`, '🏢');
+    });
+  }
+
   const filterStore = document.getElementById('filter-store');
   if (filterStore) {
     filterStore.addEventListener('change', (e) => {
@@ -796,6 +821,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       selectedStore = '';
       selectedError = '';
       selectedStatus = '';
+      selectedWarehouse = '';
       dateRange = { from: '', to: '' };
 
       if (inputSearch) inputSearch.value = '';
@@ -803,6 +829,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (dateRangeContainer) dateRangeContainer.style.display = 'none';
       if (dateFromInput) dateFromInput.value = '';
       if (dateToInput) dateToInput.value = '';
+      if (filterWarehouse) filterWarehouse.value = '';
       if (filterStore) filterStore.value = '';
       if (filterError) filterError.value = '';
       if (filterStatus) filterStatus.value = '';
@@ -1385,7 +1412,216 @@ document.addEventListener('DOMContentLoaded', async () => {
   // ==========================================================================
   // TELEGRAM MONITORING ENGINE (KRC, ABA, DC & CẢNH BÁO KHẨN CẤP WEB A)
   // ==========================================================================
-  let telegramFeedItems = (typeof window !== 'undefined' && window.TELEGRAM_FEED) ? window.TELEGRAM_FEED : [];
+  const DEFAULT_TELEGRAM_ITEMS = [
+    {
+      "id": "msg-krc-01",
+      "chat_id": "1828938896",
+      "message_id": 969297,
+      "group_type": "KRC",
+      "group_title": "KRC - ECG (Kho Rau Củ)",
+      "store_code": "HCM2 - ECG",
+      "sender_name": "Huy Nguyễn - SC019264",
+      "sender_role": "NVBH Siêu Thị",
+      "sender_username": "@Huynguyenkfm",
+      "date": "16/09/2026 09:09",
+      "timestamp": 1789534140,
+      "text": "Tài xế giao nhầm rổ cho siêu thị nên hiện tại sthi em dư những sp này vượt sức bán, nhờ ac ht điều chuyển siêu thị giúp em nha. @nynguyen09",
+      "image_url": "media/telegram/rau_cu_1001828938896_969297.jpg",
+      "web_url": "https://web.telegram.org/a/#-1001828938896?message=969297",
+      "tme_url": "https://t.me/c/1828938896/969297"
+    },
+    {
+      "id": "msg-krc-02",
+      "chat_id": "1828938896",
+      "message_id": 969296,
+      "group_type": "KRC",
+      "group_title": "SCM - KRC (Đối soát)",
+      "store_code": "HCM19 - LVT",
+      "sender_name": "SNG2-CTV- Huỳnh",
+      "sender_role": "Điều Phối SCM",
+      "sender_username": "@huynhscm",
+      "date": "16/09/2026 08:50",
+      "timestamp": 1789533000,
+      "text": "Đã xác nhận biên bản giao sai số lượng rau củ ca sáng ngày 16/09. Kho KRC duyệt điều chuyển bù hàng đợt 2 cho siêu thị LVT.",
+      "image_url": "",
+      "web_url": "https://web.telegram.org/a/#-1001828938896?message=969296",
+      "tme_url": "https://t.me/c/1828938896/969296"
+    },
+    {
+      "id": "msg-krc-03",
+      "chat_id": "1828938896",
+      "message_id": 969295,
+      "group_type": "KRC",
+      "group_title": "KRC - Kho Rau Củ Bánh Tươi Sài Gòn",
+      "store_code": "KRCBT - HUB",
+      "sender_name": "Phan Hải - QLK",
+      "sender_role": "Quản Lý Kho KRC",
+      "sender_username": "@haikrc",
+      "date": "16/09/2026 08:35",
+      "timestamp": 1789532100,
+      "text": "Hàng bắp cải đà lạt đợt này về vượt sức chứa của khu lạnh A2. Yêu cầu bộ phận kho chia tải gấp sang kho phụ.",
+      "image_url": "",
+      "web_url": "https://web.telegram.org/a/#-1001828938896?message=969295",
+      "tme_url": "https://t.me/c/1828938896/969295"
+    },
+    {
+      "id": "msg-krc-04",
+      "chat_id": "1828938896",
+      "message_id": 969294,
+      "group_type": "KRC",
+      "group_title": "KRC - Điều Phối Tuyến Xe",
+      "store_code": "XE-08 (59C-882.19)",
+      "sender_name": "Trần Văn Tâm",
+      "sender_role": "Đội Xe Giao Nhận",
+      "sender_username": "@tamdriver",
+      "date": "16/09/2026 08:15",
+      "timestamp": 1789530900,
+      "text": "Xe 08 đã xuất bến KRC đi tuyến Quận 7. Dự kiến 10h15 tới ST01, 11h tới ST05.",
+      "image_url": "",
+      "web_url": "https://web.telegram.org/a/#-1001828938896?message=969294",
+      "tme_url": "https://t.me/c/1828938896/969294"
+    },
+    {
+      "id": "msg-krc-05",
+      "chat_id": "1828938896",
+      "message_id": 969293,
+      "group_type": "KRC",
+      "group_title": "KRC - Khiếu Nại Chất Lượng",
+      "store_code": "HCM11 - TCH",
+      "sender_name": "Lê Thảo - KFM",
+      "sender_role": "Kiểm Hàng",
+      "sender_username": "@thaolekfm",
+      "date": "16/09/2026 07:55",
+      "timestamp": 1789529700,
+      "text": "Mặt hàng xà lách mỡ lô 1509 bị dập nát do tài xế xếp chồng sai quy cách, đề nghị KRC xác nhận và chuyển trả NCC.",
+      "image_url": "",
+      "web_url": "https://web.telegram.org/a/#-1001828938896?message=969293",
+      "tme_url": "https://t.me/c/1828938896/969293"
+    },
+    {
+      "id": "msg-krc-06",
+      "chat_id": "1828938896",
+      "message_id": 969292,
+      "group_type": "KRC",
+      "group_title": "KRC - ECG (Kho Rau Củ)",
+      "store_code": "HCM05 - Q2",
+      "sender_name": "Minh Trí - SC0124",
+      "sender_role": "Thủ Kho",
+      "sender_username": "@triminh_sc",
+      "date": "16/09/2026 07:30",
+      "timestamp": 1789528200,
+      "text": "@@nynguyen09 Chị Ny ơi check gấp phiếu xuất TO-20260916-088 bị lệch 40kg dưa leo đèo với thực tế trên xe ạ!",
+      "image_url": "",
+      "web_url": "https://web.telegram.org/a/#-1001828938896?message=969292",
+      "tme_url": "https://t.me/c/1828938896/969292"
+    },
+    {
+      "id": "msg-aba-01",
+      "chat_id": "1940182741",
+      "message_id": 41088,
+      "group_type": "ABA",
+      "group_title": "ABA - ĐIỀU PHỐI XE LẠNH HCM",
+      "store_code": "ABA-COLD-01",
+      "sender_name": "Nguyễn Hoàng Long",
+      "sender_role": "Điều Phối ABA",
+      "sender_username": "@longaba_scm",
+      "date": "16/09/2026 09:12",
+      "timestamp": 1789534320,
+      "text": "Nhiệt độ thùng xe ABA-51D.9213 đang ở mức +4°C, bảo đảm tiêu chuẩn rau củ mát. Đang chuyển hàng sang ST Bình Thạnh.",
+      "image_url": "",
+      "web_url": "https://web.telegram.org/a/#-1001940182741?message=41088",
+      "tme_url": "https://t.me/c/1940182741/41088"
+    },
+    {
+      "id": "msg-aba-02",
+      "chat_id": "1940182741",
+      "message_id": 41085,
+      "group_type": "ABA",
+      "group_title": "ABA - THỊT CÁ & ĐÔNG LẠNH",
+      "store_code": "DC-ABA-MEAT",
+      "sender_name": "Võ Thị Tuyết",
+      "sender_role": "Giám Sát ABA",
+      "sender_username": "@tuyetvoaba",
+      "date": "16/09/2026 08:40",
+      "timestamp": 1789532400,
+      "text": "Hôm nay đơn hàng thịt gà tươi giao sai quy cách đóng gói (thiếu tem truy xuất), nhờ DC hỗ trợ xác minh gấp.",
+      "image_url": "",
+      "web_url": "https://web.telegram.org/a/#-1001940182741?message=41085",
+      "tme_url": "https://t.me/c/1940182741/41085"
+    },
+    {
+      "id": "msg-aba-03",
+      "chat_id": "1940182741",
+      "message_id": 41079,
+      "group_type": "ABA",
+      "group_title": "ABA - GIAO NHẬN SIÊU THỊ MIỀN ĐÔNG",
+      "store_code": "ABA-ROUTE-03",
+      "sender_name": "Phạm Đăng",
+      "sender_role": "Tài Xế ABA",
+      "sender_username": "@dangdriver_aba",
+      "date": "16/09/2026 07:15",
+      "timestamp": 1789527300,
+      "text": "Đã hoàn tất bàn giao 25 thùng rau củ mát và 15 kiện thịt cho siêu thị Biên Hòa. Ký nhận đủ, nhiệt độ đạt chuẩn.",
+      "image_url": "",
+      "web_url": "https://web.telegram.org/a/#-1001940182741?message=41079",
+      "tme_url": "https://t.me/c/1940182741/41079"
+    },
+    {
+      "id": "msg-dc-01",
+      "chat_id": "2019284711",
+      "message_id": 58210,
+      "group_type": "DC",
+      "group_title": "DC TỔNG KHO MIỀN NAM - SCM",
+      "store_code": "DC-KFM-BINHCHANH",
+      "sender_name": "Vũ Đình Khoa",
+      "sender_role": "Trưởng Ca DC",
+      "sender_username": "@khoavudc",
+      "date": "16/09/2026 09:05",
+      "timestamp": 1789533900,
+      "text": "Khu vực nhận hàng rau củ DC đang quá tải, lượng pallet về vượt sức tiếp nhận dock 3. Các xe hàng khô vui lòng chờ dock 5.",
+      "image_url": "",
+      "web_url": "https://web.telegram.org/a/#-1002019284711?message=58210",
+      "tme_url": "https://t.me/c/2019284711/58210"
+    },
+    {
+      "id": "msg-dc-02",
+      "chat_id": "2019284711",
+      "message_id": 58204,
+      "group_type": "DC",
+      "group_title": "DC - ĐIỀU PHỐI ĐƠN HÀNG TO/PT",
+      "store_code": "DC-DISPATCH",
+      "sender_name": "Đặng Ngọc Mai",
+      "sender_role": "Điều Phối DC",
+      "sender_username": "@maidangdc",
+      "date": "16/09/2026 08:20",
+      "timestamp": 1789531200,
+      "text": "Lệnh điều chuyển hàng tồn kho KRC sang DC Tây Ninh đã tạo xong trên hệ thống SCM, mã phiếu DC-TO-9982.",
+      "image_url": "",
+      "web_url": "https://web.telegram.org/a/#-1002019284711?message=58204",
+      "tme_url": "https://t.me/c/2019284711/58204"
+    },
+    {
+      "id": "msg-dc-03",
+      "chat_id": "2019284711",
+      "message_id": 58190,
+      "group_type": "DC",
+      "group_title": "DC - HỖ TRỢ SIÊU THỊ KFM",
+      "store_code": "DC-SUPPORT",
+      "sender_name": "Lê Quốc Bảo",
+      "sender_role": "Vận Hành DC",
+      "sender_username": "@baole_dc",
+      "date": "16/09/2026 07:00",
+      "timestamp": 1789526400,
+      "text": "Tất cả các siêu thị lưu ý: Hạn chót gửi đơn đặt hàng rau củ bổ sung ca chiều là 14h00. Sau giờ này hệ thống tự động khóa.",
+      "image_url": "",
+      "web_url": "https://web.telegram.org/a/#-1002019284711?message=58190",
+      "tme_url": "https://t.me/c/2019284711/58190"
+    }
+  ];
+
+  let telegramFeedItems = (typeof window !== 'undefined' && Array.isArray(window.TELEGRAM_FEED) && window.TELEGRAM_FEED.length > 0)
+    ? window.TELEGRAM_FEED
+    : DEFAULT_TELEGRAM_ITEMS;
   let currentTgFilter = 'ALL'; // 'ALL', 'URGENT', 'KRC', 'ABA', 'DC'
   let tgViewMode = 'cards'; // 'cards' | 'table'
   let audioAlertEnabled = true;
@@ -1485,18 +1721,28 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   async function loadTelegramFeed() {
-    if (typeof window !== 'undefined' && window.TELEGRAM_FEED && telegramFeedItems.length === 0) {
+    if (typeof window !== 'undefined' && Array.isArray(window.TELEGRAM_FEED) && window.TELEGRAM_FEED.length > 0) {
       telegramFeedItems = window.TELEGRAM_FEED;
+    } else if (!telegramFeedItems || telegramFeedItems.length === 0) {
+      telegramFeedItems = DEFAULT_TELEGRAM_ITEMS;
     }
+    // Render ngay lập tức dữ liệu sẵn có (không phụ thuộc vào fetch mạng hay file:///)
+    renderTelegramFeed();
+
+    // Thử fetch phiên bản mới nhất từ JSON nếu có server
     try {
       const res = await fetch('data/telegram_feed.json?t=' + Date.now());
       if (res.ok) {
-        telegramFeedItems = await res.json();
+        const freshData = await res.json();
+        if (Array.isArray(freshData) && freshData.length > 0) {
+          telegramFeedItems = freshData;
+          renderTelegramFeed();
+        }
       }
     } catch (e) {
-      console.log("Dùng dữ liệu Telegram Feed hiện hành:", e);
+      // Offline hoặc mở file:/// trực tiếp trên trình duyệt
+      console.log("Đang chạy chế độ Offline / file:/// - sử dụng bộ dữ liệu tích hợp.");
     }
-    renderTelegramFeed();
   }
 
   function renderTelegramFeed() {
@@ -1857,6 +2103,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   populateStores();
   updateKPIs();
   renderTable();
+  loadTelegramFeed();
   switchViewMode('analytics');
 
   // Start Realtime Auto Sync countdown immediately
