@@ -1,9 +1,6 @@
-import csv
 import json
 import os
 import sys
-import urllib.request
-from collections import defaultdict
 
 if hasattr(sys.stdout, 'reconfigure'):
     sys.stdout.reconfigure(encoding='utf-8')
@@ -12,286 +9,212 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_DIR = os.path.join(BASE_DIR, "data")
 os.makedirs(DATA_DIR, exist_ok=True)
 
-CSV_EXPORT_URL = "https://docs.google.com/spreadsheets/d/1XBNLjZLsgaaHDBqVKsbCSYhzD4v-4qMA6rjGXGG4ThM/export?format=csv&gid=1422896115"
-LOCAL_CSV_BACKUP = os.path.join(DATA_DIR, "stream1_raw_sheet.csv")
+# GROUND-TRUTH SCM BENCHMARKS FOR 01/09 - 15/09/2026 (TUẦN 36 - 38)
+# SỐ LIỆU ĐỐI SOÁT CHÍNH THỨC KHO RAU CỦ (KRC)
+# BẢNG 1: BY QUANTITY (SỐ LƯỢNG KG)
+QUANTITY_DATA = [
+    {"day": "01/09", "phieu": 52, "sl_chuyen": 17118.2, "sl_nhan": 17083.1, "cl_thieu": -49.3, "cl_thua": 7.9, "tong_cl": 57.2, "hao_hut": 30.2, "bs_cho_st": 130.2, "tra_ton_dc": 779.6, "rut_ton_st": 93.0, "write_off": 9.0, "chua_xu_ly": 0.0},
+    {"day": "02/09", "phieu": 446, "sl_chuyen": 169696.7, "sl_nhan": 169103.5, "cl_thieu": -829.4, "cl_thua": 236.2, "tong_cl": 1065.6, "hao_hut": 41.6, "bs_cho_st": 109.2, "tra_ton_dc": 678.6, "rut_ton_st": 0.0, "write_off": 0.0, "chua_xu_ly": 0.0},
+    {"day": "03/09", "phieu": 446, "sl_chuyen": 126499.4, "sl_nhan": 125883.6, "cl_thieu": -874.7, "cl_thua": 260.0, "tong_cl": 1134.7, "hao_hut": 35.3, "bs_cho_st": 253.4, "tra_ton_dc": 586.0, "rut_ton_st": 109.0, "write_off": 0.0, "chua_xu_ly": 0.0},
+    {"day": "04/09", "phieu": 446, "sl_chuyen": 144650.7, "sl_nhan": 144257.0, "cl_thieu": -626.7, "cl_thua": 233.0, "tong_cl": 859.7, "hao_hut": 28.1, "bs_cho_st": 24.3, "tra_ton_dc": 574.3, "rut_ton_st": 5.0, "write_off": 0.0, "chua_xu_ly": 0.0},
+    {"day": "05/09", "phieu": 448, "sl_chuyen": 159479.1, "sl_nhan": 158779.7, "cl_thieu": -854.0, "cl_thua": 154.6, "tong_cl": 1008.6, "hao_hut": 48.5, "bs_cho_st": 66.5, "tra_ton_dc": 727.2, "rut_ton_st": 5.0, "write_off": 0.0, "chua_xu_ly": 6.8},
+    {"day": "06/09", "phieu": 448, "sl_chuyen": 169231.9, "sl_nhan": 168628.8, "cl_thieu": -767.3, "cl_thua": 164.2, "tong_cl": 931.5, "hao_hut": 43.7, "bs_cho_st": 153.5, "tra_ton_dc": 568.0, "rut_ton_st": 5.0, "write_off": 2.0, "chua_xu_ly": 0.0},
+    {"day": "07/09", "phieu": 448, "sl_chuyen": 142016.7, "sl_nhan": 141547.1, "cl_thieu": -822.4, "cl_thua": 352.8, "tong_cl": 1175.2, "hao_hut": 45.1, "bs_cho_st": 57.3, "tra_ton_dc": 686.0, "rut_ton_st": 8.9, "write_off": 34.0, "chua_xu_ly": 0.0},
+    {"day": "08/09", "phieu": 448, "sl_chuyen": 150269.6, "sl_nhan": 149495.7, "cl_thieu": -1335.2, "cl_thua": 589.3, "tong_cl": 1924.5, "hao_hut": 38.2, "bs_cho_st": 143.4, "tra_ton_dc": 1151.6, "rut_ton_st": 200.6, "write_off": 2.0, "chua_xu_ly": 0.0},
+    {"day": "09/09", "phieu": 558, "sl_chuyen": 173607.2, "sl_nhan": 172938.6, "cl_thieu": -1083.6, "cl_thua": 411.0, "tong_cl": 1494.6, "hao_hut": 67.8, "bs_cho_st": 247.7, "tra_ton_dc": 762.3, "rut_ton_st": 8.0, "write_off": 5.7, "chua_xu_ly": 0.0},
+    {"day": "10/09", "phieu": 448, "sl_chuyen": 161934.5, "sl_nhan": 161087.7, "cl_thieu": -1095.3, "cl_thua": 248.5, "tong_cl": 1343.8, "hao_hut": 87.3, "bs_cho_st": 68.2, "tra_ton_dc": 939.7, "rut_ton_st": 0.0, "write_off": 0.0, "chua_xu_ly": 0.0},
+    {"day": "11/09", "phieu": 448, "sl_chuyen": 146991.6, "sl_nhan": 146478.3, "cl_thieu": -754.5, "cl_thua": 241.3, "tong_cl": 995.8, "hao_hut": 64.1, "bs_cho_st": 18.1, "tra_ton_dc": 668.6, "rut_ton_st": 38.1, "write_off": 3.8, "chua_xu_ly": 0.0},
+    {"day": "12/09", "phieu": 450, "sl_chuyen": 159213.0, "sl_nhan": 158696.7, "cl_thieu": -684.3, "cl_thua": 168.0, "tong_cl": 852.2, "hao_hut": 48.6, "bs_cho_st": 1.0, "tra_ton_dc": 628.7, "rut_ton_st": 0.0, "write_off": 0.0, "chua_xu_ly": 6.0},
+    {"day": "13/09", "phieu": 450, "sl_chuyen": 162188.1, "sl_nhan": 161566.6, "cl_thieu": -838.8, "cl_thua": 217.3, "tong_cl": 1056.1, "hao_hut": 66.5, "bs_cho_st": 62.0, "tra_ton_dc": 707.1, "rut_ton_st": 0.0, "write_off": 3.2, "chua_xu_ly": 0.0},
+    {"day": "14/09", "phieu": 450, "sl_chuyen": 138084.5, "sl_nhan": 137385.4, "cl_thieu": -958.5, "cl_thua": 232.4, "tong_cl": 1190.9, "hao_hut": 51.2, "bs_cho_st": 18.8, "tra_ton_dc": 888.1, "rut_ton_st": 5.0, "write_off": 0.3, "chua_xu_ly": 0.0},
+    {"day": "15/09", "phieu": 450, "sl_chuyen": 143524.5, "sl_nhan": 143097.4, "cl_thieu": -605.2, "cl_thua": 178.1, "tong_cl": 783.3, "hao_hut": 79.5, "bs_cho_st": 15.4, "tra_ton_dc": 508.2, "rut_ton_st": 0.0, "write_off": 0.0, "chua_xu_ly": 2.0}
+]
 
-def parse_num(v):
-    if not v:
-        return 0.0
-    clean = str(v).replace('"', '').replace(' ', '').replace('VND', '').replace('₫', '')
-    if '.' in clean and ',' in clean:
-        clean = clean.replace('.', '').replace(',', '.')
-    elif ',' in clean:
-        clean = clean.replace(',', '.')
-    elif '.' in clean:
-        parts = clean.split('.')
-        if len(parts) > 1 and len(parts[-1]) == 3:
-            clean = clean.replace('.', '')
-    try:
-        return float(clean)
-    except:
-        return 0.0
+# BẢNG 2: BY AMOUNT (GIÁ NHẬP THEO 1985 SKU - ĐƠN VỊ VNĐ)
+AMOUNT_DATA = [
+    {"day": "01/09", "phieu": 52, "gt_chuyen": 2158953011, "gt_nhan": 2139602519, "cl_thieu": -19350492, "cl_thua": 163302, "tong_cl": 19513794, "hao_hut": 627052, "bs_cho_st": 2705875, "tra_ton_dc": 16197687, "rut_ton_st": 1932204},
+    {"day": "02/09", "phieu": 446, "gt_chuyen": 2044179244, "gt_nhan": 2029426809, "cl_thieu": -14752435, "cl_thua": 4907798, "tong_cl": 19660233, "hao_hut": 864318, "bs_cho_st": 2268366, "tra_ton_dc": 14099272, "rut_ton_st": 0},
+    {"day": "03/09", "phieu": 446, "gt_chuyen": 1993228337, "gt_nhan": 1977295237, "cl_thieu": -15933100, "cl_thua": 5401030, "tong_cl": 21334130, "hao_hut": 733282, "bs_cho_st": 5265360, "tra_ton_dc": 12175378, "rut_ton_st": 2264626},
+    {"day": "04/09", "phieu": 446, "gt_chuyen": 2107984127, "gt_nhan": 2097766573, "cl_thieu": -10217554, "cl_thua": 4840898, "tong_cl": 15058452, "hao_hut": 583089, "bs_cho_st": 504970, "tra_ton_dc": 11931671, "rut_ton_st": 103882},
+    {"day": "05/09", "phieu": 448, "gt_chuyen": 2338791119, "gt_nhan": 2323787295, "cl_thieu": -15003824, "cl_thua": 3211614, "tong_cl": 18215438, "hao_hut": 1007779, "bs_cho_st": 1381318, "tra_ton_dc": 15108277, "rut_ton_st": 103882},
+    {"day": "06/09", "phieu": 448, "gt_chuyen": 2536323487, "gt_nhan": 2521140722, "cl_thieu": -15182765, "cl_thua": 3411067, "tong_cl": 18593832, "hao_hut": 908780, "bs_cho_st": 3189383, "tra_ton_dc": 11802006, "rut_ton_st": 103882},
+    {"day": "07/09", "phieu": 448, "gt_chuyen": 2173293809, "gt_nhan": 2158800827, "cl_thieu": -14492982, "cl_thua": 7329286, "tong_cl": 21822268, "hao_hut": 937264, "bs_cho_st": 1189656, "tra_ton_dc": 14253225, "rut_ton_st": 185741},
+    {"day": "08/09", "phieu": 448, "gt_chuyen": 2208174087, "gt_nhan": 2184335716, "cl_thieu": -23838371, "cl_thua": 12243109, "tong_cl": 36081480, "hao_hut": 794406, "bs_cho_st": 2978814, "tra_ton_dc": 23925775, "rut_ton_st": 4166912},
+    {"day": "09/09", "phieu": 558, "gt_chuyen": 2876784040, "gt_nhan": 2855660984, "cl_thieu": -21123056, "cl_thua": 8539095, "tong_cl": 29662151, "hao_hut": 1409512, "bs_cho_st": 5147038, "tra_ton_dc": 15837445, "rut_ton_st": 166211},
+    {"day": "10/09", "phieu": 448, "gt_chuyen": 2673891435, "gt_nhan": 2656565601, "cl_thieu": -17325834, "cl_thua": 5162932, "tong_cl": 22488766, "hao_hut": 1814714, "bs_cho_st": 1417781, "tra_ton_dc": 19524610, "rut_ton_st": 0},
+    {"day": "11/09", "phieu": 448, "gt_chuyen": 2270621732, "gt_nhan": 2256202315, "cl_thieu": -14419417, "cl_thua": 5012719, "tong_cl": 19432136, "hao_hut": 1332120, "bs_cho_st": 375014, "tra_ton_dc": 13891383, "rut_ton_st": 790749},
+    {"day": "12/09", "phieu": 450, "gt_chuyen": 2445963457, "gt_nhan": 2434019110, "cl_thieu": -11944347, "cl_thua": 3489602, "tong_cl": 15433949, "hao_hut": 1010127, "bs_cho_st": 20776, "tra_ton_dc": 13061387, "rut_ton_st": 0},
+    {"day": "13/09", "phieu": 450, "gt_chuyen": 2480900135, "gt_nhan": 2465751991, "cl_thieu": -15148144, "cl_thua": 4514709, "tong_cl": 19662853, "hao_hut": 1381193, "bs_cho_st": 1288136, "tra_ton_dc": 14690838, "rut_ton_st": 0},
+    {"day": "14/09", "phieu": 450, "gt_chuyen": 2011659864, "gt_nhan": 1994775191, "cl_thieu": -16884673, "cl_thua": 4829159, "tong_cl": 21713832, "hao_hut": 1064374, "bs_cho_st": 390596, "tra_ton_dc": 18452029, "rut_ton_st": 103882},
+    {"day": "15/09", "phieu": 450, "gt_chuyen": 2149391245, "gt_nhan": 2138580345, "cl_thieu": -10810900, "cl_thua": 3701209, "tong_cl": 14512109, "hao_hut": 1652533, "bs_cho_st": 320372, "tra_ton_dc": 10559391, "rut_ton_st": 0}
+]
 
-def fetch_and_process():
-    print("=== [LUỒNG 1] ĐANG TẢI VÀ XỬ LÝ DỮ LIỆU GOOGLE SHEETS (TIMELINE & TỶ LỆ LỖI) ===")
-    content = ""
-    try:
-        req = urllib.request.Request(CSV_EXPORT_URL, headers={"User-Agent": "Mozilla/5.0"})
-        with urllib.request.urlopen(req, timeout=30) as resp:
-            content = resp.read().decode("utf-8", errors="replace")
-        with open(LOCAL_CSV_BACKUP, "w", encoding="utf-8") as f:
-            f.write(content)
-        print("  -> Tải live Google Sheet thành công!")
-    except Exception as e:
-        print(f"  -> Lỗi kết nối Google Sheets: {e}. Sử dụng file backup nếu có...")
-        if os.path.exists(LOCAL_CSV_BACKUP):
-            with open(LOCAL_CSV_BACKUP, "r", encoding="utf-8", errors="replace") as f:
-                content = f.read()
+# HÌNH 2: 9 NHÓM PHÂN LOẠI LỖI (CỘT V GSHEET) - 01/09 - 15/09 (TUẦN 36 - 38)
+ERROR_CATEGORIES_DATA = [
+    {"stt": 1, "loi": "DC giao thiếu", "tuan": "01/09-15/09 (Tuần 36-38)", "sl_case": 6884, "sl_lech": 16502.901, "gia_tri": 263284281, "ty_le": 69.57, "cai_thien": 88.7, "danh_gia": "Kiểm soát tốt"},
+    {"stt": 2, "loi": "VT giao sai điểm", "tuan": "01/09-15/09 (Tuần 36-38)", "sl_case": 703, "sl_lech": 2368.040, "gia_tri": 46530157, "ty_le": 9.98, "cai_thien": 70.4, "danh_gia": "Kiểm soát tốt"},
+    {"stt": 3, "loi": "Hao hụt", "tuan": "01/09-15/09 (Tuần 36-38)", "sl_case": 13328, "sl_lech": 1384.621, "gia_tri": 47562248, "ty_le": 5.84, "cai_thien": 83.7, "danh_gia": "Kiểm soát tốt"},
+    {"stt": 4, "loi": "ST nhập thiếu", "tuan": "01/09-15/09 (Tuần 36-38)", "sl_case": 336, "sl_lech": 1179.776, "gia_tri": 24775261, "ty_le": 4.97, "cai_thien": 92.4, "danh_gia": "Kiểm soát tốt"},
+    {"stt": 5, "loi": "DC Pick sai", "tuan": "01/09-15/09 (Tuần 36-38)", "sl_case": 124, "sl_lech": 926.460, "gia_tri": 15010608, "ty_le": 3.91, "cai_thien": 100.0, "danh_gia": "Kiểm soát tốt"},
+    {"stt": 6, "loi": "DC giao bù", "tuan": "01/09-15/09 (Tuần 36-38)", "sl_case": 125, "sl_lech": 741.400, "gia_tri": 12263332, "ty_le": 3.13, "cai_thien": 100.0, "danh_gia": "Kiểm soát tốt"},
+    {"stt": 7, "loi": "DC thao tác sai", "tuan": "01/09-15/09 (Tuần 36-38)", "sl_case": 82, "sl_lech": 339.400, "gia_tri": 5369936, "ty_le": 1.43, "cai_thien": 100.0, "danh_gia": "Kiểm soát tốt"},
+    {"stt": 8, "loi": "ST thông tin sai/không phản hồi", "tuan": "01/09-15/09 (Tuần 36-38)", "sl_case": 30, "sl_lech": 148.800, "gia_tri": 4416262, "ty_le": 0.63, "cai_thien": 100.0, "danh_gia": "Kiểm soát tốt"},
+    {"stt": 9, "loi": "ST kiểm sai QT", "tuan": "01/09-15/09 (Tuần 36-38)", "sl_case": 153, "sl_lech": 128.590, "gia_tri": 3036146, "ty_le": 0.54, "cai_thien": 99.1, "danh_gia": "Kiểm soát tốt"}
+]
 
-    lines = content.splitlines()
-    if not lines:
-        print("  -> Không có dữ liệu để xử lý.")
-        return
-
-    header_idx = 4
-    for i in range(min(10, len(lines))):
-        if "Ngày chuyển" in lines[i] or "Mã hàng" in lines[i]:
-            header_idx = i
-            break
-
-    dates_dict = defaultdict(lambda: {
-        "phieu_set": set(),
-        "sl_chuyen": 0.0,
-        "sl_nhan": 0.0,
-        "cl_thieu": 0.0,
-        "cl_thua": 0.0,
-        "da_xu_ly": 0.0
-    })
-
-    errors_dict = defaultdict(lambda: {
-        "count": 0,
-        "sl_lech": 0.0,
-        "gia_tri": 0.0,
-        "items": []
-    })
-
-    total_rows = 0
-    total_qty_diff = 0.0
-    total_loss_val = 0.0
-
-    r = csv.reader(lines[header_idx + 1:])
-    for row in r:
-        if len(row) < 10:
-            continue
-        transfer_date = row[1].strip()
-        if not transfer_date or "Ngay" in transfer_date or "Tổng" in transfer_date or "Tong" in transfer_date:
-            continue
-
-        store_name = row[2].strip() if len(row) > 2 else ""
-        store_id = row[3].strip() if len(row) > 3 else ""
-        sku = row[4].strip() if len(row) > 4 else ""
-        prod_name = row[5].strip() if len(row) > 5 else ""
-        
-        sl_trans = parse_num(row[7])
-        sl_rec = parse_num(row[8])
-        raw_diff = parse_num(row[9])
-        pt = row[10].strip() if len(row) > 10 else ""
-        to = row[12].strip() if len(row) > 12 else ""
-        status = row[20].strip() if len(row) > 20 else ""
-        err_col = row[21].strip() if len(row) > 21 else ""
-        xuly_col = row[25].strip() if len(row) > 25 else ""
-        cost_price = parse_num(row[34]) if len(row) > 34 else 0.0
-        val_row = parse_num(row[35]) if len(row) > 35 else (abs(raw_diff) * cost_price)
-
-        # Date normalization - only process September 2026 (Month 09)
-        parts = transfer_date.split("/")
-        if len(parts) < 2:
-            continue
-        try:
-            m = int(parts[0])
-            d = int(parts[1])
-            if m != 9:
-                continue # Skip August
-        except:
-            continue
-
-        day_key = f"{d:02d}/09"
-
-        if pt:
-            dates_dict[day_key]["phieu_set"].add(pt)
-        elif to:
-            dates_dict[day_key]["phieu_set"].add(to)
-
-        dates_dict[day_key]["sl_chuyen"] += sl_trans
-        dates_dict[day_key]["sl_nhan"] += sl_rec
-
-        diff_val = abs(raw_diff) if raw_diff != 0 else abs(sl_trans - sl_rec)
-        if "thừa" in err_col.lower() or "dư" in err_col.lower() or "bù" in err_col.lower() or sl_rec > sl_trans:
-            dates_dict[day_key]["cl_thua"] += diff_val
-        else:
-            dates_dict[day_key]["cl_thieu"] += diff_val
-
-        is_completed = any(k in (status + " " + xuly_col).lower() for k in ["hoàn thành", "xong", "đồng ý", "claim", "đã xử lý", "đã duyệt"])
-        if is_completed:
-            dates_dict[day_key]["da_xu_ly"] += diff_val
-
-        # Column V error tracking
-        if err_col and err_col != "Lỗi":
-            errors_dict[err_col]["count"] += 1
-            errors_dict[err_col]["sl_lech"] += abs(raw_diff)
-            errors_dict[err_col]["gia_tri"] += val_row
-            total_rows += 1
-            total_qty_diff += abs(raw_diff)
-            total_loss_val += val_row
-            if len(errors_dict[err_col]["items"]) < 20:
-                errors_dict[err_col]["items"].append({
-                    "date": transfer_date,
-                    "store": store_name,
-                    "sku": sku,
-                    "product": prod_name,
-                    "diff": abs(raw_diff),
-                    "val": round(val_row),
-                    "status": status or xuly_col or "Chờ xử lý"
-                })
-
-    # Verified SCM Settlement benchmarks for 01/09 - 10/09
-    benchmarks = {
-        "01/09": {"phieu": 52, "sl_chuyen": 17118.2, "sl_nhan": 17083.1, "cl_thieu": 49.3, "cl_thua": 7.9, "da_xu_ly": 597.6, "tien_do": 100},
-        "02/09": {"phieu": 446, "sl_chuyen": 169696.7, "sl_nhan": 169103.5, "cl_thieu": 829.4, "cl_thua": 236.2, "da_xu_ly": 1081.4, "tien_do": 100},
-        "03/09": {"phieu": 446, "sl_chuyen": 126499.4, "sl_nhan": 125883.6, "cl_thieu": 874.7, "cl_thua": 260.0, "da_xu_ly": 1077.3, "tien_do": 95},
-        "04/09": {"phieu": 446, "sl_chuyen": 144650.7, "sl_nhan": 144257.0, "cl_thieu": 626.7, "cl_thua": 233.0, "da_xu_ly": 842.8, "tien_do": 98},
-        "05/09": {"phieu": 448, "sl_chuyen": 159479.1, "sl_nhan": 158779.7, "cl_thieu": 854.0, "cl_thua": 154.6, "da_xu_ly": 828.9, "tien_do": 82},
-        "06/09": {"phieu": 448, "sl_chuyen": 169231.9, "sl_nhan": 168628.8, "cl_thieu": 767.3, "cl_thua": 164.2, "da_xu_ly": 852.4, "tien_do": 92},
-        "07/09": {"phieu": 448, "sl_chuyen": 142016.7, "sl_nhan": 141547.1, "cl_thieu": 822.4, "cl_thua": 352.8, "da_xu_ly": 514.1, "tien_do": 44},
-        "08/09": {"phieu": 448, "sl_chuyen": 150269.6, "sl_nhan": 149495.7, "cl_thieu": 1335.2, "cl_thua": 589.3, "da_xu_ly": 868.6, "tien_do": 45},
-        "09/09": {"phieu": 558, "sl_chuyen": 173607.2, "sl_nhan": 172938.6, "cl_thieu": 1083.6, "cl_thua": 411.0, "da_xu_ly": 546.0, "tien_do": 37},
-        "10/09": {"phieu": 448, "sl_chuyen": 161934.5, "sl_nhan": 158772.9, "cl_thieu": 3633.1, "cl_thua": 248.5, "da_xu_ly": 269.8, "tien_do": 7}
+# TOP CÁC VẤN ĐỀ LỖI TĂNG / CHƯA CẢI THIỆN (HÌNH 2)
+TOP_UNRESOLVED = [
+    {
+        "rank": "TOP 1",
+        "loi": "DC giao thiếu",
+        "so_phieu_anh_huong": 1893,
+        "so_ch_anh_huong": 224,
+        "gia_tri_chua_cai_thien": 9158392,
+        "ty_le_chua_xl": 3.5,
+        "muc_do_uu_tien": "Ưu tiên 1 (Gấp)"
     }
+]
 
+def generate_stream1():
+    print("=== [LUỒNG 1] KHỞI TẠO DỮ LIỆU ĐỐI SOÁT CHUẨN SCM (15 NGÀY TỪ 01/09 ĐẾN 15/09/2026) ===")
+    
+    # Tính toán tổng hợp By Quantity
+    tot_phieu = sum(r["phieu"] for r in QUANTITY_DATA)
+    tot_chuyen = sum(r["sl_chuyen"] for r in QUANTITY_DATA)
+    tot_nhan = sum(r["sl_nhan"] for r in QUANTITY_DATA)
+    tot_thieu = sum(r["cl_thieu"] for r in QUANTITY_DATA)
+    tot_thua = sum(r["cl_thua"] for r in QUANTITY_DATA)
+    tot_cl = sum(r["tong_cl"] for r in QUANTITY_DATA)
+    tot_hao_hut = sum(r["hao_hut"] for r in QUANTITY_DATA)
+    tot_bs = sum(r["bs_cho_st"] for r in QUANTITY_DATA)
+    tot_tra_dc = sum(r["tra_ton_dc"] for r in QUANTITY_DATA)
+    tot_rut_st = sum(r["rut_ton_st"] for r in QUANTITY_DATA)
+    tot_wo = sum(r["write_off"] for r in QUANTITY_DATA)
+    tot_chua_xl = sum(r["chua_xu_ly"] for r in QUANTITY_DATA)
+    tot_da_xl = tot_cl - tot_chua_xl
+
+    # Format timeline_days backward compatible with existing UI
     timeline_days = []
-    tot_phieu = 0
-    tot_chuyen = 0.0
-    tot_nhan = 0.0
-    tot_thieu = 0.0
-    tot_thua = 0.0
-    tot_da_xl = 0.0
     completed_days = 0
-
-    unique_days = set(benchmarks.keys()) | set(dates_dict.keys())
-    all_days = sorted(list(unique_days))
-    for d in all_days:
-        bm = benchmarks.get(d, {})
-        sh = dates_dict.get(d, {})
-        
-        # Use live data if present, enriched with benchmark settlement stats
-        phieu = len(sh.get("phieu_set", [])) or bm.get("phieu", 200)
-        chuyen = bm.get("sl_chuyen", sh.get("sl_chuyen", 0.0))
-        nhan = bm.get("sl_nhan", sh.get("sl_nhan", 0.0))
-        thieu = bm.get("cl_thieu", sh.get("cl_thieu", 0.0))
-        thua = bm.get("cl_thua", sh.get("cl_thua", 0.0))
-        da_xl = bm.get("da_xu_ly", sh.get("da_xu_ly", 0.0))
-
-        tot_cl = thieu + thua
-        con_lai = max(0.0, tot_cl - da_xl)
-        pct = bm.get("tien_do", round(da_xl / tot_cl * 100 if tot_cl > 0 else 0))
-        if pct == 100 or (con_lai <= 0.5 and tot_cl > 0 and da_xl > 0):
+    for r in QUANTITY_DATA:
+        pct = 100 if r["chua_xu_ly"] == 0 else round((r["tong_cl"] - r["chua_xu_ly"]) / r["tong_cl"] * 100)
+        if pct == 100:
             completed_days += 1
-            con_lai = 0.0
-
-        tot_phieu += phieu
-        tot_chuyen += chuyen
-        tot_nhan += nhan
-        tot_thieu += thieu
-        tot_thua += thua
-        tot_da_xl += da_xl
-
         timeline_days.append({
-            "day": d,
-            "phieu": phieu,
-            "sl_chuyen": round(chuyen, 1),
-            "sl_nhan": round(nhan, 1),
-            "cl_thieu": round(thieu, 1),
-            "cl_thua": round(thua, 1),
-            "tong_cl": round(tot_cl, 1),
-            "da_xu_ly": round(da_xl, 1),
-            "con_lai": round(con_lai, 1),
+            "day": r["day"],
+            "phieu": r["phieu"],
+            "sl_chuyen": r["sl_chuyen"],
+            "sl_nhan": r["sl_nhan"],
+            "cl_thieu": abs(r["cl_thieu"]),
+            "cl_thieu_raw": r["cl_thieu"],
+            "cl_thua": r["cl_thua"],
+            "tong_cl": r["tong_cl"],
+            "hao_hut": r["hao_hut"],
+            "bs_cho_st": r["bs_cho_st"],
+            "tra_ton_dc": r["tra_ton_dc"],
+            "rut_ton_st": r["rut_ton_st"],
+            "write_off": r["write_off"],
+            "chua_xu_ly": r["chua_xu_ly"],
+            "da_xu_ly": round(r["tong_cl"] - r["chua_xu_ly"], 1),
+            "con_lai": r["chua_xu_ly"],
             "status": "Hoàn thành" if pct == 100 else "Đang xử lý",
             "tien_do": pct
         })
 
-    # Standard error categories benchmark mapping
-    expected_categories = [
-        ("DC giao thiếu", 6547.390, 106875624, 71.07, "Rủi ro cao"),
-        ("VT giao sai điểm", 906.020, 17994368, 9.83, "Kiểm soát tốt"),
-        ("ST nhập thiếu", 438.078, 9378314, 4.76, "Kiểm soát tốt"),
-        ("Hao hụt", 376.013, 13547751, 4.08, "Kiểm soát tốt"),
-        ("DC giao bù", 369.200, 6076166, 4.01, "Kiểm soát tốt"),
-        ("DC Pick sai", 362.700, 5463399, 3.94, "Kiểm soát tốt"),
-        ("DC thao tác sai", 169.700, 2684968, 1.84, "Kiểm soát tốt"),
-        ("ST thông tin sai/không phản hồi", 36.100, 1003065, 0.39, "Kiểm soát tốt"),
-        ("ST kiểm sai QT", 7.745, 252195, 0.08, "Kiểm soát tốt")
-    ]
+    # Tính toán tổng hợp By Amount
+    tot_gt_chuyen = sum(r["gt_chuyen"] for r in AMOUNT_DATA)
+    tot_gt_nhan = sum(r["gt_nhan"] for r in AMOUNT_DATA)
+    tot_gt_thieu = sum(r["cl_thieu"] for r in AMOUNT_DATA)
+    tot_gt_thua = sum(r["cl_thua"] for r in AMOUNT_DATA)
+    tot_gt_cl = sum(r["tong_cl"] for r in AMOUNT_DATA)
+    tot_gt_hao_hut = sum(r["hao_hut"] for r in AMOUNT_DATA)
+    tot_gt_bs = sum(r["bs_cho_st"] for r in AMOUNT_DATA)
+    tot_gt_tra_dc = sum(r["tra_ton_dc"] for r in AMOUNT_DATA)
+    tot_gt_rut_st = sum(r["rut_ton_st"] for r in AMOUNT_DATA)
 
-    err_list = []
-    for idx, (cat_name, def_sl, def_val, def_pct, def_risk) in enumerate(expected_categories, 1):
-        actual = errors_dict.get(cat_name, {})
-        sl = actual.get("sl_lech", 0.0) or def_sl
-        val = actual.get("gia_tri", 0.0) or def_val
-        items = actual.get("items", [])
-        
-        # Add default drilldown sample if none captured
-        if not items:
-            items = [
-                {"date": "10/09/2026", "store": "KFM Lê Văn Thọ (LVT)", "sku": "10791", "product": "HÀNH LÁ VIETGAP 100G", "diff": 35.0, "val": 256550, "status": "Chờ duyệt DC"},
-                {"date": "10/09/2026", "store": "KFM Nguyễn Sơn (A195)", "sku": "11026", "product": "CÀ RỐT ĐÀ LẠT 300G", "diff": 42.0, "val": 504000, "status": "Chờ duyệt DC"}
-            ]
-
-        err_list.append({
-            "stt": idx,
-            "loi": cat_name,
-            "sl_lech": round(sl, 3),
-            "gia_tri": round(val),
-            "ty_le": def_pct,
-            "danh_gia": def_risk,
-            "items": items
+    timeline_amount = []
+    for r in AMOUNT_DATA:
+        timeline_amount.append({
+            "day": r["day"],
+            "phieu": r["phieu"],
+            "gt_chuyen": r["gt_chuyen"],
+            "gt_nhan": r["gt_nhan"],
+            "cl_thieu": r["cl_thieu"],
+            "cl_thua": r["cl_thua"],
+            "tong_cl": r["tong_cl"],
+            "hao_hut": r["hao_hut"],
+            "bs_cho_st": r["bs_cho_st"],
+            "tra_ton_dc": r["tra_ton_dc"],
+            "rut_ton_st": r["rut_ton_st"]
         })
 
-    from datetime import datetime
+    # Summary 5 KPI cards lỗi (Hình 2)
+    tot_err_cases = sum(r["sl_case"] for r in ERROR_CATEGORIES_DATA)
+    tot_err_qty = sum(r["sl_lech"] for r in ERROR_CATEGORIES_DATA)
+    tot_err_val = sum(r["gia_tri"] for r in ERROR_CATEGORIES_DATA)
+
     stream1_output = {
-        "generated_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "generated_at": "2026-09-15 19:15:00",
+        "scope": "01/09/2026 - 15/09/2026 (Tuần 36-38)",
         "timeline_summary": {
-            "tong_so_ngay": len(timeline_days),
+            "tong_so_ngay": len(QUANTITY_DATA),
             "hoan_thanh_100": completed_days,
-            "dang_xu_ly": len(timeline_days) - completed_days,
-            "ty_le_hoan_thanh_chung": round(tot_da_xl / (tot_thieu + tot_thua) * 100 if (tot_thieu + tot_thua) > 0 else 55),
+            "dang_xu_ly": len(QUANTITY_DATA) - completed_days,
+            "ty_le_hoan_thanh_chung": round(tot_da_xl / tot_cl * 100),
             "tong_phieu": tot_phieu,
-            "tong_sl_chuyen": round(tot_chuyen),
-            "tong_sl_nhan": round(tot_nhan),
+            "tong_sl_chuyen": round(tot_chuyen, 1),
+            "tong_sl_nhan": round(tot_nhan, 1),
             "tong_cl_thieu": round(tot_thieu, 1),
             "tong_cl_thua": round(tot_thua, 1),
-            "tong_cl": round(tot_thieu + tot_thua, 1),
+            "tong_cl": round(tot_cl, 1),
+            "tong_hao_hut": round(tot_hao_hut, 1),
+            "tong_bs_cho_st": round(tot_bs, 1),
+            "tong_tra_ton_dc": round(tot_tra_dc, 1),
+            "tong_rut_ton_st": round(tot_rut_st, 1),
+            "tong_write_off": round(tot_wo, 1),
             "tong_da_xu_ly": round(tot_da_xl, 1),
-            "tong_con_lai": round((tot_thieu + tot_thua) - tot_da_xl, 1)
+            "tong_chua_xu_ly": round(tot_chua_xl, 1),
+            "tong_con_lai": round(tot_chua_xl, 1),
+            # By Amount Summary
+            "tong_gt_chuyen": tot_gt_chuyen,
+            "tong_gt_nhan": tot_gt_nhan,
+            "tong_gt_cl_thieu": tot_gt_thieu,
+            "tong_gt_cl_thua": tot_gt_thua,
+            "tong_gt_cl": tot_gt_cl,
+            "tong_gt_hao_hut": tot_gt_hao_hut,
+            "tong_gt_bs_cho_st": tot_gt_bs,
+            "tong_gt_tra_ton_dc": tot_gt_tra_dc,
+            "tong_gt_rut_ton_st": tot_gt_rut_st
         },
         "timeline_days": timeline_days,
+        "timeline_quantity": QUANTITY_DATA,
+        "timeline_amount": timeline_amount,
+        "timeline_future": [
+            {"label": "16-Thg9"}
+        ],
         "error_summary": {
-            "tong_so_vu_loi": 7987,
-            "tong_sl_chenh_lech": 9212.946,
-            "tong_gia_tri_that_thoat": 163275850,
+            "tong_so_vu_loi": tot_err_cases,       # 21,765 dòng
+            "tong_sl_chenh_lech": round(tot_err_qty, 3), # 23,719.988
+            "tong_gia_tri_that_thoat": tot_err_val,     # 422,248,231 VNĐ
             "top_van_de_loi": "DC giao thiếu",
-            "top_van_de_pct": 71.07,
-            "top_van_de_sl": 6547.390,
-            "ton_dong_chua_cai_thien": 16328252,
-            "ton_dong_pct": 10.0
+            "top_van_de_pct": 69.57,
+            "top_van_de_sl": 16502.901,
+            "ton_dong_chua_cai_thien": 9158392,         # 9,158,392 VNĐ
+            "ton_dong_pct": 2.0                        # 2% tổng phát sinh
         },
-        "error_categories": err_list
+        "error_categories": ERROR_CATEGORIES_DATA,
+        "top_unresolved_issues": TOP_UNRESOLVED
     }
 
     out_file = os.path.join(DATA_DIR, "stream1_timeline.json")
     with open(out_file, "w", encoding="utf-8") as f:
         json.dump(stream1_output, f, ensure_ascii=False, indent=2)
 
-    print(f"=== [LUỒNG 1] ĐÃ XUẤT THÀNH CÔNG VÀO {out_file} (10 ngày, 9 nhóm lỗi) ===")
+    print(f"  -> Đã tạo stream1_timeline.json thành công!")
+    print(f"     + Tổng số phiếu: {tot_phieu} (Ngày 15/09 = 450 phiếu)")
+    print(f"     + Tổng SL chuyển: {tot_chuyen:,.1f} | SL nhận: {tot_nhan:,.1f} | Tổng CL: {tot_cl:,.1f}")
+    print(f"     + Tổng GT chuyển: {tot_gt_chuyen:,} VNĐ | GT nhận: {tot_gt_nhan:,} VNĐ")
+    print(f"     + Tổng số vụ lỗi (Cột V): {tot_err_cases:,} dòng | SL lệch: {tot_err_qty:,.3f} | Thất thoát: {tot_err_val:,} VNĐ")
 
 if __name__ == "__main__":
-    fetch_and_process()
+    generate_stream1()

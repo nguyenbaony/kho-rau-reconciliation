@@ -2093,7 +2093,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Realtime Polling every 5 seconds when on Telegram tab
   setInterval(() => {
-    if (currentViewMode === 'telegram') {
+    if (typeof currentViewMode !== 'undefined' && currentViewMode === 'telegram') {
       loadTelegramFeed();
     }
   }, 5000);

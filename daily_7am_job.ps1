@@ -32,6 +32,22 @@ try {
     Log-Message "BUOC 1: Loi khi xu ly so lieu: $_"
 }
 
+# 1b. Dong bo toan dien 3 luong KRC va tu dong day len GitHub
+Log-Message "BUOC 1b: Dang dong bo 3 Luong KRC (Google Sheets, StarRocks CDC, Datapay) va Push GitHub..."
+try {
+    & powershell.exe -NoProfile -ExecutionPolicy Bypass -File "$projectDir\sync_all_realtime.ps1" -AutoPush
+    if (Test-Path "$projectDir\web\data") {
+        Copy-Item "$projectDir\data\*" "$projectDir\web\data" -Force -Recurse
+    }
+    Copy-Item "$projectDir\dashboard.html" "$projectDir\web\dashboard.html" -Force
+    Copy-Item "$projectDir\index.html" "$projectDir\web\index.html" -Force
+    Copy-Item "$projectDir\style.css" "$projectDir\web\style.css" -Force
+    Copy-Item "$projectDir\app.js" "$projectDir\web\app.js" -Force
+    Log-Message "BUOC 1b: Dong bo 3 Luong KRC hoan tat thanh cong."
+} catch {
+    Log-Message "BUOC 1b: Loi dong bo 3 Luong KRC: $_"
+}
+
 # 2. Gui tin nhan bao cao vao Telegram (Saved Messages hoac target chi dinh)
 Log-Message "BUOC 2: Dang gui bao cao vao Telegram ($Target)..."
 $pythonExe = "$env:LOCALAPPDATA\PythonEmbed\python.exe"

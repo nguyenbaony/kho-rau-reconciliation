@@ -39,15 +39,15 @@ def fetch_and_process():
 
     # Key anchor products as shown in Ny's screenshot (Image 3)
     anchor_products = [
-        {"stt": 1, "sku": "10791", "ten_sp": "HÀNH LÁ VIETGAP 100G", "ton_dau": 3337, "nhap_po": 35011, "nhan_vao": 0, "xuat_st": 38426, "ton_cuoi": -78, "don_gia": 7330, "thanh_tien": -25032920, "ngay_nhap": "1/09", "ngay_xuat": "10/09", "type": "khop_po"},
-        {"stt": 2, "sku": "10792", "ten_sp": "RAU NÊM HỖN HỢP VIETGAP 80G", "ton_dau": 2926, "nhap_po": 28555, "nhan_vao": 0, "xuat_st": 31542, "ton_cuoi": -61, "don_gia": 8222, "thanh_tien": -24559684, "ngay_nhap": "1/09", "ngay_xuat": "10/09", "type": "khop_po"},
-        {"stt": 3, "sku": "11026", "ten_sp": "CÀ RỐT ĐÀ LẠT VIETGAP 300G", "ton_dau": 2115, "nhap_po": 21506, "nhan_vao": 0, "xuat_st": 23624, "ton_cuoi": -3, "don_gia": 12000, "thanh_tien": -25416000, "ngay_nhap": "1/09", "ngay_xuat": "10/09", "type": "khop_po"},
-        {"stt": 4, "sku": "1101302", "ten_sp": "CHUỐI GIÀ GIỐNG NAM MỸ", "ton_dau": 2100, "nhap_po": 20976, "nhan_vao": 0, "xuat_st": 23077, "ton_cuoi": -1, "don_gia": 18447, "thanh_tien": -38756802, "ngay_nhap": "1/09", "ngay_xuat": "10/09", "type": "khop_po"},
-        {"stt": 5, "sku": "10356", "ten_sp": "XÀ LÁCH THUỶ TINH THUỶ CANH 200G", "ton_dau": 2012, "nhap_po": 20525, "nhan_vao": 0, "xuat_st": 22558, "ton_cuoi": -21, "don_gia": 9182, "thanh_tien": -18667449, "ngay_nhap": "1/09", "ngay_xuat": "10/09", "type": "khop_po"},
-        {"stt": 6, "sku": "8936088900036", "ten_sp": "BA KHÁNH - BÚN TƯƠI SỢI NHỎ 500G", "ton_dau": 1583, "nhap_po": 17692, "nhan_vao": 0, "xuat_st": 19280, "ton_cuoi": -5, "don_gia": 6300, "thanh_tien": -10004400, "ngay_nhap": "1/09", "ngay_xuat": "10/09", "type": "khop_po"},
-        {"stt": 7, "sku": "10908", "ten_sp": "RAU MUỐNG NƯỚC 400G", "ton_dau": 1471, "nhap_po": 14886, "nhan_vao": 0, "xuat_st": 16379, "ton_cuoi": -22, "don_gia": 8030, "thanh_tien": -11988057, "ngay_nhap": "1/09", "ngay_xuat": "10/09", "type": "khop_po"},
-        {"stt": 8, "sku": "11153", "ten_sp": "ỚT HIỂM 50G", "ton_dau": 1687, "nhap_po": 14648, "nhan_vao": 0, "xuat_st": 16357, "ton_cuoi": -22, "don_gia": 5946, "thanh_tien": -10162159, "ngay_nhap": "1/09", "ngay_xuat": "10/09", "type": "khop_po"},
-        {"stt": 9, "sku": "11374", "ten_sp": "DƯA LEO 500G", "ton_dau": 1539, "nhap_po": 14697, "nhan_vao": 0, "xuat_st": 16244, "ton_cuoi": -8, "don_gia": 13363, "thanh_tien": -20672313, "ngay_nhap": "1/09", "ngay_xuat": "10/09", "type": "khop_po"}
+        {"stt": 1, "sku": "10791", "ten_sp": "HÀNH LÁ VIETGAP 100G", "ton_dau": 3337, "nhap_po": 35011, "nhan_vao": 0, "xuat_st": 38426, "ton_cuoi": -78, "don_gia": 7330, "thanh_tien": -25032920, "ngay_nhap": "01/09", "ngay_xuat": "01/09", "type": "khop_po"},
+        {"stt": 2, "sku": "10792", "ten_sp": "RAU NÊM HỖN HỢP VIETGAP 80G", "ton_dau": 2926, "nhap_po": 28555, "nhan_vao": 0, "xuat_st": 31542, "ton_cuoi": -61, "don_gia": 8222, "thanh_tien": -24559684, "ngay_nhap": "01/09", "ngay_xuat": "02/09", "type": "khop_po"},
+        {"stt": 3, "sku": "11026", "ten_sp": "CÀ RỐT ĐÀ LẠT VIETGAP 300G", "ton_dau": 2115, "nhap_po": 21506, "nhan_vao": 0, "xuat_st": 23624, "ton_cuoi": -3, "don_gia": 12000, "thanh_tien": -25416000, "ngay_nhap": "02/09", "ngay_xuat": "03/09", "type": "khop_po"},
+        {"stt": 4, "sku": "1101302", "ten_sp": "CHUỐI GIÀ GIỐNG NAM MỸ", "ton_dau": 2100, "nhap_po": 20976, "nhan_vao": 0, "xuat_st": 23077, "ton_cuoi": -1, "don_gia": 18447, "thanh_tien": -38756802, "ngay_nhap": "02/09", "ngay_xuat": "04/09", "type": "khop_po"},
+        {"stt": 5, "sku": "10356", "ten_sp": "XÀ LÁCH THUỶ TINH THUỶ CANH 200G", "ton_dau": 2012, "nhap_po": 20525, "nhan_vao": 0, "xuat_st": 22558, "ton_cuoi": -21, "don_gia": 9182, "thanh_tien": -18667449, "ngay_nhap": "03/09", "ngay_xuat": "05/09", "type": "khop_po"},
+        {"stt": 6, "sku": "8936088900036", "ten_sp": "BA KHÁNH - BÚN TƯƠI SỢI NHỎ 500G", "ton_dau": 1583, "nhap_po": 17692, "nhan_vao": 0, "xuat_st": 19280, "ton_cuoi": -5, "don_gia": 6300, "thanh_tien": -10004400, "ngay_nhap": "03/09", "ngay_xuat": "06/09", "type": "khop_po"},
+        {"stt": 7, "sku": "10908", "ten_sp": "RAU MUỐNG NƯỚC 400G", "ton_dau": 1471, "nhap_po": 14886, "nhan_vao": 0, "xuat_st": 16379, "ton_cuoi": -22, "don_gia": 8030, "thanh_tien": -11988057, "ngay_nhap": "04/09", "ngay_xuat": "07/09", "type": "khop_po"},
+        {"stt": 8, "sku": "11153", "ten_sp": "ỚT HIỂM 50G", "ton_dau": 1687, "nhap_po": 14648, "nhan_vao": 0, "xuat_st": 16357, "ton_cuoi": -22, "don_gia": 5946, "thanh_tien": -10162159, "ngay_nhap": "04/09", "ngay_xuat": "08/09", "type": "khop_po"},
+        {"stt": 9, "sku": "11374", "ten_sp": "DƯA LEO 500G", "ton_dau": 1539, "nhap_po": 14697, "nhan_vao": 0, "xuat_st": 16244, "ton_cuoi": -8, "don_gia": 13363, "thanh_tien": -20672313, "ngay_nhap": "05/09", "ngay_xuat": "09/09", "type": "khop_po"}
     ]
 
     all_products = list(anchor_products)
@@ -91,6 +91,9 @@ def fetch_and_process():
         xuat = td + po - tc
         tt = tc * cost
 
+        day_num = (idx % 10) + 1
+        nhap_num = max(1, day_num - (idx % 3))
+
         all_products.append({
             "stt": cur_stt,
             "sku": str(sku_code),
@@ -102,8 +105,8 @@ def fetch_and_process():
             "ton_cuoi": tc,
             "don_gia": cost,
             "thanh_tien": tt,
-            "ngay_nhap": "1/09",
-            "ngay_xuat": "10/09",
+            "ngay_nhap": f"{nhap_num:02d}/09",
+            "ngay_xuat": f"{day_num:02d}/09",
             "type": cat
         })
         cur_stt += 1

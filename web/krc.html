@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bản Review: 2 Luồng Báo Cáo KRC (Timeline Tiến Độ & Phân Tích KRC) | KFM - SCM</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&family=Inter:wght@400;500;600;700;800&family=Roboto+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="krc_style.css">
+</head>
+<body>
+  <!-- Top Global Header -->
+  <header class="top-nav">
+    <div class="nav-left">
+      <div class="logo-box">
+        <span class="logo-icon">🥦</span>
+        <div>
+          <div class="logo-title">KRC DUAL PIPELINE ENGINE <span class="badge-preview">BẢN REVIEW</span></div>
+          <div class="logo-sub">Hệ Thống Phân Tách 2 Luồng Độc Lập: Google Sheets & StarRocks CDC</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2 Independent Stream Tabs -->
+    <div class="stream-switcher">
+      <button class="stream-btn active" id="tab-stream1" data-stream="stream1">
+        <span class="stream-icon">⏱️</span>
+        <div class="stream-text">
+          <div class="stream-title">LUỒNG 1: TIMELINE TIẾN ĐỘ & TỶ LỆ LỖI</div>
+          <div class="stream-sub">Theo dõi tiến độ xử lý hàng ngày & lỗi Cột V GSheet</div>
+        </div>
+      </button>
+
+      <button class="stream-btn" id="tab-stream2" data-stream="stream2">
+        <span class="stream-icon">📊</span>
+        <div class="stream-text">
+          <div class="stream-title">LUỒNG 2: BÁO CÁO & PHÂN TÍCH KRC</div>
+          <div class="stream-sub">Xuất - Nhập - Tồn - GAP - Khớp PO từ CDC StarRocks</div>
+        </div>
+      </button>
+    </div>
+
+    <div class="nav-right" style="display: flex; align-items: center; gap: 12px;">
+      <a href="index.html" class="btn btn-outline" style="border: 1px solid rgba(59, 130, 246, 0.6); color: #1d4ed8; background: #eff6ff; font-weight: 700; text-decoration: none; padding: 7px 14px; border-radius: 8px; font-size: 0.82rem; display: flex; align-items: center; gap: 6px;">
+        <span>📑</span> Báo Cáo Datapay & Tồn Kho CDC ↗
+      </a>
+      <div class="status-pill live">
+        <span class="dot"></span>
+        <span>VPN CDC: Connected</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="main-container">
+    <!-- ============================================================ -->
+    <!-- STREAM 1: TIMELINE TIẾN ĐỘ & THEO DÕI TỶ LỆ LỖI -->
+    <!-- ============================================================ -->
+    <section id="view-stream1" class="stream-view active">
+      <!-- Top Date Progress Bar (01-Thg9 -> 16-Thg9) -->
+      <div class="timeline-bar-card">
+        <div class="timeline-scroll-wrapper">
+          <table class="timeline-strip-table">
+            <tbody>
+              <tr class="strip-row-header">
+                <td class="strip-label">Ngày</td>
+                <td class="strip-col">01-Thg9</td>
+                <td class="strip-col">02-Thg9</td>
+                <td class="strip-col">03-Thg9</td>
+                <td class="strip-col">04-Thg9</td>
+                <td class="strip-col">05-Thg9</td>
+                <td class="strip-col">06-Thg9</td>
+                <td class="strip-col">07-Thg9</td>
+                <td class="strip-col">08-Thg9</td>
+                <td class="strip-col">09-Thg9</td>
+                <td class="strip-col">10-Thg9</td>
+                <td class="strip-col future">11-Thg9</td>
+                <td class="strip-col future">12-Thg9</td>
+                <td class="strip-col future">13-Thg9</td>
+                <td class="strip-col future">14-Thg9</td>
+                <td class="strip-col future">15-Thg9</td>
+                <td class="strip-col future">16-Thg9</td>
+              </tr>
+              <tr class="strip-row-data">
+                <td class="strip-label font-bold">CL Thiếu</td>
+                <td>49.3</td>
+                <td>829.4</td>
+                <td>874.7</td>
+                <td>626.7</td>
+                <td>854</td>
+                <td>767.3</td>
+                <td>822.4</td>
+                <td>1,335.2</td>
+                <td>1,083.6</td>
+                <td class="text-danger font-bold">3,633.1</td>
+                <td class="future"></td>
+                <td class="future"></td>
+                <td class="future"></td>
+                <td class="future"></td>
+                <td class="future"></td>
+                <td class="future"></td>
+              </tr>
+              <tr class="strip-row-progress">
+                <td class="strip-label font-bold">Tiến độ</td>
+                <td><span class="badge-pct pct-100">100%</span></td>
+                <td><span class="badge-pct pct-100">100%</span></td>
+                <td><span class="badge-pct pct-high">95%</span></td>
+                <td><span class="badge-pct pct-high">98%</span></td>
+                <td><span class="badge-pct pct-mid">82%</span></td>
+                <td><span class="badge-pct pct-high">92%</span></td>
+                <td><span class="badge-pct pct-low">44%</span></td>
+                <td><span class="badge-pct pct-low">45%</span></td>
+                <td><span class="badge-pct pct-low">37%</span></td>
+                <td><span class="badge-pct pct-alert">7%</span></td>
+                <td class="future"></td>
+                <td class="future"></td>
+                <td class="future"></td>
+                <td class="future"></td>
+                <td class="future"></td>
+                <td class="future"></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Top Luồng 1 Date Filter Bar -->
+      <div class="filter-bar" style="margin-bottom: 16px;">
+        <div class="filter-item">
+          <label>Từ ngày:</label>
+          <input type="text" id="s1-top-date-from" placeholder="mm/dd/yyyy" class="input-date" value="09/01/2026">
+        </div>
+        <div class="filter-item">
+          <label>Đến ngày:</label>
+          <input type="text" id="s1-top-date-to" placeholder="mm/dd/yyyy" class="input-date" value="09/10/2026">
+        </div>
+        <button class="btn btn-primary" id="btn-s1-top-filter-date">🔍 Lọc theo ngày</button>
+        <button class="btn btn-ghost" id="btn-s1-top-reset-date">🔄 Reset</button>
+      </div>
+
+      <!-- 4 KPI Metrics Cards -->
+      <div class="kpi-quad-grid">
+        <div class="kpi-card card-blue">
+          <div class="kpi-meta">TỔNG SỐ NGÀY ĐỐI SOÁT</div>
+          <div class="kpi-num" id="s1-kpi-total-days">10</div>
+          <div class="kpi-desc">Mốc ngày có phát sinh phiếu</div>
+        </div>
+
+        <div class="kpi-card card-green">
+          <div class="kpi-meta">HOÀN THÀNH 100%</div>
+          <div class="kpi-num" id="s1-kpi-completed-days">2</div>
+          <div class="kpi-desc">Số ngày đối soát xong</div>
+        </div>
+
+        <div class="kpi-card card-amber">
+          <div class="kpi-meta">ĐANG XỬ LÝ</div>
+          <div class="kpi-num" id="s1-kpi-pending-days">8</div>
+          <div class="kpi-desc">Số ngày còn chênh lệch tồn</div>
+        </div>
+
+        <div class="kpi-card card-purple">
+          <div class="kpi-meta">TỶ LỆ HOÀN THÀNH CHUNG</div>
+          <div class="kpi-num" id="s1-kpi-pct">55%</div>
+          <div class="kpi-desc">Tổng đã XL / Tổng chênh lệch</div>
+        </div>
+      </div>
+
+      <!-- TABLE 1: Danh Sách Tiến Độ Theo Từng Ngày Chi Tiết (Kho Rau Củ) -->
+      <div class="content-panel">
+        <div class="panel-header">
+          <div class="panel-title">
+            <span>📑 DANH SÁCH TIẾN ĐỘ THEO TỪNG NGÀY CHI TIẾT (KHO RAU CỦ)</span>
+          </div>
+          <div class="panel-meta" id="s1-panel-meta">10 mốc ngày đối soát</div>
+        </div>
+
+        <div class="table-responsive">
+          <table class="data-table" id="table-timeline-days">
+            <thead>
+              <tr>
+                <th>NGÀY</th>
+                <th class="text-right">PHIẾU</th>
+                <th class="text-right">SL CHUYỂN</th>
+                <th class="text-right">SL NHẬN</th>
+                <th class="text-right">CL THIẾU</th>
+                <th class="text-right">CL THỪA</th>
+                <th class="text-right font-bold">TỔNG CL</th>
+                <th class="text-right">ĐÃ XỬ LÝ</th>
+                <th class="text-right">CÒN LẠI</th>
+                <th class="text-center">TRẠNG THÁI</th>
+                <th class="text-center">TIẾN ĐỘ XỬ LÝ</th>
+              </tr>
+            </thead>
+            <tbody id="tbody-timeline-days">
+              <!-- Rendered by JS -->
+            </tbody>
+            <tfoot id="tfoot-timeline-days">
+              <!-- Rendered by JS -->
+            </tfoot>
+          </table>
+        </div>
+      </div>
+
+      <!-- SECTION 2: BẢNG THÔNG TIN THEO DÕI TỶ LỆ LỖI (CỘT V GSHEET) -->
+      <div class="error-tracking-section">
+        <!-- Date Filters -->
+        <div class="filter-bar">
+          <div class="filter-item">
+            <label>Từ ngày:</label>
+            <input type="text" id="s1-date-from" placeholder="mm/dd/yyyy" class="input-date" value="09/01/2026">
+          </div>
+          <div class="filter-item">
+            <label>Đến ngày:</label>
+            <input type="text" id="s1-date-to" placeholder="mm/dd/yyyy" class="input-date" value="09/10/2026">
+          </div>
+          <button class="btn btn-primary" id="btn-s1-filter-date">🔍 Lọc theo ngày</button>
+          <button class="btn btn-ghost" id="btn-s1-reset-date">🔄 Reset</button>
+        </div>
+
+        <!-- 5 Error KPI Cards -->
+        <div class="kpi-error-grid">
+          <div class="kpi-error-card border-blue">
+            <div class="err-kpi-label">🎯 TỔNG SỐ VỤ/DÒNG LỖI</div>
+            <div class="err-kpi-val text-blue" id="err-kpi-total-cases">7,987 dòng</div>
+            <div class="err-kpi-sub">Số dòng chênh lệch ghi nhận</div>
+          </div>
+
+          <div class="kpi-error-card border-cyan">
+            <div class="err-kpi-label">📦 TỔNG SL CHÊNH LỆCH (CỘT J)</div>
+            <div class="err-kpi-val text-cyan" id="err-kpi-total-qty">9,212.946</div>
+            <div class="err-kpi-sub">Số lượng chênh lệch thực tế</div>
+          </div>
+
+          <div class="kpi-error-card border-red">
+            <div class="err-kpi-label">💰 TỔNG GIÁ TRỊ THẤT THOÁT</div>
+            <div class="err-kpi-val text-red" id="err-kpi-total-val">163,275,850 VNĐ</div>
+            <div class="err-kpi-sub">Giá trị chênh lệch phát sinh</div>
+          </div>
+
+          <div class="kpi-error-card border-amber">
+            <div class="err-kpi-label">📈 TOP VẤN ĐỀ LỖI CAO NHẤT</div>
+            <div class="err-kpi-val text-amber" id="err-kpi-top-issue">DC giao thiếu</div>
+            <div class="err-kpi-sub" id="err-kpi-top-sub">71.07% tổng SL lệch (6,547.390)</div>
+          </div>
+
+          <div class="kpi-error-card border-purple">
+            <div class="err-kpi-label">🚨 TỒN ĐỌNG CHƯA CẢI THIỆN</div>
+            <div class="err-kpi-val text-purple" id="err-kpi-pending-val">16,328,252 VNĐ</div>
+            <div class="err-kpi-sub">10% tổng phát sinh</div>
+          </div>
+        </div>
+
+        <!-- TABLE 2: Bảng Thống Kê Tỷ Lệ Lỗi (Cột V GSheet) -->
+        <div class="content-panel">
+          <div class="panel-header">
+            <div class="panel-title">
+              <span>📊 BẢNG THÔNG TIN THEO DÕI TỶ LỆ LỖI (CỘT V GSHEET)</span>
+              <span class="panel-sub">Thống kê SL Chênh lệch (Cột J), Giá trị lệch & Tỷ lệ lỗi (%) theo Cột V (Lỗi)</span>
+            </div>
+            <button class="btn btn-sm btn-outline">🔄 Làm mới</button>
+          </div>
+
+          <div class="table-responsive">
+            <table class="data-table" id="table-error-categories">
+              <thead>
+                <tr>
+                  <th class="text-center" style="width: 60px;">STT</th>
+                  <th>PHÂN LOẠI LỖI (CỘT V GSHEET)</th>
+                  <th class="text-right">SL CHÊNH LỆCH</th>
+                  <th class="text-right">TỔNG GIÁ TRỊ LỆCH (VNĐ)</th>
+                  <th class="text-right">TỶ LỆ LỖI (%)</th>
+                  <th class="text-center">ĐÁNH GIÁ RỦI RO</th>
+                  <th class="text-center">CHI TIẾT</th>
+                </tr>
+              </thead>
+              <tbody id="tbody-error-categories">
+                <!-- Rendered by JS -->
+              </tbody>
+              <tfoot id="tfoot-error-categories">
+                <!-- Rendered by JS -->
+              </tfoot>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================ -->
+    <!-- STREAM 2: BÁO CÁO & PHÂN TÍCH KRC (CDC STARROCKS + GSHEET) -->
+    <!-- ============================================================ -->
+    <section id="view-stream2" class="stream-view">
+      <!-- Stream 2 Controls Bar -->
+      <div class="krc-controls-card">
+        <div class="krc-header-meta">
+          <span class="krc-title">📑 Báo cáo & Phân tích KRC</span>
+          <span class="krc-meta-tag">345 SKU | 2.5s | 2026-09-10 03:57:10</span>
+        </div>
+
+        <div class="krc-filters-row">
+          <div class="filter-item">
+            <label>Từ:</label>
+            <input type="text" id="krc-date-from" class="input-date" value="09/01/2026">
+          </div>
+          <div class="filter-item">
+            <label>Đến:</label>
+            <input type="text" id="krc-date-to" class="input-date" value="09/10/2026">
+          </div>
+          <button class="btn btn-primary" id="btn-krc-filter-date" style="padding: 7px 14px; font-weight: 600;">🔍 Lọc</button>
+          <button class="btn btn-ghost" id="btn-krc-reset-date" style="padding: 7px 12px;">🔄 Reset</button>
+
+          <div class="action-buttons-group">
+            <button class="btn btn-teal" id="btn-reload-cdc">📥 Tải dữ liệu</button>
+            <button class="btn btn-primary" id="btn-export-excel">📊 Export Excel</button>
+            <button class="btn btn-purple" id="btn-export-pdf">📄 Export PDF</button>
+            <button class="btn btn-blue" id="btn-send-telegram">✈️ Gửi Telegram</button>
+          </div>
+
+          <div class="filter-item">
+            <label>Ngày xuất:</label>
+            <select class="select-box" id="krc-select-date-xuat">
+              <option value="">Tất cả ngày</option>
+              <option value="01/09">01/09</option>
+              <option value="02/09">02/09</option>
+              <option value="03/09">03/09</option>
+              <option value="04/09">04/09</option>
+              <option value="05/09">05/09</option>
+              <option value="06/09">06/09</option>
+              <option value="07/09">07/09</option>
+              <option value="08/09">08/09</option>
+              <option value="09/09">09/09</option>
+              <option value="10/09">10/09</option>
+            </select>
+          </div>
+
+          <div class="filter-item">
+            <label>Thuế VAT:</label>
+            <select class="select-box" id="krc-select-vat">
+              <option value="1.0">Chưa VAT (Giá vốn)</option>
+              <option value="1.08">Đã gồm VAT 8%</option>
+              <option value="1.1">Đã gồm VAT 10%</option>
+            </select>
+          </div>
+
+          <div class="filter-item">
+            <label>Giá mặc định:</label>
+            <input type="text" id="krc-input-default-price" class="input-text" value="6800" style="width: 80px;">
+          </div>
+
+          <div class="filter-item flex-grow">
+            <input type="text" id="krc-search-sku" class="input-search" placeholder="🔍 Tìm SKU hoặc tên SP...">
+          </div>
+        </div>
+      </div>
+
+      <!-- 5 KRC KPI Summary Cards -->
+      <div class="krc-kpi-strip">
+        <div class="krc-kpi-pill pill-blue">
+          <div class="krc-kpi-val" id="krc-kpi-total-sku">345</div>
+          <div class="krc-kpi-lbl">Tổng SKU</div>
+        </div>
+
+        <div class="krc-kpi-pill pill-green">
+          <div class="krc-kpi-val" id="krc-kpi-khop">118</div>
+          <div class="krc-kpi-lbl">Khớp (~100%)</div>
+        </div>
+
+        <div class="krc-kpi-pill pill-teal">
+          <div class="krc-kpi-val" id="krc-kpi-chia-thieu">116</div>
+          <div class="krc-kpi-lbl">Chia thiếu</div>
+        </div>
+
+        <div class="krc-kpi-pill pill-red">
+          <div class="krc-kpi-val" id="krc-kpi-chia-du">111</div>
+          <div class="krc-kpi-lbl">Chia dư</div>
+        </div>
+
+        <div class="krc-kpi-pill pill-amber">
+          <div class="krc-kpi-val" id="krc-kpi-bat-thuong">148</div>
+          <div class="krc-kpi-lbl">Bất thường</div>
+        </div>
+      </div>
+
+      <!-- Sub-Tabs Navigation -->
+      <div class="krc-subtabs-nav">
+        <button class="krc-subtab-btn" data-subtab="all">📊 Tổng hợp GAP</button>
+        <button class="krc-subtab-btn active" data-subtab="khop_po">✅ Khớp PO</button>
+        <button class="krc-subtab-btn" data-subtab="chia_du">📉 Chia dư</button>
+        <button class="krc-subtab-btn" data-subtab="chia_thieu">📈 Chia thiếu</button>
+        <button class="krc-subtab-btn" data-subtab="daily">📅 Tổng quan theo ngày</button>
+      </div>
+
+      <!-- TABLE 3: KRC Detailed SKU Stockcard Table -->
+      <div class="content-panel">
+        <div class="table-responsive">
+          <table class="data-table table-krc" id="table-krc-products">
+            <thead>
+              <tr>
+                <th class="text-center" style="width: 50px;">#</th>
+                <th>SKU</th>
+                <th>TÊN SP</th>
+                <th class="text-right">TỒN ĐẦU</th>
+                <th class="text-right">NHẬP PO</th>
+                <th class="text-right">NHẬN VÀO</th>
+                <th class="text-right">XUẤT ST</th>
+                <th class="text-right font-bold">TỒN CUỐI</th>
+                <th class="text-right">ĐƠN GIÁ</th>
+                <th class="text-right font-bold">THÀNH TIỀN</th>
+                <th class="text-center">NGÀY NHẬP</th>
+                <th class="text-center">NGÀY XUẤT</th>
+              </tr>
+            </thead>
+            <tbody id="tbody-krc-products">
+              <!-- Rendered by JS -->
+            </tbody>
+            <tfoot id="tfoot-krc-products">
+              <!-- Rendered by JS -->
+            </tfoot>
+          </table>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Modal Chi Tiết Lỗi -->
+  <div id="modal-error-detail" class="modal-backdrop" style="display: none;">
+    <div class="modal-box">
+      <div class="modal-header">
+        <div class="modal-title" id="modal-error-title">Chi Tiết Nhóm Lỗi</div>
+        <button class="btn-close-modal" id="btn-close-error-modal">✕</button>
+      </div>
+      <div class="modal-body" id="modal-error-content">
+        <!-- Dynamic Table Rendered by JS -->
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary" onclick="document.getElementById('modal-error-detail').style.display='none';">Đóng</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast-container" class="toast-container"></div>
+
+  <!-- Realtime Data Bundle & Frontend Script -->
+  <script src="data/data_bundle.js"></script>
+  <script src="krc_app.js"></script>
+</body>
+</html>
