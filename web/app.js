@@ -248,6 +248,8 @@ document.addEventListener('DOMContentLoaded', async () => {
           if (dateRange.from && itemIso < dateRange.from) return false;
           if (dateRange.to && itemIso > dateRange.to) return false;
         }
+      }
+
       // Warehouse Filter (KRC vs KRCBT)
       if (selectedWarehouse) {
         const isBanh = (item.product_name || '').toUpperCase().includes('BÁNH') ||

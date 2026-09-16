@@ -7,11 +7,12 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Roboto+Mono:wght@500;600;700&display=swap" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="chart.umd.min.js"></script>
+  <script>if (typeof Chart === 'undefined') { document.write('<script src="https://cdn.jsdelivr.net/npm/chart.js"><\/script>'); }</script>
   <link rel="stylesheet" href="style.css?v=20260911_v5">
   <link rel="stylesheet" href="style_legacy.css?v=20260911_v5">
 </head>
-<body class="theme-light">
+<body>
   <!-- Top Global Header -->
   <header class="top-nav">
     <div class="nav-left">
@@ -28,7 +29,7 @@
       <div class="status-pill live" id="top-sync-pill" style="cursor: pointer; background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.4); padding: 5px 12px; border-radius: 20px;" title="Bấm để đồng bộ dữ liệu Google Sheets ngay">
         <span class="dot"></span>
         <span id="top-status-text">Sheets: <b>Realtime</b></span>
-        <span id="top-countdown" style="font-size: 0.72rem; font-variant-numeric: tabular-nums; margin-left: 3px;">(60s)</span>
+        <span id="top-countdown" style="font-size: 0.72rem; color: #a7f3d0; font-variant-numeric: tabular-nums; margin-left: 3px;">(60s)</span>
       </div>
       <div class="status-pill live">
         <span class="dot"></span>
@@ -395,6 +396,9 @@
             <div style="display: flex; align-items: center; gap: 8px; background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); padding: 6px 12px; border-radius: 20px;">
               <span class="status-indicator live"></span>
               <span style="font-size: 0.78rem; color: #34d399; font-weight: 700;">Realtime Web A: Đang kết nối</span>
+            </div>
+            <div style="font-size: 0.78rem; color: #a7f3d0; background: rgba(16, 185, 129, 0.12); border: 1px solid rgba(16, 185, 129, 0.3); padding: 5px 12px; border-radius: 20px; font-weight: 600;">
+              📅 Dữ liệu thực tế: <b>01/09/2026 - nay</b> (<a href="https://t.me/nynguyen09" target="_blank" style="color: #38bdf8; text-decoration: none;">@nynguyen09</a>)
             </div>
           </div>
 

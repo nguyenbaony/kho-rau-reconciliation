@@ -248,6 +248,8 @@ document.addEventListener('DOMContentLoaded', async () => {
           if (dateRange.from && itemIso < dateRange.from) return false;
           if (dateRange.to && itemIso > dateRange.to) return false;
         }
+      }
+
       // Warehouse Filter (KRC vs KRCBT)
       if (selectedWarehouse) {
         const isBanh = (item.product_name || '').toUpperCase().includes('BÁNH') ||
@@ -1626,6 +1628,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   let tgViewMode = 'cards'; // 'cards' | 'table'
   let audioAlertEnabled = true;
   let lastUrgentCount = 0;
+  let currentTgDisplayLimit = 60;
+  let currentTgTablePage = 1;
+  const TG_PAGE_SIZE = 50;
 
   const tgCardsGrid = document.getElementById('telegram-cards-grid');
   const tgTableView = document.getElementById('telegram-table-view');
@@ -1828,10 +1833,20 @@ document.addEventListener('DOMContentLoaded', async () => {
       return;
     }
 
-    // Render Cards View
+    // Sắp xếp: Ưu tiên tin khẩn cấp lên đầu, sau đó theo thời gian mới nhất (timestamp giảm dần)
+    filtered.sort((a, b) => {
+      if (a.isUrgent && !b.isUrgent) return -1;
+      if (!a.isUrgent && b.isUrgent) return 1;
+      return (b.timestamp || 0) - (a.timestamp || 0);
+    });
+
+    // Render Cards View (Phân trang mượt mà cho tập dữ liệu lớn)
     if (tgCardsGrid) {
+      const displayCount = Math.min(filtered.length, currentTgDisplayLimit);
+      const displayItems = filtered.slice(0, displayCount);
+
       let cardsHtml = '';
-      filtered.forEach(item => {
+      displayItems.forEach(item => {
         const isKrc = item.normGroup === 'KRC';
         const isAba = item.normGroup === 'ABA';
         const groupIcon = isKrc ? '🥦' : (isAba ? '❄️' : '🏢');
@@ -1913,13 +1928,38 @@ document.addEventListener('DOMContentLoaded', async () => {
           </div>
         `;
       });
+
+      if (filtered.length > displayCount) {
+        const remaining = filtered.length - displayCount;
+        cardsHtml += `
+          <div style="grid-column: 1/-1; text-align: center; padding: 24px 0 10px;">
+            <button id="btn-tg-load-more" class="btn btn-primary" style="padding: 12px 28px; font-size: 0.92rem; font-weight: 700; border-radius: 10px; box-shadow: 0 4px 16px rgba(56,189,248,0.35);">
+              📥 Tải Thêm 60 Tin Nhắn Tiếp Theo (Đang xem ${displayCount.toLocaleString()} / ${filtered.length.toLocaleString()} tin)
+            </button>
+          </div>
+        `;
+      }
+
       tgCardsGrid.innerHTML = cardsHtml;
+
+      const btnLoadMore = document.getElementById('btn-tg-load-more');
+      if (btnLoadMore) {
+        btnLoadMore.addEventListener('click', () => {
+          currentTgDisplayLimit += 60;
+          renderTelegramFeed();
+        });
+      }
     }
 
-    // Render Table View
+    // Render Table View (Có phân trang 50 tin/trang)
     if (tgTableTbody) {
+      const totalPages = Math.ceil(filtered.length / TG_PAGE_SIZE) || 1;
+      if (currentTgTablePage > totalPages) currentTgTablePage = totalPages;
+      const startIdx = (currentTgTablePage - 1) * TG_PAGE_SIZE;
+      const pageItems = filtered.slice(startIdx, startIdx + TG_PAGE_SIZE);
+
       let tableHtml = '';
-      filtered.forEach((item, idx) => {
+      pageItems.forEach((item, idx) => {
         const isKrc = item.normGroup === 'KRC';
         const isAba = item.normGroup === 'ABA';
         const badgeColor = isKrc ? '#34d399' : (isAba ? '#38bdf8' : '#c084fc');
@@ -1929,7 +1969,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         tableHtml += `
           <tr style="border-bottom: 1px solid rgba(255,255,255,0.05); ${item.isUrgent ? 'background: rgba(239, 68, 68, 0.05);' : ''}">
-            <td style="text-align: center; color: #64748b;">${idx + 1}</td>
+            <td style="text-align: center; color: #64748b;">${startIdx + idx + 1}</td>
             <td style="text-align: center;">
               ${item.isUrgent 
                 ? '<span class="badge-urgent-pulse">🚨 KHẨN CẤP</span>' 
@@ -2074,11 +2114,17 @@ document.addEventListener('DOMContentLoaded', async () => {
       document.querySelectorAll('.tg-tab-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       currentTgFilter = btn.getAttribute('data-tg-group');
+      currentTgDisplayLimit = 60;
+      currentTgTablePage = 1;
       renderTelegramFeed();
     });
   });
 
-  if (tgInputSearch) tgInputSearch.addEventListener('input', renderTelegramFeed);
+  if (tgInputSearch) tgInputSearch.addEventListener('input', () => {
+    currentTgDisplayLimit = 60;
+    currentTgTablePage = 1;
+    renderTelegramFeed();
+  });
 
   const btnRefreshTg = document.getElementById('btn-refresh-telegram');
   if (btnRefreshTg) {
@@ -2093,7 +2139,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Realtime Polling every 5 seconds when on Telegram tab
   setInterval(() => {
-    if (typeof currentViewMode !== 'undefined' && currentViewMode === 'telegram') {
+    if (currentViewMode === 'telegram') {
       loadTelegramFeed();
     }
   }, 5000);
