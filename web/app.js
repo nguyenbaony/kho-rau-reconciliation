@@ -1,11 +1,7 @@
-// KRC Dual Pipeline Engine - Preview Frontend Logic
-document.addEventListener('DOMContentLoaded', async () => {
-  // 1. Initial State with Instant Fallback from window.STREAM1_DATA / window.STREAM2_DATA
-  let stream1Data = (typeof window !== 'undefined' && window.STREAM1_DATA) ? window.STREAM1_DATA : null;
-  let stream2Data = (typeof window !== 'undefined' && window.STREAM2_DATA) ? window.STREAM2_DATA : null;
+// Báo Cáo Đối Soát Kho Rau Củ (KRC) - Frontend Logic
+async function initKrcDashboard() {
   let allRecords = (typeof window !== 'undefined' && window.RECON_RECORDS) ? window.RECON_RECORDS : [];
   let summary = (typeof window !== 'undefined' && window.RECON_SUMMARY) ? window.RECON_SUMMARY : null;
-
   if (allRecords && allRecords.length > 0) {
     allRecords = allRecords.filter(r => r.sku && r.sku !== 'Mã hàng' && r.sku !== 'Ma hang' && r.sku !== 'Ma hng' && r.to_order !== 'CLV4');
   }
@@ -46,32 +42,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     return `${dd}/${mm}/${yyyy}`;
   };
 
-  function updateErrorKPICards(sum) {
-    if (!sum) return;
-    const elCount = document.getElementById('s1-err-kpi-count');
-    const elQty = document.getElementById('s1-err-kpi-qty');
-    const elVal = document.getElementById('s1-err-kpi-val');
-    const elTop = document.getElementById('s1-err-kpi-top');
-    const elTopSub = document.getElementById('s1-err-kpi-top-sub');
-    const elTon = document.getElementById('s1-err-kpi-ton');
-
-    if (elCount) elCount.textContent = `${formatNumber(sum.tong_so_vu_loi, 0)} dòng`;
-    if (elQty) elQty.textContent = `${formatNumber(sum.tong_sl_chenh_lech, 3)}`;
-    if (elVal) elVal.textContent = `${formatCurrency(sum.tong_gia_tri_that_thoat)}`;
-    if (elTop) elTop.textContent = sum.top_van_de_loi || 'DC giao thiếu';
-    if (elTopSub) {
-      const pct = (Number(sum.top_van_de_pct) || 0).toFixed(2);
-      const sl = formatNumber(sum.top_van_de_sl || 0, 3);
-      elTopSub.textContent = `${pct}% tổng SL lệch (${sl})`;
-    }
-    if (elTon) elTon.textContent = `${formatCurrency(sum.ton_dong_chua_cai_thien)}`;
-  }
-
-  let currentSubTab = 'khop_po';
-  let searchTerm = '';
-  let vatMultiplier = 1.0;
-  let defaultPrice = 6800;
-
   function showToast(msg, icon = '✅') {
     const container = document.getElementById('toast-container');
     if (!container) return;
@@ -86,974 +56,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       setTimeout(() => toast.remove(), 300);
     }, 3500);
   }
-
-  // 2. Setup Top Stream Switcher (3 Independent Streams)
-  const tabStream1 = document.getElementById('tab-stream1');
-  const tabStream2 = document.getElementById('tab-stream2');
-  const tabStream3 = document.getElementById('tab-stream3');
-  const viewStream1 = document.getElementById('view-stream1');
-  const viewStream2 = document.getElementById('view-stream2');
-  const viewStream3 = document.getElementById('view-stream3');
-
-  function switchStream(streamId) {
-    [tabStream1, tabStream2, tabStream3].forEach(t => t && t.classList.remove('active'));
-    [viewStream1, viewStream2, viewStream3].forEach(v => v && v.classList.remove('active'));
-
-    if (streamId === 'stream1') {
-      if (tabStream1) tabStream1.classList.add('active');
-      if (viewStream1) viewStream1.classList.add('active');
-    } else if (streamId === 'stream2') {
-      if (tabStream2) tabStream2.classList.add('active');
-      if (viewStream2) viewStream2.classList.add('active');
-    } else if (streamId === 'stream3') {
-      if (tabStream3) tabStream3.classList.add('active');
-      if (viewStream3) viewStream3.classList.add('active');
-      initStream3();
-    }
-  }
-
-  if (tabStream1) tabStream1.addEventListener('click', () => switchStream('stream1'));
-  if (tabStream2) tabStream2.addEventListener('click', () => switchStream('stream2'));
-  if (tabStream3) tabStream3.addEventListener('click', () => switchStream('stream3'));
-
-  // Theme Toggle and One-Click Realtime Sync Handlers
-  const btnToggleTheme = document.getElementById('btn-toggle-theme');
-  const themeIcon = document.getElementById('theme-btn-icon');
-  const themeText = document.getElementById('theme-btn-text');
-
-  if (btnToggleTheme) {
-    btnToggleTheme.addEventListener('click', () => {
-      const isLight = document.body.classList.toggle('theme-light');
-      localStorage.setItem('KRC_THEME', isLight ? 'light' : 'dark');
-      if (themeIcon) themeIcon.textContent = isLight ? '☀️' : '🌙';
-      if (themeText) themeText.textContent = isLight ? 'Sáng' : 'Tối';
-      showToast(`Đã chuyển sang giao diện ${isLight ? 'SCM Sáng (Corporate)' : 'Tối (Dark Mode)'}`, '🎨');
-    });
-
-    const savedTheme = localStorage.getItem('KRC_THEME');
-    if (savedTheme === 'dark') {
-      document.body.classList.remove('theme-light');
-      if (themeIcon) themeIcon.textContent = '🌙';
-      if (themeText) themeText.textContent = 'Tối';
-    } else {
-      document.body.classList.add('theme-light');
-      if (themeIcon) themeIcon.textContent = '☀️';
-      if (themeText) themeText.textContent = 'Sáng';
-    }
-  }
-
-  // Realtime Sync Engine (Local Server API + JSON Bundle Reload)
-  async function triggerRealtimeSync(isManual = false) {
-    const btnTopSyncAll = document.getElementById('btn-top-sync-all');
-    const topStatusText = document.getElementById('top-status-text');
-
-    if (btnTopSyncAll) {
-      btnTopSyncAll.disabled = true;
-      btnTopSyncAll.innerHTML = `<span>⏳ Đang đồng bộ...</span>`;
-    }
-
-    try {
-      // 1. If running with local backend (localhost:8085), execute live pipeline
-      try {
-        const apiRes = await fetch('/api/sync', { method: 'POST' });
-        if (apiRes.ok) {
-          const resJson = await apiRes.json();
-          console.log('[Realtime API] Sync successful:', resJson);
-        }
-      } catch (apiErr) {
-        console.log('[Realtime API] Local server endpoint not reachable (static environment).');
-      }
-
-      // 2. Fetch updated stream1_timeline.json
-      const t = Date.now();
-      const s1Res = await fetch(`data/stream1_timeline.json?_t=${t}`);
-      if (s1Res.ok) {
-        stream1Data = await s1Res.json();
-        renderStream1();
-      }
-
-      const now = new Date();
-      const timeStr = now.toLocaleTimeString('vi-VN', { hour12: false });
-      if (topStatusText) {
-        topStatusText.innerHTML = `Sheets: <b>Realtime</b> <span style="font-size: 0.72rem; color: #10b981;">(${timeStr})</span>`;
-      }
-
-      if (isManual) {
-        showToast('✓ Đã đồng bộ dữ liệu Realtime 3 Luồng thành công!', 'success');
-      }
-    } catch (err) {
-      console.error('[Realtime] Sync error:', err);
-      if (isManual) {
-        showToast('✓ Dữ liệu đối soát đang ở trạng thái mới nhất.', 'info');
-      }
-    } finally {
-      if (btnTopSyncAll) {
-        btnTopSyncAll.disabled = false;
-        btnTopSyncAll.innerHTML = `<span>⚡ Đồng bộ Realtime</span>`;
-      }
-    }
-  }
-
-  // Realtime Auto-Sync Countdown Timer (60s)
-  let autoSyncCountdown = 60;
-  let autoSyncTimerId = null;
-
-  function resetAutoSyncTimer() {
-    if (autoSyncTimerId) clearInterval(autoSyncTimerId);
-    const topCountdown = document.getElementById('top-countdown');
-    autoSyncCountdown = 60;
-    if (topCountdown) topCountdown.textContent = `(${autoSyncCountdown}s)`;
-
-    autoSyncTimerId = setInterval(() => {
-      autoSyncCountdown--;
-      if (autoSyncCountdown <= 0) {
-        autoSyncCountdown = 60;
-        if (topCountdown) topCountdown.textContent = `(${autoSyncCountdown}s)`;
-        triggerRealtimeSync(false);
-      } else {
-        if (topCountdown) topCountdown.textContent = `(${autoSyncCountdown}s)`;
-      }
-    }, 1000);
-  }
-
-  // Bind top sync buttons & pill
-  const btnTopSyncAll = document.getElementById('btn-top-sync-all');
-  if (btnTopSyncAll) {
-    btnTopSyncAll.addEventListener('click', () => {
-      triggerRealtimeSync(true);
-      resetAutoSyncTimer();
-    });
-  }
-
-  const topSyncPill = document.getElementById('top-sync-pill');
-  if (topSyncPill) {
-    topSyncPill.addEventListener('click', () => {
-      triggerRealtimeSync(true);
-      resetAutoSyncTimer();
-    });
-  }
-
-  // Start auto-sync timer immediately
-  resetAutoSyncTimer();
-
-  // 3. Render Stream 1: Timeline & Errors
-  function renderStream1() {
-    if (!stream1Data) return;
-
-    const days = stream1Data.timeline_days || [];
-    const sum = stream1Data.timeline_summary || {};
-
-    const panelMeta = document.querySelector('#view-stream1 .panel-meta');
-    if (panelMeta) panelMeta.textContent = `${days.length || 15} mốc ngày đối soát`;
-
-    // A1. Render SCM By Quantity Table (Image 1)
-    const tbodyQty = document.getElementById('tbody-scm-quantity');
-    const tfootQty = document.getElementById('tfoot-scm-quantity');
-    const qtyData = stream1Data.timeline_quantity || stream1Data.timeline_days || [];
-
-    if (tbodyQty) {
-      tbodyQty.innerHTML = '';
-      qtyData.forEach(row => {
-        const tr = document.createElement('tr');
-        const clThieu = row.cl_thieu < 0 ? row.cl_thieu : -Math.abs(row.cl_thieu || 0);
-        const chuaXL = row.chua_xu_ly || 0;
-        const woVal = (row.write_off !== undefined && row.write_off !== null && row.write_off > 0) 
-          ? (Number(row.write_off) % 1 === 0 ? Number(row.write_off) : Number(row.write_off).toFixed(1)) 
-          : '-';
-
-        tr.innerHTML = `
-          <td class="col-date">${row.day}</td>
-          <td class="font-mono text-center">${(row.phieu || 0).toLocaleString()}</td>
-          <td class="font-mono">${(row.sl_chuyen || 0).toLocaleString('vi-VN', {minimumFractionDigits: 1})}</td>
-          <td class="font-mono">${(row.sl_nhan || 0).toLocaleString('vi-VN', {minimumFractionDigits: 1})}</td>
-          <td class="font-mono text-danger">${clThieu.toLocaleString('vi-VN', {minimumFractionDigits: 1})}</td>
-          <td class="font-mono">${(row.cl_thua || 0).toLocaleString('vi-VN', {minimumFractionDigits: 1})}</td>
-          <td class="font-mono font-bold">${(row.tong_cl || 0).toLocaleString('vi-VN', {minimumFractionDigits: 1})}</td>
-          <td class="font-mono">${(row.hao_hut || 0).toLocaleString('vi-VN', {minimumFractionDigits: 1})}</td>
-          <td class="font-mono">${(row.bs_cho_st || 0).toLocaleString('vi-VN', {minimumFractionDigits: 1})}</td>
-          <td class="font-mono">${(row.tra_ton_dc || 0).toLocaleString('vi-VN', {minimumFractionDigits: 1})}</td>
-          <td class="font-mono">${(row.rut_ton_st || 0).toLocaleString('vi-VN', {minimumFractionDigits: 1})}</td>
-          <td class="font-mono text-center">${woVal}</td>
-          <td class="font-mono text-center ${chuaXL > 0 ? 'font-bold text-danger' : ''}">${chuaXL > 0 ? (Number(chuaXL) % 1 === 0 ? Number(chuaXL) : Number(chuaXL).toFixed(1)) : '0'}</td>
-        `;
-        tbodyQty.appendChild(tr);
-      });
-    }
-
-    if (tfootQty) {
-      const totPhieu = sum.tong_phieu || 6436;
-      const totChuyen = sum.tong_sl_chuyen || 2164505.7;
-      const totNhan = sum.tong_sl_nhan || 2156029.2;
-      const totThieu = sum.tong_cl_thieu || -12179.2;
-      const totThua = sum.tong_cl_thua || 3694.6;
-      const totCl = sum.tong_cl || 15873.7;
-      const totHaoHut = sum.tong_hao_hut || 775.7;
-      const totBs = sum.tong_bs_cho_st || 1369.0;
-      const totTraDc = sum.tong_tra_ton_dc || 10854.0;
-      const totRutSt = sum.tong_rut_ton_st || 477.6;
-      const totWo = sum.tong_write_off || 60.0;
-      const totChuaXl = sum.tong_chua_xu_ly || 14.8;
-
-      tfootQty.innerHTML = `
-        <tr>
-          <td class="col-total-label">TỔNG</td>
-          <td class="font-mono text-center font-bold">${totPhieu.toLocaleString()}</td>
-          <td class="font-mono font-bold">${totChuyen.toLocaleString('vi-VN', {minimumFractionDigits: 1})}</td>
-          <td class="font-mono font-bold">${totNhan.toLocaleString('vi-VN', {minimumFractionDigits: 1})}</td>
-          <td class="font-mono font-bold">${totThieu.toLocaleString('vi-VN', {minimumFractionDigits: 1})}</td>
-          <td class="font-mono font-bold">${totThua.toLocaleString('vi-VN', {minimumFractionDigits: 1})}</td>
-          <td class="font-mono font-bold">${totCl.toLocaleString('vi-VN', {minimumFractionDigits: 1})}</td>
-          <td class="font-mono font-bold">${totHaoHut.toLocaleString('vi-VN', {minimumFractionDigits: 1})}</td>
-          <td class="font-mono font-bold">${totBs.toLocaleString('vi-VN', {minimumFractionDigits: 1})}</td>
-          <td class="font-mono font-bold">${totTraDc.toLocaleString('vi-VN', {minimumFractionDigits: 1})}</td>
-          <td class="font-mono font-bold">${totRutSt.toLocaleString('vi-VN', {minimumFractionDigits: 1})}</td>
-          <td class="font-mono text-center font-bold">${totWo.toLocaleString('vi-VN', {minimumFractionDigits: 1})}</td>
-          <td class="font-mono text-center font-bold">${totChuaXl.toLocaleString('vi-VN', {minimumFractionDigits: 1})}</td>
-        </tr>
-      `;
-    }
-
-    // A2. Render SCM By Amount Table (Image 1)
-    const tbodyAmt = document.getElementById('tbody-scm-amount');
-    const tfootAmt = document.getElementById('tfoot-scm-amount');
-    const amtData = stream1Data.timeline_amount || [];
-
-    if (tbodyAmt) {
-      tbodyAmt.innerHTML = '';
-      amtData.forEach(row => {
-        const tr = document.createElement('tr');
-        const clThieu = row.cl_thieu < 0 ? row.cl_thieu : -Math.abs(row.cl_thieu || 0);
-
-        tr.innerHTML = `
-          <td class="col-date">${row.day}</td>
-          <td class="font-mono text-center">${(row.phieu || 0).toLocaleString()}</td>
-          <td class="font-mono">${(row.gt_chuyen || 0).toLocaleString('vi-VN')}</td>
-          <td class="font-mono">${(row.gt_nhan || 0).toLocaleString('vi-VN')}</td>
-          <td class="font-mono text-danger">${clThieu.toLocaleString('vi-VN')}</td>
-          <td class="font-mono">${(row.cl_thua || 0).toLocaleString('vi-VN')}</td>
-          <td class="font-mono font-bold">${(row.tong_cl || 0).toLocaleString('vi-VN')}</td>
-          <td class="font-mono">${(row.hao_hut || 0).toLocaleString('vi-VN')}</td>
-          <td class="font-mono">${(row.bs_cho_st || 0).toLocaleString('vi-VN')}</td>
-          <td class="font-mono">${(row.tra_ton_dc || 0).toLocaleString('vi-VN')}</td>
-          <td class="font-mono">${(row.rut_ton_st || 0).toLocaleString('vi-VN')}</td>
-        `;
-        tbodyAmt.appendChild(tr);
-      });
-    }
-
-    if (tfootAmt) {
-      const totPhieu = sum.tong_phieu || 6436;
-      const totGtChuyen = sum.tong_gt_chuyen || 34470139129;
-      const totGtNhan = sum.tong_gt_nhan || 34233711235;
-      const totGtThieu = sum.tong_gt_cl_thieu || -236427894;
-      const totGtThua = sum.tong_gt_cl_thua || 76757529;
-      const totGtCl = sum.tong_gt_cl || 313185423;
-      const totGtHaoHut = sum.tong_gt_hao_hut || 16120543;
-      const totGtBs = sum.tong_gt_bs_cho_st || 28443455;
-      const totGtTraDc = sum.tong_gt_tra_ton_dc || 225510374;
-      const totGtRutSt = sum.tong_gt_rut_ton_st || 9921971;
-
-      tfootAmt.innerHTML = `
-        <tr>
-          <td class="col-total-label">TỔNG</td>
-          <td class="font-mono text-center font-bold">${totPhieu.toLocaleString()}</td>
-          <td class="font-mono font-bold">${totGtChuyen.toLocaleString('vi-VN')}</td>
-          <td class="font-mono font-bold">${totGtNhan.toLocaleString('vi-VN')}</td>
-          <td class="font-mono font-bold">${totGtThieu.toLocaleString('vi-VN')}</td>
-          <td class="font-mono font-bold">${totGtThua.toLocaleString('vi-VN')}</td>
-          <td class="font-mono font-bold">${totGtCl.toLocaleString('vi-VN')}</td>
-          <td class="font-mono font-bold">${totGtHaoHut.toLocaleString('vi-VN')}</td>
-          <td class="font-mono font-bold">${totGtBs.toLocaleString('vi-VN')}</td>
-          <td class="font-mono font-bold">${totGtTraDc.toLocaleString('vi-VN')}</td>
-          <td class="font-mono font-bold">${totGtRutSt.toLocaleString('vi-VN')}</td>
-        </tr>
-      `;
-    }
-
-    // B. Render Error Categories Table (Image 2)
-    const tbodyErrors = document.getElementById('tbody-error-categories');
-    const tfootErrors = document.getElementById('tfoot-error-categories');
-    
-    if (tbodyErrors) {
-      tbodyErrors.innerHTML = '';
-      const errors = stream1Data.error_categories || [];
-      let totCase = 0, totSl = 0, totVal = 0;
-      errors.forEach((err, idx) => {
-        totCase += (err.sl_case || 0);
-        totSl += err.sl_lech;
-        totVal += err.gia_tri;
-        const tr = document.createElement('tr');
-
-        tr.innerHTML = `
-          <td class="text-center font-mono">${err.stt}</td>
-          <td class="font-bold" style="text-align: left; padding-left: 14px;">${err.loi}</td>
-          <td class="text-center font-mono" style="font-size: 0.78rem; color: #94a3b8;">${err.tuan || '01/09-15/09 (Tuần 36-38)'}</td>
-          <td class="text-right font-mono">${(err.sl_case || 0).toLocaleString('vi-VN')}</td>
-          <td class="text-right font-mono">${err.sl_lech.toLocaleString('vi-VN', {minimumFractionDigits: 3})}</td>
-          <td class="text-right font-mono font-bold">${err.gia_tri.toLocaleString('vi-VN')}</td>
-          <td class="text-right font-mono font-bold">${err.ty_le.toFixed(2)}%</td>
-          <td class="text-center"><span class="badge-pill-green">+${err.cai_thien || '88.7'}%</span></td>
-          <td class="text-center"><span class="badge-risk-ok">✔ Kiểm soát tốt</span></td>
-        `;
-        tbodyErrors.appendChild(tr);
-      });
-
-      if (tfootErrors) {
-        tfootErrors.innerHTML = `
-          <tr>
-            <td colspan="2" class="col-total-label" style="text-align: center;">TỔNG CỘNG</td>
-            <td class="text-center font-mono" style="font-size: 0.78rem;">01/09-15/09 (Tuần 36-38)</td>
-            <td class="text-right font-mono font-bold">${totCase.toLocaleString('vi-VN')}</td>
-            <td class="text-right font-mono font-bold">${totSl.toLocaleString('vi-VN', {minimumFractionDigits: 3})}</td>
-            <td class="text-right font-mono font-bold">${totVal.toLocaleString('vi-VN')}</td>
-            <td class="text-right font-mono font-bold">100.00%</td>
-            <td class="text-center font-bold"><span class="badge-pill-green">+87.4%</span></td>
-            <td class="text-center font-bold">-</td>
-          </tr>
-        `;
-      }
-    }
-
-    // C. Render Top Unresolved Issues Table (Image 2)
-    const tbodyUnres = document.getElementById('tbody-unresolved-issues');
-    if (tbodyUnres && stream1Data.top_unresolved_issues) {
-      tbodyUnres.innerHTML = '';
-      stream1Data.top_unresolved_issues.forEach(item => {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td class="col-date font-bold" style="color: #f43f5e;">${item.rank || 'TOP 1'}</td>
-          <td class="font-bold" style="text-align: left; padding-left: 14px;">${item.loi}</td>
-          <td class="font-mono text-right">${(item.so_phieu_anh_huong || 1893).toLocaleString()}</td>
-          <td class="font-mono text-right">${(item.so_ch_anh_huong || 224).toLocaleString()}</td>
-          <td class="font-mono font-bold text-right" style="color: #f43f5e;">${(item.gia_tri_chua_cai_thien || 9158392).toLocaleString('vi-VN')} VNĐ</td>
-          <td class="font-mono font-bold text-right">${item.ty_le_chua_xl || 3.5}%</td>
-          <td class="text-center"><span class="badge-pill-priority">${item.muc_do_uu_tien || '🚨 Ưu tiên 1 (Gấp)'}</span></td>
-          <td class="text-center"><button class="btn btn-sm btn-outline btn-view-err-detail" data-idx="0">🔍 Chi tiết</button></td>
-        `;
-        tbodyUnres.appendChild(tr);
-      });
-    }
-
-    // Update 5 Error KPI Cards (Image 2)
-    if (stream1Data && stream1Data.error_summary) {
-      updateErrorKPICards(stream1Data.error_summary);
-    }
-  }
-
-  // Modal Error Detail
-  const modal = document.getElementById('modal-error-detail');
-  const btnCloseModal = document.getElementById('btn-close-error-modal');
-  if (btnCloseModal) {
-    btnCloseModal.addEventListener('click', () => {
-      if (modal) modal.style.display = 'none';
-    });
-  }
-  if (modal) {
-    modal.addEventListener('click', (e) => {
-      if (e.target === modal) modal.style.display = 'none';
-    });
-  }
-
-  function openErrorDetailModal(err) {
-    if (!err || !modal) return;
-    const titleEl = document.getElementById('modal-error-title');
-    if (titleEl) {
-      titleEl.textContent = `Chi Tiết Nhóm Lỗi: ${err.loi} (${err.sl_lech.toLocaleString()} KG/Pack - ${err.gia_tri.toLocaleString()} đ)`;
-    }
-    const container = document.getElementById('modal-error-content');
-    if (!container) return;
-    
-    const items = err.items || [];
-    if (items.length === 0) {
-      container.innerHTML = '<p style="color: #64748b; padding: 15px 0; text-align: center;">Không có dữ liệu chi tiết mẫu cho nhóm lỗi này.</p>';
-    } else {
-      let rows = items.map((it, idx) => `
-        <tr>
-          <td class="text-center font-mono">${idx + 1}</td>
-          <td class="font-mono font-bold">${it.date}</td>
-          <td>${it.store}</td>
-          <td class="font-mono" style="color: #2563eb; font-weight: bold;">${it.sku}</td>
-          <td class="font-bold">${it.product}</td>
-          <td class="text-right font-mono text-danger">${it.diff.toLocaleString()}</td>
-          <td class="text-right font-mono font-bold">${it.val.toLocaleString()} đ</td>
-          <td class="text-center"><span class="tag-status tag-pending">${it.status || 'Chờ xử lý'}</span></td>
-        </tr>
-      `).join('');
-
-      container.innerHTML = `
-        <table class="data-table" style="font-size: 0.85rem;">
-          <thead>
-            <tr>
-              <th class="text-center">#</th>
-              <th>NGÀY</th>
-              <th>SIÊU THỊ</th>
-              <th>SKU</th>
-              <th>TÊN SẢN PHẨM</th>
-              <th class="text-right">LỆCH</th>
-              <th class="text-right">THÀNH TIỀN</th>
-              <th class="text-center">TRẠNG THÁI</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${rows}
-          </tbody>
-        </table>
-      `;
-    }
-    modal.style.display = 'flex';
-  }
-
-  // 3b. Realtime Engine: Calculate Stream 1 directly from Google Sheets records with optional date range
-  function computeStream1FromRecords(records, filterFromIso = '', filterToIso = '') {
-    const fromIso = toIsoDate(filterFromIso) || (filterFromIso && filterFromIso.length === 10 ? filterFromIso : '');
-    const toIso = toIsoDate(filterToIso) || (filterToIso && filterToIso.length === 10 ? filterToIso : '');
-
-    // If viewing full range (01/09 to 15/09 or empty), prioritize official ground-truth benchmark
-    if (window.STREAM1_DATA && (!fromIso || fromIso <= '2026-09-01') && (!toIso || toIso >= '2026-09-15')) {
-      return window.STREAM1_DATA;
-    }
-    if (!records || records.length === 0) return window.STREAM1_DATA || null;
-
-    const isFiltered = Boolean(fromIso || toIso);
-    let targetRows = records;
-    if (isFiltered) {
-      targetRows = records.filter(r => {
-        const iso = toIsoDate(r.transfer_date);
-        if (!iso) return false;
-        if (fromIso && iso < fromIso) return false;
-        if (toIso && iso > toIso) return false;
-        return true;
-      });
-    }
-
-    const daysMap = {};
-    const errorsMap = {};
-    let totalErrorRows = 0;
-    let totalDiffQty = 0;
-    let totalLossVal = 0;
-
-    targetRows.forEach(r => {
-      const dStr = r.transfer_date || '';
-      const pDate = parseDate(dStr);
-      if (pDate) {
-        const dd = String(pDate.getDate()).padStart(2, '0');
-        const mm = String(pDate.getMonth() + 1).padStart(2, '0');
-        const dayKey = `${dd}/${mm}`;
-        if (!daysMap[dayKey]) {
-          daysMap[dayKey] = {
-            day: dayKey,
-            phieuSet: new Set(),
-            sl_chuyen: 0,
-            sl_nhan: 0,
-            cl_thieu: 0,
-            cl_thua: 0,
-            da_xu_ly: 0
-          };
-        }
-        const g = daysMap[dayKey];
-        if (r.pt_transfer) g.phieuSet.add(r.pt_transfer);
-        else if (r.to_order) g.phieuSet.add(r.to_order);
-
-        const chuyen = Number(r.qty_transferred) || 0;
-        const nhan = Number(r.qty_received) || 0;
-        const diff = Number(r.qty_diff) || 0;
-        g.sl_chuyen += chuyen;
-        g.sl_nhan += nhan;
-
-        const diffVal = Math.abs(diff) || Math.abs(chuyen - nhan);
-        const err = (r.error_type || '').trim();
-        const stt = r.status || '';
-        const resp = r.responsible_party || '';
-
-        if (err.includes('thừa') || err.includes('dư') || nhan > chuyen) {
-          g.cl_thua += diffVal;
-        } else {
-          g.cl_thieu += diffVal;
-        }
-
-        const isDone = /hoàn thành|xong|đồng ý|claim|đã xử lý|đã duyệt/i.test(`${stt} ${resp} ${r.dc_confirmation}`);
-        if (isDone) {
-          g.da_xu_ly += diffVal;
-        }
-
-        if (diffVal > 0 || (err && err !== 'Lỗi')) {
-          const errKey = (err && err !== 'Lỗi') ? err : 'Khác';
-          if (!errorsMap[errKey]) errorsMap[errKey] = { count: 0, sl_lech: 0, gia_tri: 0, items: [] };
-          errorsMap[errKey].count++;
-          errorsMap[errKey].sl_lech += diffVal;
-          const valRow = (Number(r.total_value) || (diffVal * (Number(r.cost_price) || 0)));
-          errorsMap[errKey].gia_tri += valRow;
-
-          totalErrorRows++;
-          totalDiffQty += diffVal;
-          totalLossVal += valRow;
-
-          if (errorsMap[errKey].items.length < 25) {
-            errorsMap[errKey].items.push({
-              date: dStr,
-              store: r.store_name,
-              sku: r.sku,
-              product: r.product_name,
-              diff: Math.round(diffVal * 1000) / 1000,
-              val: Math.round(valRow),
-              status: stt || resp || 'Chờ xử lý'
-            });
-          }
-        }
-      }
-    });
-
-    const benchmarks = {
-      "01/09": {phieu: 193, sl_chuyen: 17118.2, sl_nhan: 17083.1, cl_thieu: 49.3, cl_thua: 7.9, da_xu_ly: 597.6, tien_do: 100},
-      "02/09": {phieu: 189, sl_chuyen: 169696.7, sl_nhan: 169103.5, cl_thieu: 829.4, cl_thua: 236.2, da_xu_ly: 1081.4, tien_do: 100},
-      "03/09": {phieu: 174, sl_chuyen: 126499.4, sl_nhan: 125883.6, cl_thieu: 874.7, cl_thua: 260.0, da_xu_ly: 1077.3, tien_do: 95},
-      "04/09": {phieu: 184, sl_chuyen: 144650.7, sl_nhan: 144257.0, cl_thieu: 626.7, cl_thua: 233.0, da_xu_ly: 842.8, tien_do: 98},
-      "05/09": {phieu: 204, sl_chuyen: 159479.1, sl_nhan: 158779.7, cl_thieu: 854.0, cl_thua: 154.6, da_xu_ly: 828.9, tien_do: 82},
-      "06/09": {phieu: 207, sl_chuyen: 169231.9, sl_nhan: 168628.8, cl_thieu: 767.3, cl_thua: 164.2, da_xu_ly: 852.4, tien_do: 92},
-      "07/09": {phieu: 194, sl_chuyen: 142016.7, sl_nhan: 141547.1, cl_thieu: 822.4, cl_thua: 352.8, da_xu_ly: 514.1, tien_do: 44},
-      "08/09": {phieu: 178, sl_chuyen: 150269.6, sl_nhan: 149495.7, cl_thieu: 1335.2, cl_thua: 589.3, da_xu_ly: 868.6, tien_do: 45},
-      "09/09": {phieu: 240, sl_chuyen: 173607.2, sl_nhan: 172938.6, cl_thieu: 1083.6, cl_thua: 411.0, da_xu_ly: 546.0, tien_do: 37},
-      "10/09": {phieu: 224, sl_chuyen: 161934.5, sl_nhan: 158772.9, cl_thieu: 3633.1, cl_thua: 248.5, da_xu_ly: 269.8, tien_do: 7},
-      "11/09": {phieu: 201, sl_chuyen: 158420.5, sl_nhan: 157666.0, cl_thieu: 754.5, cl_thua: 0.0, da_xu_ly: 0.0, tien_do: 0},
-      "12/09": {phieu: 195, sl_chuyen: 164250.0, sl_nhan: 163571.7, cl_thieu: 678.3, cl_thua: 0.0, da_xu_ly: 678.3, tien_do: 100},
-      "13/09": {phieu: 205, sl_chuyen: 167800.0, sl_nhan: 166961.2, cl_thieu: 838.8, cl_thua: 0.0, da_xu_ly: 838.8, tien_do: 100},
-      "14/09": {phieu: 189, sl_chuyen: 162100.0, sl_nhan: 161141.5, cl_thieu: 958.5, cl_thua: 0.0, da_xu_ly: 958.5, tien_do: 100},
-      "15/09": {phieu: 450, sl_chuyen: 165500.0, sl_nhan: 164894.8, cl_thieu: 605.2, cl_thua: 0.0, da_xu_ly: 605.2, tien_do: 100}
-    };
-
-    const combinedDays = Array.from(new Set([...Object.keys(benchmarks), ...Object.keys(daysMap)]));
-    let allDays;
-    if (isFiltered) {
-      allDays = combinedDays.filter(d => {
-        const parts = d.split('/');
-        const iso = `2026-${parts[1] ? parts[1].padStart(2, '0') : '09'}-${parts[0].padStart(2, '0')}`;
-        if (fromIso && iso < fromIso) return false;
-        if (toIso && iso > toIso) return false;
-        return true;
-      }).sort();
-    } else {
-      allDays = combinedDays.sort();
-    }
-
-    const timelineDays = [];
-    let totPhieu = 0, totChuyen = 0, totNhan = 0, totThieu = 0, totThua = 0, totDaXl = 0;
-    let completedDays = 0;
-
-    allDays.forEach(d => {
-      const bm = benchmarks[d] || {};
-      const sh = daysMap[d] || {};
-
-      const phieu = bm.phieu !== undefined ? bm.phieu : ((sh.phieuSet ? sh.phieuSet.size : 0) || 200);
-      const chuyen = bm.sl_chuyen !== undefined ? bm.sl_chuyen : (sh.sl_chuyen || 0);
-      const nhan = bm.sl_nhan !== undefined ? bm.sl_nhan : (sh.sl_nhan || 0);
-      const thieu = bm.cl_thieu !== undefined ? bm.cl_thieu : (sh.cl_thieu || 0);
-      const thua = bm.cl_thua !== undefined ? bm.cl_thua : (sh.cl_thua || 0);
-      const da_xl = bm.da_xu_ly !== undefined ? bm.da_xu_ly : (sh.da_xu_ly || 0);
-
-      const tot_cl = thieu + thua;
-      let con_lai = Math.max(0, tot_cl - da_xl);
-      const pct = bm.tien_do !== undefined ? bm.tien_do : (tot_cl > 0 ? Math.round(da_xl / tot_cl * 100) : 0);
-
-      if (pct === 100 || (con_lai <= 0.5 && tot_cl > 0 && da_xl > 0)) {
-        completedDays++;
-        con_lai = 0;
-      }
-
-      totPhieu += phieu;
-      totChuyen += chuyen;
-      totNhan += nhan;
-      totThieu += thieu;
-      totThua += thua;
-      totDaXl += da_xl;
-
-      timelineDays.push({
-        day: d,
-        phieu: phieu,
-        sl_chuyen: Math.round(chuyen * 10) / 10,
-        sl_nhan: Math.round(nhan * 10) / 10,
-        cl_thieu: Math.round(thieu * 10) / 10,
-        cl_thua: Math.round(thua * 10) / 10,
-        tong_cl: Math.round(tot_cl * 10) / 10,
-        da_xu_ly: Math.round(da_xl * 10) / 10,
-        con_lai: Math.round(con_lai * 10) / 10,
-        status: pct === 100 ? 'Hoàn thành' : 'Đang xử lý',
-        tien_do: pct
-      });
-    });
-
-    const totClAll = totThieu + totThua;
-    const overallPct = totClAll > 0 ? Math.round(totDaXl / totClAll * 100) : (isFiltered ? 0 : 61);
-
-    // Error categories benchmark mapping
-    const expectedCategories = [
-      { loi: "DC giao thiếu", defSl: 6547.390, defVal: 106875624, defPct: 71.07, risk: "Rủi ro cao" },
-      { loi: "VT giao sai điểm", defSl: 906.020, defVal: 17994368, defPct: 9.83, risk: "Kiểm soát tốt" },
-      { loi: "ST nhập thiếu", defSl: 438.078, defVal: 9378314, defPct: 4.76, risk: "Kiểm soát tốt" },
-      { loi: "Hao hụt", defSl: 376.013, defVal: 13547751, defPct: 4.08, risk: "Kiểm soát tốt" },
-      { loi: "DC giao bù", defSl: 369.200, defVal: 6076166, defPct: 4.01, risk: "Kiểm soát tốt" },
-      { loi: "DC Pick sai", defSl: 362.700, defVal: 5463399, defPct: 3.94, risk: "Kiểm soát tốt" },
-      { loi: "DC thao tác sai", defSl: 169.700, defVal: 2684968, defPct: 1.84, risk: "Kiểm soát tốt" },
-      { loi: "ST thông tin sai/không phản hồi", defSl: 36.100, defVal: 1003065, defPct: 0.39, risk: "Kiểm soát tốt" },
-      { loi: "ST kiểm sai QT", defSl: 7.745, defVal: 252195, defPct: 0.08, risk: "Kiểm soát tốt" }
-    ];
-
-    const errList = [];
-    const seenNames = new Set();
-
-    expectedCategories.forEach((exp, idx) => {
-      seenNames.add(exp.loi);
-      const actual = errorsMap[exp.loi];
-      let sl = 0, val = 0, items = [];
-      if (actual) {
-        sl = actual.sl_lech;
-        val = actual.gia_tri;
-        items = actual.items;
-      } else if (!isFiltered) {
-        sl = exp.defSl;
-        val = exp.defVal;
-      }
-
-      if (isFiltered && sl === 0 && (!items || items.length === 0)) {
-        return;
-      }
-
-      if (!items || items.length === 0) {
-        items = [
-          { date: "11/09/2026", store: "KFM Lê Văn Thọ (LVT)", sku: "10791", product: "HÀNH LÁ VIETGAP 100G", diff: 35.0, val: 256550, status: "Chờ duyệt DC" },
-          { date: "11/09/2026", store: "KFM Nguyễn Sơn (A195)", sku: "11026", product: "CÀ RỐT ĐÀ LẠT 300G", diff: 42.0, val: 504000, status: "Chờ duyệt DC" }
-        ];
-      }
-      errList.push({
-        stt: idx + 1,
-        loi: exp.loi,
-        sl_lech: Math.round(sl * 1000) / 1000,
-        gia_tri: Math.round(val),
-        ty_le: exp.defPct,
-        danh_gia: exp.risk,
-        items: items
-      });
-    });
-
-    Object.keys(errorsMap).forEach(cat => {
-      if (!seenNames.has(cat)) {
-        const act = errorsMap[cat];
-        errList.push({
-          stt: errList.length + 1,
-          loi: cat,
-          sl_lech: Math.round(act.sl_lech * 1000) / 1000,
-          gia_tri: Math.round(act.gia_tri),
-          ty_le: 0,
-          danh_gia: 'Kiểm soát tốt',
-          items: act.items || []
-        });
-      }
-    });
-
-    let currentTotalDiff = 0;
-    errList.forEach(e => { currentTotalDiff += e.sl_lech; });
-    if (currentTotalDiff > 0) {
-      errList.forEach(e => {
-        e.ty_le = Math.round((e.sl_lech / currentTotalDiff) * 10000) / 100;
-        if (e.ty_le >= 30 || e.loi.includes('DC giao thiếu')) {
-          e.danh_gia = 'Rủi ro cao';
-        } else {
-          e.danh_gia = 'Kiểm soát tốt';
-        }
-      });
-    }
-    errList.sort((a, b) => b.sl_lech - a.sl_lech);
-    errList.forEach((e, idx) => { e.stt = idx + 1; });
-
-    const topCat = errList[0] || { loi: 'DC giao thiếu', sl_lech: 0, ty_le: 0 };
-    const errorSummary = {
-      tong_so_vu_loi: isFiltered ? totalErrorRows : (totalErrorRows || 8908),
-      tong_sl_chenh_lech: isFiltered ? (Math.round(totalDiffQty * 1000) / 1000) : (Math.round((totalDiffQty || 9980.39) * 1000) / 1000),
-      tong_gia_tri_that_thoat: isFiltered ? Math.round(totalLossVal) : (Math.round(totalLossVal) || 175980240),
-      top_van_de_loi: topCat.loi,
-      top_van_de_pct: topCat.ty_le,
-      top_van_de_sl: topCat.sl_lech,
-      ton_dong_chua_cai_thien: isFiltered ? Math.round(totalLossVal * 0.1) : Math.round((totalLossVal || 175980240) * 0.1),
-      ton_dong_pct: 10.0
-    };
-
-    return {
-      generated_at: new Date().toLocaleString('vi-VN'),
-      timeline_summary: {
-        tong_so_ngay: timelineDays.length,
-        hoan_thanh_100: completedDays,
-        dang_xu_ly: timelineDays.length - completedDays,
-        ty_le_hoan_thanh_chung: overallPct,
-        tong_phieu: totPhieu,
-        tong_sl_chuyen: Math.round(totChuyen),
-        tong_sl_nhan: Math.round(totNhan),
-        tong_cl_thieu: Math.round(totThieu * 10) / 10,
-        tong_cl_thua: Math.round(totThua * 10) / 10,
-        tong_cl: Math.round(totClAll * 10) / 10,
-        tong_da_xu_ly: Math.round(totDaXl * 10) / 10,
-        tong_con_lai: Math.round((totClAll - totDaXl) * 10) / 10
-      },
-      timeline_days: timelineDays,
-      error_summary: errorSummary,
-      error_categories: errList
-    };
-  }
-
-  // Luồng 1 Date Filter Controls
-  const s1DateFrom = document.getElementById('s1-date-from');
-  const s1DateTo = document.getElementById('s1-date-to');
-  const s1BtnFilter = document.getElementById('s1-btn-filter-date');
-  const s1BtnReset = document.getElementById('s1-btn-reset-date');
-  const s1BtnRefresh = document.getElementById('s1-btn-refresh-errors');
-
-  function applyStream1DateFilter() {
-    const fromVal = s1DateFrom ? s1DateFrom.value : '';
-    const toVal = s1DateTo ? s1DateTo.value : '';
-
-    const recordsToUse = (allRecords && allRecords.length > 0) ? allRecords : (window.RECON_RECORDS || []);
-    const computed = computeStream1FromRecords(recordsToUse, fromVal, toVal);
-    if (computed) {
-      stream1Data = computed;
-      renderStream1();
-      if (fromVal || toVal) {
-        showToast(`Đã lọc từ ${formatDateVN(fromVal) || 'đầu'} đến ${formatDateVN(toVal) || 'nay'} (${formatNumber(computed.error_summary.tong_so_vu_loi, 0)} dòng lỗi)`, '🔍');
-      }
-    }
-  }
-
-  if (s1BtnFilter) s1BtnFilter.addEventListener('click', applyStream1DateFilter);
-  if (s1DateFrom) s1DateFrom.addEventListener('change', applyStream1DateFilter);
-  if (s1DateTo) s1DateTo.addEventListener('change', applyStream1DateFilter);
-  if (s1BtnReset) {
-    s1BtnReset.addEventListener('click', () => {
-      if (s1DateFrom) s1DateFrom.value = '09/01/2026';
-      if (s1DateTo) s1DateTo.value = '09/15/2026';
-      if (window.STREAM1_DATA) {
-        stream1Data = window.STREAM1_DATA;
-      } else {
-        const recordsToUse = (allRecords && allRecords.length > 0) ? allRecords : (window.RECON_RECORDS || []);
-        stream1Data = computeStream1FromRecords(recordsToUse, '2026-09-01', '2026-09-15');
-      }
-      if (stream1Data) renderStream1();
-      showToast('Đã đặt lại bộ lọc chuẩn: 01/09/2026 đến 15/09/2026 (Tuần 36-38).', '🔄');
-    });
-  }
-  if (s1BtnRefresh) {
-    s1BtnRefresh.addEventListener('click', () => {
-      applyStream1DateFilter();
-      showToast('Đã làm mới bảng tỷ lệ lỗi!', '🔄');
-    });
-  }
-
-  // 4. Render Stream 2: KRC Analytics
-  const krcDateFrom = document.getElementById('krc-date-from');
-  const krcDateTo = document.getElementById('krc-date-to');
-  const krcSelectExport = document.getElementById('krc-select-export-day');
-
-  function renderStream2() {
-    if (!stream2Data) return;
-    const tbody = document.getElementById('tbody-krc-products');
-    if (!tbody) return;
-    tbody.innerHTML = '';
-
-    const selectedExport = krcSelectExport ? krcSelectExport.value : '';
-    const prods = stream2Data.products || [];
-    const filtered = prods.filter(p => {
-      // subtab filter
-      if (currentSubTab === 'khop_po' && p.type !== 'khop_po') return false;
-      if (currentSubTab === 'chia_du' && p.type !== 'chia_du') return false;
-      if (currentSubTab === 'chia_thieu' && p.type !== 'chia_thieu') return false;
-
-      // export day dropdown filter
-      if (selectedExport) {
-        const pExport = (p.ngay_xuat || '11/09').replace(/^(\d)\//, '0$1/');
-        const selExport = selectedExport.replace(/^(\d)\//, '0$1/');
-        if (pExport !== selExport) return false;
-      }
-
-      // search filter
-      if (searchTerm) {
-        const query = searchTerm.toLowerCase();
-        const mSku = (p.sku || '').toLowerCase().includes(query);
-        const mName = (p.ten_sp || '').toLowerCase().includes(query);
-        return mSku || mName;
-      }
-      return true;
-    });
-
-    filtered.forEach((p, idx) => {
-      const tr = document.createElement('tr');
-      const tc = p.ton_cuoi;
-      const tcColor = tc < 0 ? 'color: #dc2626; font-weight: bold;' : (tc > 0 ? 'color: #0d9488; font-weight: bold;' : '');
-      
-      const effectivePrice = (p.don_gia || defaultPrice) * vatMultiplier;
-      const effectiveVal = Math.round(tc * effectivePrice);
-      const ttColor = effectiveVal < 0 ? 'color: #dc2626; font-weight: bold;' : (effectiveVal > 0 ? 'color: #0d9488; font-weight: bold;' : '');
-
-      tr.innerHTML = `
-        <td class="text-center font-mono">${idx + 1}</td>
-        <td class="font-mono font-bold" style="color: #2563eb;">${p.sku}</td>
-        <td class="font-bold">${p.ten_sp}</td>
-        <td class="text-right font-mono">${(p.ton_dau || 0).toLocaleString('vi-VN')}</td>
-        <td class="text-right font-mono font-bold">${(p.nhap_po || 0).toLocaleString('vi-VN')}</td>
-        <td class="text-right font-mono">${(p.nhan_vao || 0).toLocaleString('vi-VN')}</td>
-        <td class="text-right font-mono font-bold">${(p.xuat_st || 0).toLocaleString('vi-VN')}</td>
-        <td class="text-right font-mono" style="${tcColor}">${(tc || 0).toLocaleString('vi-VN')}</td>
-        <td class="text-right font-mono">${Math.round(effectivePrice).toLocaleString('vi-VN')}</td>
-        <td class="text-right font-mono" style="${ttColor}">${effectiveVal.toLocaleString('vi-VN')}</td>
-        <td class="text-center font-mono">${p.ngay_nhap || '01/09'}</td>
-        <td class="text-center font-mono">${p.ngay_xuat || '11/09'}</td>
-      `;
-      tbody.appendChild(tr);
-    });
-  }
-
-  function applyStream2DateFilter() {
-    renderStream2();
-    const fromStr = krcDateFrom ? krcDateFrom.value : '';
-    const toStr = krcDateTo ? krcDateTo.value : '';
-    if (fromStr || toStr) {
-      showToast(`Đã lọc KRC từ ${fromStr || 'đầu'} đến ${toStr || 'nay'}`, '🔍');
-    }
-  }
-
-  if (krcDateFrom) {
-    krcDateFrom.addEventListener('change', applyStream2DateFilter);
-    krcDateFrom.addEventListener('blur', applyStream2DateFilter);
-  }
-  if (krcDateTo) {
-    krcDateTo.addEventListener('change', applyStream2DateFilter);
-    krcDateTo.addEventListener('blur', applyStream2DateFilter);
-  }
-  if (krcSelectExport) {
-    krcSelectExport.addEventListener('change', (e) => {
-      const selectedDay = e.target.value;
-      if (selectedDay && krcDateTo) {
-        const parts = selectedDay.split('/');
-        if (parts.length === 2) {
-          krcDateTo.value = `09/${parts[0].padStart(2, '0')}/2026`;
-        }
-      }
-      applyStream2DateFilter();
-    });
-  }
-
-  // 5. Setup Sub-Tabs Listeners for Stream 2
-  const subtabButtons = document.querySelectorAll('.krc-subtab-btn');
-  subtabButtons.forEach(btn => {
-    btn.addEventListener('click', () => {
-      subtabButtons.forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      currentSubTab = btn.getAttribute('data-subtab');
-      renderStream2();
-    });
-  });
-
-  // Search input listener
-  const searchInput = document.getElementById('krc-search-sku');
-  if (searchInput) {
-    searchInput.addEventListener('input', (e) => {
-      searchTerm = e.target.value.trim();
-      renderStream2();
-    });
-  }
-
-  // Action Buttons: Excel, PDF, Telegram, Tải dữ liệu
-  const btnExcel = document.getElementById('btn-export-excel') || document.querySelector('.action-buttons-group .btn-primary');
-  if (btnExcel) {
-    btnExcel.addEventListener('click', () => {
-      exportTableToCSV('krc_stock_analytics.csv');
-      showToast('Đã xuất file Excel / CSV thành công!', '📊');
-    });
-  }
-
-  const btnPdf = document.getElementById('btn-export-pdf') || document.querySelector('.action-buttons-group .btn-purple');
-  if (btnPdf) {
-    btnPdf.addEventListener('click', () => {
-      window.print();
-    });
-  }
-
-  const btnTg = document.getElementById('btn-send-telegram') || document.querySelector('.action-buttons-group .btn-blue');
-  if (btnTg) {
-    btnTg.addEventListener('click', () => {
-      showToast('Đã gửi thông báo phân tích KRC vào Telegram của Ny!', '✈️');
-    });
-  }
-
-  const btnReload = document.getElementById('btn-reload-cdc') || document.querySelector('.action-buttons-group .btn-teal');
-  if (btnReload) {
-    btnReload.addEventListener('click', async () => {
-      showToast('Đang làm mới dữ liệu từ CDC StarRocks...', '⏳');
-      try {
-        const res2 = await fetch('data/stream2_krc_analytics.json');
-        if (res2.ok) {
-          stream2Data = await res2.json();
-          renderStream2();
-          showToast('Dữ liệu KRC đã được cập nhật mới nhất!', '✅');
-        }
-      } catch (e) {
-        showToast('Lỗi cập nhật dữ liệu.', '❌');
-      }
-    });
-  }
-
-  function exportTableToCSV(filename) {
-    const rows = document.querySelectorAll('#table-krc-products tr');
-    let csv = [];
-    rows.forEach(r => {
-      const cols = r.querySelectorAll('th, td');
-      let rowData = [];
-      cols.forEach(c => {
-        rowData.push('"' + c.innerText.replace(/"/g, '""').trim() + '"');
-      });
-      csv.push(rowData.join(','));
-    });
-
-    const csvFile = new Blob(['\uFEFF' + csv.join('\n')], { type: 'text/csv;charset=utf-8;' });
-    const downloadLink = document.createElement('a');
-    downloadLink.download = filename;
-    downloadLink.href = window.URL.createObjectURL(csvFile);
-    downloadLink.style.display = 'none';
-    document.body.appendChild(downloadLink);
-    downloadLink.click();
-    downloadLink.remove();
-  }
-
-  // 6. Execute Immediate Renders
-  renderStream1();
-  renderStream2();
-
-  // 7. Background Async Fetch to Ensure Freshest JSON
-  try {
-    const res1 = await fetch('data/stream1_timeline.json');
-    if (res1.ok) {
-      const data1 = await res1.json();
-      if (data1 && data1.timeline_days && data1.timeline_days.length > 0) {
-        stream1Data = data1;
-        renderStream1();
-      }
-    }
-  } catch (e) {
-    console.log('Stream 1 using loaded bundle:', e);
-  }
-
-  try {
-    const res2 = await fetch('data/stream2_krc_analytics.json');
-    if (res2.ok) {
-      const data2 = await res2.json();
-      if (data2 && data2.products && data2.products.length > 0) {
-        stream2Data = data2;
-        renderStream2();
-      }
-    }
-  } catch (e) {
-    console.log('Stream 2 using loaded bundle:', e);
-  }
-
-  // 8. Auto-start Realtime Background Engine immediately on page load
-  setTimeout(() => {
-    initStream3();
-  }, 100);
 
   // ============================================================
   // LUỒNG 3: BÁO CÁO TỔNG HỢP DATAPAY & TỒN KHO CDC (LEGACY RECON)
@@ -1106,9 +108,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Fallback: If not loaded via script tag, fetch JSON directly
   if (!allRecords || allRecords.length === 0) {
     try {
+      const base = (typeof window !== 'undefined' && window.KRC_REMOTE_BASE) ? window.KRC_REMOTE_BASE : '';
       const [recRes, sumRes] = await Promise.all([
-        fetch('data/reconciliation_records.json'),
-        fetch('data/datapay_summary.json')
+        fetch(`${base}data/reconciliation_records.json`),
+        fetch(`${base}data/datapay_summary.json`)
       ]);
       if (recRes.ok) allRecords = await recRes.json();
       if (sumRes.ok) summary = await sumRes.json();
@@ -1120,23 +123,13 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Clean data: Filter out any header remnants
   allRecords = allRecords.filter(r => r.sku && r.sku !== 'Mã hàng' && r.sku !== 'Ma hang' && r.sku !== 'Ma hng' && r.to_order !== 'CLV4');
 
-  // Compute Luồng 1 on initial load from bundled/cached records
-  if (allRecords && allRecords.length > 0) {
-    const fromVal = s1DateFrom ? s1DateFrom.value : '2026-09-01';
-    const toVal = s1DateTo ? s1DateTo.value : '2026-09-11';
-    const dynamicS1 = computeStream1FromRecords(allRecords, fromVal, toVal);
-    if (dynamicS1) {
-      stream1Data = dynamicS1;
-      renderStream1();
-    }
-  }
-
   let currentStep = 'all';
   let searchQuery = '';
   let selectedDate = '';
   let selectedStore = '';
   let selectedError = '';
   let selectedStatus = '';
+  let selectedWarehouse = '';
   let dateRange = { from: '', to: '' };
 
   let currentPage = 1;
@@ -1256,6 +249,21 @@ document.addEventListener('DOMContentLoaded', async () => {
           if (dateRange.from && itemIso < dateRange.from) return false;
           if (dateRange.to && itemIso > dateRange.to) return false;
         }
+      }
+
+      // Warehouse Filter (KRC vs KRCBT)
+      if (selectedWarehouse) {
+        const isBanh = (item.product_name || '').toUpperCase().includes('BÁNH') ||
+                       (item.product_name || '').toUpperCase().includes('BANH') ||
+                       (item.product_name || '').toUpperCase().includes('SANDWICH') ||
+                       (item.product_name || '').toUpperCase().includes('BREAD') ||
+                       (item.product_name || '').toUpperCase().includes('CROISSANT') ||
+                       (item.warehouse_id || '').toUpperCase().includes('KRCBT') ||
+                       (item.to_order || '').toUpperCase().includes('KRCBT') ||
+                       (item.unit || '').toUpperCase() === 'KHAY' ||
+                       (item.unit || '').toUpperCase() === 'CÁI';
+        if (selectedWarehouse === 'KRCBT' && !isBanh) return false;
+        if (selectedWarehouse === 'KRC' && isBanh) return false;
       }
 
       // Store Filter
@@ -1531,6 +539,202 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   };
 
+  // 3c. Báo Cáo Chênh Lệch Hằng Ngày (5 Chỉ Tiêu KRC & KRCBT)
+  const renderDailyDiscrepancy = () => {
+    const list = filterRecords();
+    const dayMap = {};
+
+    list.forEach(item => {
+      const d = item.transfer_date || 'Chưa rõ';
+      const isBanh = (item.product_name || '').toUpperCase().includes('BÁNH') ||
+                     (item.product_name || '').toUpperCase().includes('BANH') ||
+                     (item.product_name || '').toUpperCase().includes('SANDWICH') ||
+                     (item.product_name || '').toUpperCase().includes('BREAD') ||
+                     (item.product_name || '').toUpperCase().includes('CROISSANT') ||
+                     (item.warehouse_id || '').toUpperCase().includes('KRCBT') ||
+                     (item.to_order || '').toUpperCase().includes('KRCBT') ||
+                     (item.unit || '').toUpperCase() === 'KHAY' ||
+                     (item.unit || '').toUpperCase() === 'CÁI';
+      const whKey = isBanh ? 'KRCBT' : 'KRC';
+      const key = `${d}__${whKey}`;
+
+      if (!dayMap[key]) {
+        dayMap[key] = {
+          date: d,
+          warehouse_code: whKey,
+          warehouse_name: isBanh ? '🥖 Kho Bánh Tươi' : '🥦 Kho Rau Củ',
+          ticketSet: new Set(),
+          discrepancyTicketSet: new Set(),
+          total_transferred: 0,
+          total_received: 0,
+          total_diff_abs: 0,
+          total_surplus: 0,
+          total_shortage: 0,
+          natural_loss_qty: 0,
+          natural_loss_vnd: 0,
+          warehouse_penalty_vnd: 0,
+          store_penalty_vnd: 0,
+          total_loss_val: 0
+        };
+      }
+
+      const entry = dayMap[key];
+      const ticketId = item.to_order || item.pt_transfer || item.id;
+      entry.ticketSet.add(ticketId);
+
+      const qTrans = Number(item.qty_transferred) || 0;
+      const qRecv = Number(item.qty_received) || 0;
+      const qDiff = Number(item.qty_diff) || 0;
+
+      entry.total_transferred += qTrans;
+      entry.total_received += qRecv;
+      entry.total_diff_abs += Math.abs(qDiff);
+
+      if (qDiff !== 0 || Number(item.natural_loss_qty || 0) > 0) {
+        entry.discrepancyTicketSet.add(ticketId);
+      }
+
+      // 3. SL Dư (Thừa)
+      if (qRecv > qTrans) {
+        entry.total_surplus += (qRecv - qTrans);
+      }
+
+      // 4. SL Thiếu (đã trừ hao hụt)
+      if (qTrans > qRecv) {
+        const lossQ = Number(item.natural_loss_qty) || 0;
+        const netShortage = Math.max(0, (qTrans - qRecv) - lossQ);
+        entry.total_shortage += netShortage;
+      }
+
+      // 5. Hao hụt
+      entry.natural_loss_qty += (Number(item.natural_loss_qty) || 0);
+      entry.natural_loss_vnd += (Number(item.loss_value) || 0);
+
+      // Chế tài
+      entry.warehouse_penalty_vnd += (Number(item.warehouse_penalty) || 0);
+      entry.store_penalty_vnd += (Number(item.store_penalty) || 0);
+      entry.total_loss_val += (Number(item.warehouse_penalty || 0) + Number(item.store_penalty || 0) + Number(item.loss_value || 0) + Number(item.undetermined_value || 0));
+    });
+
+    const entries = Object.values(dayMap).sort((a, b) => {
+      const da = parseDate(a.date);
+      const db = parseDate(b.date);
+      return (db ? db.getTime() : 0) - (da ? da.getTime() : 0);
+    });
+
+    // Xác định ngày mục tiêu cho 5 KPI Cards: ngày được chọn hoặc ngày chốt sổ mới nhất (16/09/2026)
+    const targetDate = selectedDate || (entries.length > 0 ? entries[0].date : '09/16/2026');
+    const kpiEntries = targetDate ? entries.filter(e => e.date === targetDate) : entries;
+
+    // Compute Daily KPI Cards for the targeted cutoff date
+    let grandTickets = 0, krcTickets = 0, krcbtTickets = 0;
+    let grandDiffQty = 0, grandDiffVal = 0;
+    let grandSurplusQty = 0;
+    let grandShortageQty = 0, grandWhPenalty = 0, grandStPenalty = 0;
+    let grandLossQty = 0, grandLossVal = 0;
+
+    kpiEntries.forEach(e => {
+      const tCnt = e.ticketSet.size;
+      grandTickets += tCnt;
+      if (e.warehouse_code === 'KRC') krcTickets += tCnt;
+      else krcbtTickets += tCnt;
+
+      grandDiffQty += e.total_diff_abs;
+      grandDiffVal += e.total_loss_val;
+      grandSurplusQty += e.total_surplus;
+      grandShortageQty += e.total_shortage;
+      grandWhPenalty += e.warehouse_penalty_vnd;
+      grandStPenalty += e.store_penalty_vnd;
+      grandLossQty += e.natural_loss_qty;
+      grandLossVal += e.natural_loss_vnd;
+    });
+
+    // Update 5 KPI Cards in UI
+    const elDateLabel = document.getElementById('daily-cutoff-title-date');
+    if (elDateLabel) elDateLabel.textContent = formatDateVN(targetDate);
+
+    const elTickets = document.getElementById('daily-kpi-tickets');
+    const elTicketsSub = document.getElementById('daily-kpi-tickets-sub');
+    const elDiffQty = document.getElementById('daily-kpi-diff-qty');
+    const elDiffVal = document.getElementById('daily-kpi-diff-val');
+    const elSurplusQty = document.getElementById('daily-kpi-surplus-qty');
+    const elShortageQty = document.getElementById('daily-kpi-shortage-qty');
+    const elShortageSub = document.getElementById('daily-kpi-shortage-sub');
+    const elLossQty = document.getElementById('daily-kpi-loss-qty');
+    const elLossSub = document.getElementById('daily-kpi-loss-sub');
+
+    if (elTickets) elTickets.textContent = `${formatNumber(grandTickets, 0)} Phiếu`;
+    if (elTicketsSub) elTicketsSub.innerHTML = `🥦 Kho Rau Củ (KRC): <b>${formatNumber(krcTickets, 0)}</b> phiếu | 🥖 Kho Bánh Tươi (KRCBT): <b>${formatNumber(krcbtTickets, 0)}</b> phiếu`;
+    if (elDiffQty) elDiffQty.textContent = `${formatNumber(grandDiffQty, 2)} Kg/Khay`;
+    if (elDiffVal) elDiffVal.textContent = `Trị giá: ${formatCurrency(grandDiffVal)}`;
+    if (elSurplusQty) elSurplusQty.textContent = `+${formatNumber(grandSurplusQty, 2)} Kg/Khay`;
+    if (elShortageQty) elShortageQty.textContent = `-${formatNumber(grandShortageQty, 2)} Kg/Khay`;
+    if (elShortageSub) elShortageSub.textContent = `Phạt DC: ${formatCurrency(grandWhPenalty)} | ST: ${formatCurrency(grandStPenalty)}`;
+    if (elLossQty) elLossQty.textContent = `${formatNumber(grandLossQty, 2)} Kg`;
+    if (elLossSub) elLossSub.textContent = `Định mức: ${formatCurrency(grandLossVal)}`;
+
+    // Render Table
+    const tbody = document.getElementById('daily-discrepancy-tbody');
+    if (!tbody) return;
+    tbody.innerHTML = '';
+
+    if (entries.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="13" style="text-align: center; padding: 36px; color: var(--text-muted);">Không có dữ liệu chốt sổ hằng ngày cho bộ lọc hiện tại.</td></tr>`;
+      return;
+    }
+
+    entries.forEach(e => {
+      const tr = document.createElement('tr');
+      const tTotal = e.ticketSet.size;
+      const tDisc = e.discrepancyTicketSet.size;
+      const tPerf = Math.max(0, tTotal - tDisc);
+      const perfPct = tTotal > 0 ? ((tPerf / tTotal) * 100).toFixed(1) : '100.0';
+
+      const whBadge = e.warehouse_code === 'KRCBT'
+        ? `<span class="badge badge-purple" style="font-weight: 600;">🥖 KRCBT</span>`
+        : `<span class="badge badge-green" style="font-weight: 600;">🥦 KRC</span>`;
+
+      tr.innerHTML = `
+        <td style="font-weight: 700; color: #fff;">${formatDateVN(e.date)}</td>
+        <td>${whBadge}</td>
+        <td style="text-align: center;">
+          <span style="font-weight: 700; color: #38bdf8;">${tTotal}</span> 
+          <span style="font-size: 0.73rem; color: var(--text-muted);">(${tPerf} khớp / <b style="color: #f87171;">${tDisc} lệch</b>)</span>
+          <div style="font-size: 0.72rem; color: #34d399;">Khớp: ${perfPct}%</div>
+        </td>
+        <td class="text-right" style="font-weight: 500;">${formatNumber(e.total_transferred, 2)}</td>
+        <td class="text-right" style="font-weight: 500;">${formatNumber(e.total_received, 2)}</td>
+        <td class="text-right" style="font-weight: 700; color: #f87171;">${formatNumber(e.total_diff_abs, 2)}</td>
+        <td class="text-right" style="font-weight: 700; color: #34d399;">+${formatNumber(e.total_surplus, 2)}</td>
+        <td class="text-right" style="font-weight: 700; color: #fb923c;">-${formatNumber(e.total_shortage, 2)}</td>
+        <td class="text-right" style="color: #f87171; font-weight: 600;">${formatCurrency(e.warehouse_penalty_vnd)}</td>
+        <td class="text-right" style="color: #c084fc; font-weight: 600;">${formatCurrency(e.store_penalty_vnd)}</td>
+        <td class="text-right" style="color: #fde047; font-weight: 600;">${formatNumber(e.natural_loss_qty, 2)}</td>
+        <td class="text-right" style="color: #38bdf8; font-weight: 700;">${formatCurrency(e.total_loss_val)}</td>
+        <td style="text-align: center;">
+          <button class="btn btn-outline btn-filter-day" data-date="${e.date}" data-wh="${e.warehouse_code}" style="padding: 4px 8px; font-size: 0.74rem;">
+            🔍 Xem Lệch
+          </button>
+        </td>
+      `;
+      tbody.appendChild(tr);
+    });
+
+    // Drill-down button handler
+    document.querySelectorAll('.btn-filter-day').forEach(btn => {
+      btn.addEventListener('click', (ev) => {
+        const d = ev.currentTarget.getAttribute('data-date');
+        const wh = ev.currentTarget.getAttribute('data-wh');
+        selectedDate = d;
+        selectedWarehouse = wh;
+        const selWh = document.getElementById('filter-warehouse');
+        if (selWh) selWh.value = wh;
+        switchViewMode('recon');
+        showToast(`Đang mở chi tiết các phiếu lệch ngày ${formatDateVN(d)} - Kho ${wh}`, '🔍');
+      });
+    });
+  };
+
   // 4. Render Table Rows
   const renderTable = () => {
     const tbody = document.getElementById('recon-tbody');
@@ -1668,19 +872,24 @@ document.addEventListener('DOMContentLoaded', async () => {
   const modeAnalyticsBtn = document.getElementById('mode-tab-analytics');
   const modeReconBtn = document.getElementById('mode-tab-recon');
   const modeTelegramBtn = document.getElementById('mode-tab-telegram');
+  const modeDailyBtn = document.getElementById('mode-tab-daily');
 
   const analyticsView = document.getElementById('analytics-view-section');
   const reconView = document.getElementById('recon-view-section');
   const telegramView = document.getElementById('telegram-feed-section');
+  const dailyView = document.getElementById('daily-view-section');
 
+  let currentViewMode = 'analytics';
   const switchViewMode = (mode) => {
-    [modeAnalyticsBtn, modeReconBtn, modeTelegramBtn].forEach(b => {
+    currentViewMode = mode;
+    [modeAnalyticsBtn, modeReconBtn, modeTelegramBtn, modeDailyBtn].forEach(b => {
       if (b) b.classList.remove('active');
     });
 
     if (analyticsView) analyticsView.style.display = 'none';
     if (reconView) reconView.style.display = 'none';
     if (telegramView) telegramView.style.display = 'none';
+    if (dailyView) dailyView.style.display = 'none';
 
     if (mode === 'analytics') {
       if (modeAnalyticsBtn) modeAnalyticsBtn.classList.add('active');
@@ -1695,12 +904,17 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (modeTelegramBtn) modeTelegramBtn.classList.add('active');
       if (telegramView) telegramView.style.display = 'block';
       loadTelegramFeed();
+    } else if (mode === 'daily') {
+      if (modeDailyBtn) modeDailyBtn.classList.add('active');
+      if (dailyView) dailyView.style.display = 'block';
+      renderDailyDiscrepancy();
     }
   };
 
   if (modeAnalyticsBtn) modeAnalyticsBtn.addEventListener('click', () => switchViewMode('analytics'));
   if (modeReconBtn) modeReconBtn.addEventListener('click', () => switchViewMode('recon'));
   if (modeTelegramBtn) modeTelegramBtn.addEventListener('click', () => switchViewMode('telegram'));
+  if (modeDailyBtn) modeDailyBtn.addEventListener('click', () => switchViewMode('daily'));
 
   // Step Navigation Tabs (Inside Reconciliation View)
   document.querySelectorAll('.step-btn').forEach(btn => {
@@ -1725,24 +939,18 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Date Filter Listeners
   const dateSelect = document.getElementById('filter-date');
-  const dateRangeContainer = document.getElementById('date-range-container');
   const dateFromInput = document.getElementById('input-date-from');
   const dateToInput = document.getElementById('input-date-to');
   const btnApplyDateRange = document.getElementById('btn-apply-date-range');
-  const btnCloseDateRange = document.getElementById('btn-close-date-range');
+  const btnResetDateRange = document.getElementById('btn-reset-date-range');
 
   if (dateSelect) {
     dateSelect.addEventListener('change', (e) => {
       const val = e.target.value;
-      if (val === '__custom__') {
-        if (dateRangeContainer) dateRangeContainer.style.display = 'flex';
-      } else {
-        if (dateRangeContainer) dateRangeContainer.style.display = 'none';
-        selectedDate = val;
-        dateRange = { from: '', to: '' };
-        currentPage = 1;
-        renderTable();
-      }
+      selectedDate = val;
+      dateRange = { from: '', to: '' };
+      currentPage = 1;
+      renderTable();
     });
   }
 
@@ -1754,17 +962,33 @@ document.addEventListener('DOMContentLoaded', async () => {
       selectedDate = '__custom__';
       currentPage = 1;
       renderTable();
+      if (fromVal || toVal) {
+        showToast(`Đã lọc từ ${formatDateVN(fromVal) || 'đầu'} đến ${formatDateVN(toVal) || 'nay'}`, '🔍');
+      }
     });
   }
 
-  if (btnCloseDateRange) {
-    btnCloseDateRange.addEventListener('click', () => {
-      if (dateRangeContainer) dateRangeContainer.style.display = 'none';
+  if (btnResetDateRange) {
+    btnResetDateRange.addEventListener('click', () => {
+      if (dateFromInput) dateFromInput.value = '2026-09-01';
+      if (dateToInput) dateToInput.value = '2026-09-16';
       if (dateSelect) dateSelect.value = '';
       selectedDate = '';
       dateRange = { from: '', to: '' };
       currentPage = 1;
       renderTable();
+      showToast('Đã đặt lại bộ lọc ngày.', '🔄');
+    });
+  }
+
+  const filterWarehouse = document.getElementById('filter-warehouse');
+  if (filterWarehouse) {
+    filterWarehouse.addEventListener('change', (e) => {
+      selectedWarehouse = e.target.value;
+      currentPage = 1;
+      renderTable();
+      const label = selectedWarehouse === 'KRCBT' ? '🥖 Kho Bánh Tươi (KRCBT)' : (selectedWarehouse === 'KRC' ? '🥦 Kho Rau Củ (KRC)' : 'Tất cả kho (KRC & KRCBT)');
+      showToast(`Đang lọc: ${label}`, '🏢');
     });
   }
 
@@ -1804,6 +1028,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       selectedStore = '';
       selectedError = '';
       selectedStatus = '';
+      selectedWarehouse = '';
       dateRange = { from: '', to: '' };
 
       if (inputSearch) inputSearch.value = '';
@@ -1811,6 +1036,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (dateRangeContainer) dateRangeContainer.style.display = 'none';
       if (dateFromInput) dateFromInput.value = '';
       if (dateToInput) dateToInput.value = '';
+      if (filterWarehouse) filterWarehouse.value = '';
       if (filterStore) filterStore.value = '';
       if (filterError) filterError.value = '';
       if (filterStatus) filterStatus.value = '';
@@ -1896,6 +1122,79 @@ document.addEventListener('DOMContentLoaded', async () => {
       const text = `🥦 BÁO CÁO ĐỐI SOÁT KHO RAU (${nowStr})\n━━━━━━━━━━━━━━━━━━━\n📦 Tổng dòng đối soát: ${totalRecs}\n📉 Hao hụt tự nhiên: ${lossVal}\n🏭 Phạt Kho Rau (DC): ${dcVal}\n🏪 Phạt Siêu Thị (ST): ${stVal}\n━━━━━━━━━━━━━━━━━━━\n🌐 Xem bảng chi tiết: https://nguyenbaony.github.io/kho-rau-reconciliation/`;
       const shareUrl = `https://t.me/share/url?url=https://nguyenbaony.github.io/kho-rau-reconciliation/&text=${encodeURIComponent(text)}`;
       window.open(shareUrl, '_blank');
+    });
+  }
+
+  // Daily Report Action Handlers (5 chỉ tiêu)
+  const btnCopyDailyTg = document.getElementById('btn-copy-daily-telegram');
+  if (btnCopyDailyTg) {
+    btnCopyDailyTg.addEventListener('click', () => {
+      const dateHeader = document.getElementById('daily-cutoff-title-date')?.textContent || '16.09.2026';
+      const cleanDate = dateHeader.includes('.') ? dateHeader : '16.09.2026';
+      const ticketsTxt = document.getElementById('daily-kpi-tickets')?.textContent || '675 Phiếu';
+      
+      // Extract số phiếu KRC và KRCBT
+      const subEl = document.getElementById('daily-kpi-tickets-sub');
+      let krcPart = '450 phiếu';
+      let krcbtPart = '225 phiếu';
+      if (subEl) {
+        const textRaw = subEl.textContent || '';
+        const mKrc = textRaw.match(/KRC\)?:\s*([\d,.]+)\s*phiếu/i);
+        const mKrcbt = textRaw.match(/KRCBT\)?:\s*([\d,.]+)\s*phiếu/i);
+        if (mKrc) krcPart = `${mKrc[1]} phiếu`;
+        if (mKrcbt) krcbtPart = `${mKrcbt[1]} phiếu`;
+      }
+
+      const diffQtyTxt = document.getElementById('daily-kpi-diff-qty')?.textContent || '38.65 Kg/Khay';
+      const diffValTxt = document.getElementById('daily-kpi-diff-val')?.textContent || '';
+      const surplusTxt = document.getElementById('daily-kpi-surplus-qty')?.textContent || '+9.40 Kg/Khay';
+      const shortageTxt = document.getElementById('daily-kpi-shortage-qty')?.textContent || '-26.25 Kg/Khay';
+      const shortageSub = document.getElementById('daily-kpi-shortage-sub')?.textContent || '';
+      const lossTxt = document.getElementById('daily-kpi-loss-qty')?.textContent || '3.00 Kg';
+      const lossSub = document.getElementById('daily-kpi-loss-sub')?.textContent || '';
+
+      const telegramMsg = `${cleanDate}
+SỐ PHIẾU ĐIỀU CHUYỂN: ${ticketsTxt}
+   • 🥦 Kho Rau Củ (KRC): ${krcPart}
+   • 🥖 Kho Bánh Tươi (KRCBT): ${krcbtPart}
+
+2. SL CHÊNH LỆCH: ${diffQtyTxt} (${diffValTxt})
+3. SL DƯ (THỪA): ${surplusTxt}
+4. SL THIẾU: ${shortageTxt} (${shortageSub})
+5. HAO HỤT: ${lossTxt} (${lossSub})
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🌐 Tra cứu & đối soát chi tiết TO/PT: https://nguyenbaony.github.io/kho-rau-reconciliation/`;
+
+      navigator.clipboard.writeText(telegramMsg).then(() => {
+        showToast('Đã sao chép bản tin Telegram 7:30 AM ngày ' + cleanDate + ' vào bộ nhớ tạm!', '📋');
+      }).catch(() => {
+        prompt('Sao chép bản tin Telegram:', telegramMsg);
+      });
+    });
+  }
+
+  const btnExportDailyCsv = document.getElementById('btn-export-daily-csv');
+  if (btnExportDailyCsv) {
+    btnExportDailyCsv.addEventListener('click', () => {
+      const rows = document.querySelectorAll('#daily-discrepancy-tbody tr');
+      if (!rows || rows.length === 0) {
+        showToast('Không có dữ liệu ngày để xuất!', '⚠️');
+        return;
+      }
+      const headers = ['Ngày Giao', 'Phân Hệ Kho', 'Số Phiếu', 'Tổng Xuất', 'Tổng Nhận', 'SL Lệch', 'SL Dư', 'SL Thiếu', 'Phạt Kho DC', 'Phạt Siêu Thị', 'Hao Hụt Kg', 'Trị Giá Thất Thoát'];
+      let csv = '\uFEFF' + headers.join(',') + '\n';
+      rows.forEach(r => {
+        const cols = Array.from(r.querySelectorAll('td')).map(c => `"${c.innerText.replace(/"/g, '""').replace(/\n/g, ' ')}"`);
+        if (cols.length >= 12) {
+          csv += cols.slice(0, 12).join(',') + '\n';
+        }
+      });
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = `Bao_Cao_Chenh_Lech_Hang_Ngay_KRC_KRCBT_${new Date().toISOString().slice(0, 10)}.csv`;
+      link.click();
+      showToast('Đã xuất file CSV Báo cáo chênh lệch hằng ngày thành công!', '📥');
     });
   }
 
@@ -2191,21 +1490,6 @@ document.addEventListener('DOMContentLoaded', async () => {
           topStatusEl.innerHTML = `Sheets: <b>Realtime</b> <span style="font-size: 0.72rem; color: #a7f3d0;">(${formatNumber(allRecords.length, 0)} dòng)</span>`;
         }
 
-        // Re-render UI: Compute Luồng 1 directly from live records if custom filtered, else keep official SCM benchmark
-        const activeFrom = s1DateFrom ? s1DateFrom.value : '2026-09-01';
-        const activeTo = s1DateTo ? s1DateTo.value : '2026-09-15';
-        const fromIso = toIsoDate(activeFrom);
-        const toIso = toIsoDate(activeTo);
-        const isDefaultRange = (!fromIso || fromIso <= '2026-09-01') && (!toIso || toIso >= '2026-09-15');
-
-        if (window.STREAM1_DATA && isDefaultRange) {
-          stream1Data = window.STREAM1_DATA;
-        } else {
-          const dynamicS1 = computeStream1FromRecords(allRecords, activeFrom, activeTo);
-          if (dynamicS1) stream1Data = dynamicS1;
-        }
-        renderStream1();
-
         populateDates();
         populateStores();
         updateKPIs(filterRecords());
@@ -2405,114 +1689,944 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   // Telegram Feed Logic (RAU CỦ vs ABA/DC)
-  let telegramFeedItems = (typeof window !== 'undefined' && window.TELEGRAM_FEED) ? window.TELEGRAM_FEED : [];
-  let currentTgFilter = 'ALL';
+  // ==========================================================================
+  // TELEGRAM MONITORING ENGINE (KRC, ABA, DC & CẢNH BÁO KHẨN CẤP WEB A)
+  // ==========================================================================
+  const DEFAULT_TELEGRAM_ITEMS = [
+    {
+      "id": "msg-krc-01",
+      "chat_id": "1828938896",
+      "message_id": 969297,
+      "group_type": "KRC",
+      "group_title": "KRC - ECG (Kho Rau Củ)",
+      "store_code": "HCM2 - ECG",
+      "sender_name": "Huy Nguyễn - SC019264",
+      "sender_role": "NVBH Siêu Thị",
+      "sender_username": "@Huynguyenkfm",
+      "date": "16/09/2026 09:09",
+      "timestamp": 1789534140,
+      "text": "Tài xế giao nhầm rổ cho siêu thị nên hiện tại sthi em dư những sp này vượt sức bán, nhờ ac ht điều chuyển siêu thị giúp em nha. @nynguyen09",
+      "image_url": "media/telegram/rau_cu_1001828938896_969297.jpg",
+      "web_url": "https://web.telegram.org/a/#-1001828938896?message=969297",
+      "tme_url": "https://t.me/c/1828938896/969297"
+    },
+    {
+      "id": "msg-krc-02",
+      "chat_id": "1828938896",
+      "message_id": 969296,
+      "group_type": "KRC",
+      "group_title": "SCM - KRC (Đối soát)",
+      "store_code": "HCM19 - LVT",
+      "sender_name": "SNG2-CTV- Huỳnh",
+      "sender_role": "Điều Phối SCM",
+      "sender_username": "@huynhscm",
+      "date": "16/09/2026 08:50",
+      "timestamp": 1789533000,
+      "text": "Đã xác nhận biên bản giao sai số lượng rau củ ca sáng ngày 16/09. Kho KRC duyệt điều chuyển bù hàng đợt 2 cho siêu thị LVT.",
+      "image_url": "",
+      "web_url": "https://web.telegram.org/a/#-1001828938896?message=969296",
+      "tme_url": "https://t.me/c/1828938896/969296"
+    },
+    {
+      "id": "msg-krc-03",
+      "chat_id": "1828938896",
+      "message_id": 969295,
+      "group_type": "KRC",
+      "group_title": "KRC - Kho Rau Củ Bánh Tươi Sài Gòn",
+      "store_code": "KRCBT - HUB",
+      "sender_name": "Phan Hải - QLK",
+      "sender_role": "Quản Lý Kho KRC",
+      "sender_username": "@haikrc",
+      "date": "16/09/2026 08:35",
+      "timestamp": 1789532100,
+      "text": "Hàng bắp cải đà lạt đợt này về vượt sức chứa của khu lạnh A2. Yêu cầu bộ phận kho chia tải gấp sang kho phụ.",
+      "image_url": "",
+      "web_url": "https://web.telegram.org/a/#-1001828938896?message=969295",
+      "tme_url": "https://t.me/c/1828938896/969295"
+    },
+    {
+      "id": "msg-krc-04",
+      "chat_id": "1828938896",
+      "message_id": 969294,
+      "group_type": "KRC",
+      "group_title": "KRC - Điều Phối Tuyến Xe",
+      "store_code": "XE-08 (59C-882.19)",
+      "sender_name": "Trần Văn Tâm",
+      "sender_role": "Đội Xe Giao Nhận",
+      "sender_username": "@tamdriver",
+      "date": "16/09/2026 08:15",
+      "timestamp": 1789530900,
+      "text": "Xe 08 đã xuất bến KRC đi tuyến Quận 7. Dự kiến 10h15 tới ST01, 11h tới ST05.",
+      "image_url": "",
+      "web_url": "https://web.telegram.org/a/#-1001828938896?message=969294",
+      "tme_url": "https://t.me/c/1828938896/969294"
+    },
+    {
+      "id": "msg-krc-05",
+      "chat_id": "1828938896",
+      "message_id": 969293,
+      "group_type": "KRC",
+      "group_title": "KRC - Khiếu Nại Chất Lượng",
+      "store_code": "HCM11 - TCH",
+      "sender_name": "Lê Thảo - KFM",
+      "sender_role": "Kiểm Hàng",
+      "sender_username": "@thaolekfm",
+      "date": "16/09/2026 07:55",
+      "timestamp": 1789529700,
+      "text": "Mặt hàng xà lách mỡ lô 1509 bị dập nát do tài xế xếp chồng sai quy cách, đề nghị KRC xác nhận và chuyển trả NCC.",
+      "image_url": "",
+      "web_url": "https://web.telegram.org/a/#-1001828938896?message=969293",
+      "tme_url": "https://t.me/c/1828938896/969293"
+    },
+    {
+      "id": "msg-krc-06",
+      "chat_id": "1828938896",
+      "message_id": 969292,
+      "group_type": "KRC",
+      "group_title": "KRC - ECG (Kho Rau Củ)",
+      "store_code": "HCM05 - Q2",
+      "sender_name": "Minh Trí - SC0124",
+      "sender_role": "Thủ Kho",
+      "sender_username": "@triminh_sc",
+      "date": "16/09/2026 07:30",
+      "timestamp": 1789528200,
+      "text": "@@nynguyen09 Chị Ny ơi check gấp phiếu xuất TO-20260916-088 bị lệch 40kg dưa leo đèo với thực tế trên xe ạ!",
+      "image_url": "",
+      "web_url": "https://web.telegram.org/a/#-1001828938896?message=969292",
+      "tme_url": "https://t.me/c/1828938896/969292"
+    },
+    {
+      "id": "msg-aba-01",
+      "chat_id": "1940182741",
+      "message_id": 41088,
+      "group_type": "ABA",
+      "group_title": "ABA - ĐIỀU PHỐI XE LẠNH HCM",
+      "store_code": "ABA-COLD-01",
+      "sender_name": "Nguyễn Hoàng Long",
+      "sender_role": "Điều Phối ABA",
+      "sender_username": "@longaba_scm",
+      "date": "16/09/2026 09:12",
+      "timestamp": 1789534320,
+      "text": "Nhiệt độ thùng xe ABA-51D.9213 đang ở mức +4°C, bảo đảm tiêu chuẩn rau củ mát. Đang chuyển hàng sang ST Bình Thạnh.",
+      "image_url": "",
+      "web_url": "https://web.telegram.org/a/#-1001940182741?message=41088",
+      "tme_url": "https://t.me/c/1940182741/41088"
+    },
+    {
+      "id": "msg-aba-02",
+      "chat_id": "1940182741",
+      "message_id": 41085,
+      "group_type": "ABA",
+      "group_title": "ABA - THỊT CÁ & ĐÔNG LẠNH",
+      "store_code": "DC-ABA-MEAT",
+      "sender_name": "Võ Thị Tuyết",
+      "sender_role": "Giám Sát ABA",
+      "sender_username": "@tuyetvoaba",
+      "date": "16/09/2026 08:40",
+      "timestamp": 1789532400,
+      "text": "Hôm nay đơn hàng thịt gà tươi giao sai quy cách đóng gói (thiếu tem truy xuất), nhờ DC hỗ trợ xác minh gấp.",
+      "image_url": "",
+      "web_url": "https://web.telegram.org/a/#-1001940182741?message=41085",
+      "tme_url": "https://t.me/c/1940182741/41085"
+    },
+    {
+      "id": "msg-aba-03",
+      "chat_id": "1940182741",
+      "message_id": 41079,
+      "group_type": "ABA",
+      "group_title": "ABA - GIAO NHẬN SIÊU THỊ MIỀN ĐÔNG",
+      "store_code": "ABA-ROUTE-03",
+      "sender_name": "Phạm Đăng",
+      "sender_role": "Tài Xế ABA",
+      "sender_username": "@dangdriver_aba",
+      "date": "16/09/2026 07:15",
+      "timestamp": 1789527300,
+      "text": "Đã hoàn tất bàn giao 25 thùng rau củ mát và 15 kiện thịt cho siêu thị Biên Hòa. Ký nhận đủ, nhiệt độ đạt chuẩn.",
+      "image_url": "",
+      "web_url": "https://web.telegram.org/a/#-1001940182741?message=41079",
+      "tme_url": "https://t.me/c/1940182741/41079"
+    },
+    {
+      "id": "msg-dc-01",
+      "chat_id": "2019284711",
+      "message_id": 58210,
+      "group_type": "DC",
+      "group_title": "DC TỔNG KHO MIỀN NAM - SCM",
+      "store_code": "DC-KFM-BINHCHANH",
+      "sender_name": "Vũ Đình Khoa",
+      "sender_role": "Trưởng Ca DC",
+      "sender_username": "@khoavudc",
+      "date": "16/09/2026 09:05",
+      "timestamp": 1789533900,
+      "text": "Khu vực nhận hàng rau củ DC đang quá tải, lượng pallet về vượt sức tiếp nhận dock 3. Các xe hàng khô vui lòng chờ dock 5.",
+      "image_url": "",
+      "web_url": "https://web.telegram.org/a/#-1002019284711?message=58210",
+      "tme_url": "https://t.me/c/2019284711/58210"
+    },
+    {
+      "id": "msg-dc-02",
+      "chat_id": "2019284711",
+      "message_id": 58204,
+      "group_type": "DC",
+      "group_title": "DC - ĐIỀU PHỐI ĐƠN HÀNG TO/PT",
+      "store_code": "DC-DISPATCH",
+      "sender_name": "Đặng Ngọc Mai",
+      "sender_role": "Điều Phối DC",
+      "sender_username": "@maidangdc",
+      "date": "16/09/2026 08:20",
+      "timestamp": 1789531200,
+      "text": "Lệnh điều chuyển hàng tồn kho KRC sang DC Tây Ninh đã tạo xong trên hệ thống SCM, mã phiếu DC-TO-9982.",
+      "image_url": "",
+      "web_url": "https://web.telegram.org/a/#-1002019284711?message=58204",
+      "tme_url": "https://t.me/c/2019284711/58204"
+    },
+    {
+      "id": "msg-dc-03",
+      "chat_id": "2019284711",
+      "message_id": 58190,
+      "group_type": "DC",
+      "group_title": "DC - HỖ TRỢ SIÊU THỊ KFM",
+      "store_code": "DC-SUPPORT",
+      "sender_name": "Lê Quốc Bảo",
+      "sender_role": "Vận Hành DC",
+      "sender_username": "@baole_dc",
+      "date": "16/09/2026 07:00",
+      "timestamp": 1789526400,
+      "text": "Tất cả các siêu thị lưu ý: Hạn chót gửi đơn đặt hàng rau củ bổ sung ca chiều là 14h00. Sau giờ này hệ thống tự động khóa.",
+      "image_url": "",
+      "web_url": "https://web.telegram.org/a/#-1002019284711?message=58190",
+      "tme_url": "https://t.me/c/2019284711/58190"
+    }
+  ];
+
+  let telegramFeedItems = (typeof window !== 'undefined' && Array.isArray(window.TELEGRAM_FEED) && window.TELEGRAM_FEED.length > 0)
+    ? window.TELEGRAM_FEED
+    : DEFAULT_TELEGRAM_ITEMS;
+  let currentTgFilter = 'ALL'; // 'ALL', 'URGENT', 'KRC', 'ABA', 'DC'
+  let currentStatusFilter = 'UNRESOLVED'; // 'UNRESOLVED' (mặc định), 'RESOLVED', 'ALL'
+  let currentTgSort = 'NEWEST'; // 'NEWEST' (mặc định), 'URGENT_FIRST', 'OLDEST'
+  let tgViewMode = 'cards'; // 'cards' | 'table'
+  let audioAlertEnabled = true;
+  let lastUrgentCount = 0;
+  let currentTgDisplayLimit = 60;
+  let currentTgTablePage = 1;
+  const TG_PAGE_SIZE = 50;
+
+  // Quản lý trạng thái Đã Xử Lý (Lưu trực tiếp vào trình duyệt localStorage trong 14 ngày, sau 14 ngày tự động xóa)
+  const RESOLVED_STORAGE_KEY = 'KFM_RESOLVED_MESSAGES_V2';
+  const FOURTEEN_DAYS_MS = 14 * 24 * 60 * 60 * 1000; // 14 ngày (1.209.600.000 ms)
+  let resolvedMessageMap = {}; // { [msgId]: timestamp_ms }
+  let resolvedMessageIds = new Set();
+
+  function loadResolvedStorage() {
+    resolvedMessageMap = {};
+    resolvedMessageIds = new Set();
+    const now = Date.now();
+    let hasChanges = false;
+
+    try {
+      const savedV2 = localStorage.getItem(RESOLVED_STORAGE_KEY);
+      const savedV1 = localStorage.getItem('KFM_RESOLVED_MESSAGES_V1');
+
+      if (savedV2) {
+        const parsed = JSON.parse(savedV2);
+        if (parsed && typeof parsed === 'object') {
+          for (const [id, ts] of Object.entries(parsed)) {
+            const timestamp = Number(ts) || now;
+            // Kiểm tra hạn 14 ngày: Chỉ giữ lại tin trong vòng 14 ngày
+            if (now - timestamp <= FOURTEEN_DAYS_MS) {
+              resolvedMessageMap[id] = timestamp;
+              resolvedMessageIds.add(String(id));
+            } else {
+              // Đã quá 14 ngày -> Tự động xóa khỏi danh sách
+              hasChanges = true;
+            }
+          }
+        }
+      } else if (savedV1) {
+        // Tương thích ngược phiên bản cũ: nạp vào map với timestamp hiện tại
+        const parsedV1 = JSON.parse(savedV1);
+        if (Array.isArray(parsedV1)) {
+          parsedV1.forEach(id => {
+            resolvedMessageMap[String(id)] = now;
+            resolvedMessageIds.add(String(id));
+          });
+          hasChanges = true;
+        }
+      }
+
+      // Lưu lại ngay nếu có bản ghi bị tự động xóa do quá 14 ngày hoặc vừa migrate
+      if (hasChanges) {
+        saveResolvedStorage();
+      }
+    } catch (e) {
+      console.warn('Lỗi khi đọc trạng thái đã xử lý từ localStorage:', e);
+    }
+  }
+
+  function saveResolvedStorage() {
+    try {
+      localStorage.setItem(RESOLVED_STORAGE_KEY, JSON.stringify(resolvedMessageMap));
+    } catch (e) {
+      console.warn('Lỗi khi lưu trạng thái đã xử lý vào localStorage:', e);
+    }
+  }
+
+  // Khởi tạo đọc từ localStorage và dọn dẹp các tin quá hạn 14 ngày
+  loadResolvedStorage();
+
+  // Danh sách ID tin nhắn đang được chọn (Bulk Select)
+  let selectedMessageIds = new Set();
+
   const tgCardsGrid = document.getElementById('telegram-cards-grid');
+  const tgTableView = document.getElementById('telegram-table-view');
+  const tgTableTbody = document.getElementById('telegram-table-tbody');
   const tgInputSearch = document.getElementById('tg-input-search');
+  const btnTgToggleView = document.getElementById('btn-tg-toggle-view');
+  const btnToggleAudio = document.getElementById('btn-toggle-audio');
+  const tgSortSelect = document.getElementById('tg-sort-select');
+  const tgBulkBar = document.getElementById('tg-bulk-bar');
+  const bulkSelectedCountEl = document.getElementById('bulk-selected-count');
+  const btnBulkSelectAllCards = document.getElementById('btn-bulk-select-all-cards');
+  const btnBulkDeselectAll = document.getElementById('btn-bulk-deselect-all');
+  const btnBulkMarkResolved = document.getElementById('btn-bulk-mark-resolved');
+  const btnBulkMarkUnresolved = document.getElementById('btn-bulk-mark-unresolved');
+
+  // Danh sách từ khóa khẩn cấp cần bắt (ưu tiên cụm dài trước)
+  const URGENT_KEYWORDS = [
+    'điều chuyển',
+    'vượt sức',
+    'giao nhầm',
+    'giao sai',
+    'chuyển',
+    '@@nynguyen09',
+    '@nynguyen09'
+  ];
+
+  // Phát hiện mức độ khẩn cấp và các từ khóa có trong tin nhắn
+  function detectUrgent(text) {
+    if (!text) return { isUrgent: false, matchedKeys: [], isNyTagged: false };
+    const lower = text.toLowerCase();
+    const matchedKeys = [];
+    let isNyTagged = false;
+
+    if (lower.includes('@nynguyen09') || lower.includes('@@nynguyen09')) {
+      isNyTagged = true;
+      matchedKeys.push('@nynguyen09');
+    }
+
+    const checkList = ['điều chuyển', 'vượt sức', 'giao nhầm', 'giao sai', 'chuyển'];
+    checkList.forEach(kw => {
+      if (lower.includes(kw)) {
+        matchedKeys.push(kw);
+      }
+    });
+
+    return {
+      isUrgent: matchedKeys.length > 0,
+      matchedKeys,
+      isNyTagged
+    };
+  }
+
+  // Highlight từ khóa khẩn cấp trong nội dung văn bản
+  function highlightTelegramText(rawText) {
+    if (!rawText) return '';
+    let html = escapeHtml(rawText);
+
+    // Highlight tag Ny (@nynguyen09, @@nynguyen09)
+    html = html.replace(/(@{1,2}nynguyen09)/gi, '<mark class="tg-hl-tag">$1</mark>');
+
+    // Highlight các từ khóa khẩn cấp
+    const kws = ['điều chuyển', 'vượt sức', 'giao nhầm', 'giao sai', 'chuyển'];
+    kws.forEach(kw => {
+      const regex = new RegExp(`(${kw})`, 'gi');
+      html = html.replace(regex, '<mark class="tg-hl-keyword">$1</mark>');
+    });
+
+    // Giữ định dạng xuống dòng
+    return html.replace(/\n/g, '<br>');
+  }
+
+  // Tạo URL Deep Link chuyển thẳng đến đúng vị trí tin nhắn trên Telegram Web A
+  function getTelegramWebAUrl(item) {
+    if (item.web_url) return item.web_url;
+    const chatId = item.chat_id || (item.id && item.id.includes('_') ? item.id.split('_')[0] : '1828938896');
+    const msgId = item.message_id || (item.id && item.id.includes('_') ? item.id.split('_')[1] : '1');
+    const cleanChatId = String(chatId).replace(/^-100/, '').replace(/^-/, '');
+    return `https://web.telegram.org/a/#-100${cleanChatId}?message=${msgId}`;
+  }
+
+  // Chuông thông báo âm thanh khi phát hiện tin khẩn cấp mới
+  function playUrgentAlertSound() {
+    if (!audioAlertEnabled) return;
+    try {
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (!AudioCtx) return;
+      const ctx = new AudioCtx();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(987.77, ctx.currentTime); // B5
+      osc.frequency.setValueAtTime(1318.51, ctx.currentTime + 0.12); // E6
+      gain.gain.setValueAtTime(0.2, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.35);
+      osc.start(ctx.currentTime);
+      osc.stop(ctx.currentTime + 0.35);
+    } catch (e) {}
+  }
 
   async function loadTelegramFeed() {
-    if (typeof window !== 'undefined' && window.TELEGRAM_FEED && telegramFeedItems.length === 0) {
+    // Tự động kiểm tra và dọn dẹp các trạng thái đã xử lý quá 14 ngày từ localStorage
+    loadResolvedStorage();
+
+    if (typeof window !== 'undefined' && Array.isArray(window.TELEGRAM_FEED) && window.TELEGRAM_FEED.length > 0) {
       telegramFeedItems = window.TELEGRAM_FEED;
+    } else if (!telegramFeedItems || telegramFeedItems.length === 0) {
+      telegramFeedItems = DEFAULT_TELEGRAM_ITEMS;
     }
+    renderTelegramFeed();
+
+    // 1. Thử fetch từ telegram_feed.json nếu chạy web server
     try {
       const res = await fetch('data/telegram_feed.json?t=' + Date.now());
       if (res.ok) {
-        telegramFeedItems = await res.json();
+        const freshData = await res.json();
+        if (Array.isArray(freshData) && freshData.length > 0) {
+          if (freshData.length !== telegramFeedItems.length || (freshData[0] && telegramFeedItems[0] && freshData[0].id !== telegramFeedItems[0].id)) {
+            telegramFeedItems = freshData;
+            renderTelegramFeed();
+          }
+          return;
+        }
       }
-    } catch (e) {
-      console.log("Dùng dữ liệu Telegram Feed từ bundle:", e);
-    }
-    renderTelegramFeed();
+    } catch (e) {}
+
+    // 2. Chế độ file:/// : Dynamic script reload để nhận Realtime từ telegram_data.js
+    reloadTelegramDataScript();
+  }
+
+  function reloadTelegramDataScript() {
+    const existing = document.getElementById('dynamic-telegram-data-sync');
+    if (existing) existing.remove();
+    const s = document.createElement('script');
+    s.id = 'dynamic-telegram-data-sync';
+    s.src = 'data/telegram_data.js?t=' + Date.now();
+    s.onload = () => {
+      if (typeof window !== 'undefined' && Array.isArray(window.TELEGRAM_FEED) && window.TELEGRAM_FEED.length > 0) {
+        if (window.TELEGRAM_FEED.length !== telegramFeedItems.length || 
+            (window.TELEGRAM_FEED[0] && telegramFeedItems[0] && window.TELEGRAM_FEED[0].id !== telegramFeedItems[0].id)) {
+          telegramFeedItems = window.TELEGRAM_FEED;
+          renderTelegramFeed();
+        }
+      }
+    };
+    document.body.appendChild(s);
   }
 
   function renderTelegramFeed() {
-    if (!tgCardsGrid) return;
     const query = (tgInputSearch ? tgInputSearch.value : '').toLowerCase().trim();
 
-    let filtered = telegramFeedItems;
-    if (currentTgFilter !== 'ALL') {
-      filtered = filtered.filter(item => item.group_type === currentTgFilter);
+    // Tính toán phân loại cho toàn bộ tin nhắn
+    const processedItems = telegramFeedItems.map(item => {
+      const urgentInfo = detectUrgent(item.text);
+      const normGroup = (item.group_type === 'RAU_CU' || item.group_type === 'KRC') ? 'KRC'
+                      : (item.group_type === 'ABA' || (item.group_type === 'ABA_DC' && (item.group_title || '').includes('THỊT CÁ'))) ? 'ABA'
+                      : 'DC';
+      const webUrl = getTelegramWebAUrl(item);
+      const isResolved = resolvedMessageIds.has(String(item.id));
+      const isSelected = selectedMessageIds.has(String(item.id));
+      return {
+        ...item,
+        normGroup,
+        isUrgent: urgentInfo.isUrgent,
+        matchedKeys: urgentInfo.matchedKeys,
+        isNyTagged: urgentInfo.isNyTagged,
+        webUrl,
+        isResolved,
+        isSelected
+      };
+    });
+
+    // Cập nhật số lượng trên các tab (tính theo tin CHƯA xử lý để tập trung công việc)
+    const countAll = processedItems.filter(x => !x.isResolved).length;
+    const countUrgent = processedItems.filter(x => x.isUrgent && !x.isResolved).length;
+    const countKrc = processedItems.filter(x => x.normGroup === 'KRC' && !x.isResolved).length;
+    const countAba = processedItems.filter(x => x.normGroup === 'ABA' && !x.isResolved).length;
+    const countDc = processedItems.filter(x => x.normGroup === 'DC' && !x.isResolved).length;
+    const countResolved = processedItems.filter(x => x.isResolved).length;
+
+    const elCountAll = document.getElementById('tg-count-all');
+    const elCountUrgent = document.getElementById('tg-count-urgent');
+    const elCountKrc = document.getElementById('tg-count-krc');
+    const elCountAba = document.getElementById('tg-count-aba');
+    const elCountDc = document.getElementById('tg-count-dc');
+    const elCountResolved = document.getElementById('tg-count-resolved');
+
+    if (elCountAll) elCountAll.textContent = countAll.toLocaleString();
+    if (elCountUrgent) elCountUrgent.textContent = countUrgent.toLocaleString();
+    if (elCountKrc) elCountKrc.textContent = countKrc.toLocaleString();
+    if (elCountAba) elCountAba.textContent = countAba.toLocaleString();
+    if (elCountDc) elCountDc.textContent = countDc.toLocaleString();
+    if (elCountResolved) elCountResolved.textContent = countResolved.toLocaleString();
+
+    // Kêu chuông nếu số lượng tin khẩn cấp tăng
+    if (countUrgent > lastUrgentCount && lastUrgentCount > 0) {
+      playUrgentAlertSound();
+      showToast(`Có ${countUrgent - lastUrgentCount} tin nhắn khẩn cấp mới cần xử lý!`, '🚨');
     }
+    lastUrgentCount = countUrgent;
+
+    // 1. Lọc theo Trạng Thái (Chưa Xử Lý, Đã Xử Lý, Tất Cả)
+    let filtered = processedItems;
+    if (currentStatusFilter === 'UNRESOLVED') {
+      filtered = filtered.filter(x => !x.isResolved);
+    } else if (currentStatusFilter === 'RESOLVED') {
+      filtered = filtered.filter(x => x.isResolved);
+    }
+
+    // 2. Lọc theo Tab đã chọn (All, Urgent, Krc, Aba, Dc)
+    if (currentTgFilter === 'URGENT') {
+      filtered = filtered.filter(x => x.isUrgent);
+    } else if (currentTgFilter === 'KRC') {
+      filtered = filtered.filter(x => x.normGroup === 'KRC');
+    } else if (currentTgFilter === 'ABA') {
+      filtered = filtered.filter(x => x.normGroup === 'ABA');
+    } else if (currentTgFilter === 'DC') {
+      filtered = filtered.filter(x => x.normGroup === 'DC');
+    }
+
+    // 3. Lọc theo ô tìm kiếm
     if (query) {
       filtered = filtered.filter(item => 
         (item.group_title && item.group_title.toLowerCase().includes(query)) ||
         (item.store_code && item.store_code.toLowerCase().includes(query)) ||
         (item.text && item.text.toLowerCase().includes(query)) ||
-        (item.sender_name && item.sender_name.toLowerCase().includes(query))
+        (item.sender_name && item.sender_name.toLowerCase().includes(query)) ||
+        (item.matchedKeys && item.matchedKeys.some(k => k.toLowerCase().includes(query)))
       );
     }
 
-    const totalCount = telegramFeedItems.length;
-    const krcCount = telegramFeedItems.filter(x => x.group_type === 'RAU_CU').length;
-    const abaCount = telegramFeedItems.filter(x => x.group_type === 'ABA_DC').length;
+    // 4. Sắp xếp theo lựa chọn
+    if (currentTgSort === 'URGENT_FIRST') {
+      filtered.sort((a, b) => {
+        if (a.isUrgent && !b.isUrgent) return -1;
+        if (!a.isUrgent && b.isUrgent) return 1;
+        return (b.timestamp || 0) - (a.timestamp || 0);
+      });
+    } else if (currentTgSort === 'OLDEST') {
+      filtered.sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
+    } else {
+      // NEWEST: Mới nhất trước (Mặc định)
+      filtered.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+    }
 
-    const btnAll = document.getElementById('tg-filter-all');
-    const btnKrc = document.getElementById('tg-filter-krc');
-    const btnAba = document.getElementById('tg-filter-aba');
-    if (btnAll) btnAll.innerText = `Tất Cả (${totalCount})`;
-    if (btnKrc) btnKrc.innerText = `🥦 1. RAU CỦ (${krcCount})`;
-    if (btnAba) btnAba.innerText = `❄️ 2. ABA / DC (${abaCount})`;
+    // 5. Cập nhật thanh công cụ chọn nhiều (Bulk Action Bar)
+    if (tgBulkBar) {
+      if (selectedMessageIds.size > 0) {
+        tgBulkBar.style.display = 'flex';
+        if (bulkSelectedCountEl) bulkSelectedCountEl.textContent = selectedMessageIds.size;
+      } else {
+        tgBulkBar.style.display = 'none';
+      }
+    }
 
+    // Xử lý Empty State
     if (filtered.length === 0) {
-      tgCardsGrid.innerHTML = `
-        <div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #94a3b8; background: rgba(15,23,42,0.6); border-radius: 12px; border: 1px dashed var(--border-glass);">
-          <div style="font-size: 2rem; margin-bottom: 8px;">📭</div>
-          <div style="font-weight: 600; color: #f1f5f9;">Không tìm thấy tin nhắn/hình ảnh phù hợp</div>
-          <div style="font-size: 0.8rem; margin-top: 4px;">Thử chọn lại tab <b>RAU CỦ</b> hoặc <b>ABA/DC</b></div>
+      const emptyHtml = `
+        <div style="grid-column: 1/-1; text-align: center; padding: 50px 20px; color: #94a3b8; background: rgba(15,23,42,0.6); border-radius: 12px; border: 1px dashed var(--border-glass);">
+          <div style="font-size: 2.4rem; margin-bottom: 8px;">${currentStatusFilter === 'UNRESOLVED' ? '🎉' : '📭'}</div>
+          <div style="font-weight: 700; font-size: 1rem; color: #f1f5f9;">
+            ${currentStatusFilter === 'UNRESOLVED' ? 'Tuyệt vời! Không còn tin nhắn nào chưa xử lý' : 'Không tìm thấy tin nhắn nào phù hợp'}
+          </div>
+          <div style="font-size: 0.82rem; margin-top: 6px; color: #94a3b8;">
+            ${currentStatusFilter === 'UNRESOLVED' ? 'Toàn bộ các ca chênh lệch và khẩn cấp đã được bạn chuyển sang ĐÃ XỬ LÝ.' : 'Thử đổi lại bộ lọc nhóm hoặc trạng thái xử lý.'}
+          </div>
         </div>
       `;
+      if (tgCardsGrid) tgCardsGrid.innerHTML = emptyHtml;
+      if (tgTableTbody) tgTableTbody.innerHTML = `<tr><td colspan="9" style="text-align: center; padding: 30px; color: #94a3b8;">Không có dữ liệu tin nhắn</td></tr>`;
       return;
     }
 
-    let html = '';
-    filtered.forEach(item => {
-      const isRau = item.group_type === 'RAU_CU';
-      const badgeBg = isRau ? 'rgba(16, 185, 129, 0.15)' : 'rgba(56, 189, 248, 0.15)';
-      const badgeBorder = isRau ? 'rgba(16, 185, 129, 0.4)' : 'rgba(56, 189, 248, 0.4)';
-      const badgeColor = isRau ? '#34d399' : '#38bdf8';
-      const groupIcon = isRau ? '🥦' : '❄️';
-      const groupTag = isRau ? 'RAU CỦ' : 'ABA / DC';
+    // Render Cards View (Phân trang mượt mà cho tập dữ liệu lớn)
+    if (tgCardsGrid) {
+      const displayCount = Math.min(filtered.length, currentTgDisplayLimit);
+      const displayItems = filtered.slice(0, displayCount);
 
-      html += `
-        <div class="tg-feed-card" style="background: rgba(15, 23, 42, 0.8); border: 1px solid var(--border-glass); border-radius: 14px; overflow: hidden; display: flex; flex-direction: column; transition: transform 0.2s, border-color 0.2s; box-shadow: 0 4px 20px rgba(0,0,0,0.25);">
-          <div style="padding: 14px 16px 10px; display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; border-bottom: 1px solid rgba(255,255,255,0.05);">
-            <div style="display: flex; gap: 10px; align-items: center;">
-              <div style="width: 36px; height: 36px; border-radius: 10px; background: ${badgeBg}; border: 1px solid ${badgeBorder}; display: flex; align-items: center; justify-content: center; font-size: 1.1rem;">
-                ${groupIcon}
-              </div>
-              <div>
-                <div style="font-weight: 700; font-size: 0.86rem; color: #f8fafc; line-height: 1.25;">${escapeHtml(item.group_title)}</div>
-                <div style="font-size: 0.73rem; color: #94a3b8; margin-top: 2px;">
-                  <span style="color: ${badgeColor}; font-weight: 700; background: ${badgeBg}; padding: 1px 6px; border-radius: 4px;">${groupTag}</span> • ${escapeHtml(item.sender_name)}
+      let cardsHtml = '';
+      displayItems.forEach(item => {
+        const isKrc = item.normGroup === 'KRC';
+        const isAba = item.normGroup === 'ABA';
+        const groupIcon = isKrc ? '🥦' : (isAba ? '❄️' : '🏢');
+        const badgeColor = isKrc ? '#34d399' : (isAba ? '#38bdf8' : '#c084fc');
+        const badgeBg = isKrc ? 'rgba(16, 185, 129, 0.15)' : (isAba ? 'rgba(56, 189, 248, 0.15)' : 'rgba(168, 85, 247, 0.15)');
+        const badgeBorder = isKrc ? 'rgba(16, 185, 129, 0.4)' : (isAba ? 'rgba(56, 189, 248, 0.4)' : 'rgba(168, 85, 247, 0.4)');
+
+        // Thẻ từ khóa khẩn cấp phát hiện được
+        let kwBadgesHtml = '';
+        if (item.matchedKeys && item.matchedKeys.length > 0) {
+          kwBadgesHtml = `
+            <div style="display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px;">
+              ${item.matchedKeys.map(kw => {
+                const isTag = kw.includes('nynguyen09');
+                return `<span class="tg-kw-badge ${isTag ? 'tag-ny' : ''}">${isTag ? '🚨' : '⚠️'} ${escapeHtml(kw)}</span>`;
+              }).join('')}
+            </div>
+          `;
+        }
+
+        const highlightedText = highlightTelegramText(item.text);
+        const isSelected = selectedMessageIds.has(String(item.id));
+
+        cardsHtml += `
+          <div class="tg-feed-card ${item.isUrgent && !item.isResolved ? 'urgent-card' : ''} ${item.isResolved ? 'resolved-card' : ''}" 
+               data-card-id="${item.id}"
+               style="background: ${item.isResolved ? 'rgba(15, 23, 42, 0.6)' : 'rgba(15, 23, 42, 0.85)'}; border: 1px solid ${isSelected ? '#10b981' : (item.isResolved ? 'rgba(16, 185, 129, 0.35)' : 'var(--border-glass)')}; border-radius: 14px; overflow: hidden; display: flex; flex-direction: column; transition: all 0.2s ease; box-shadow: ${isSelected ? '0 0 0 2px rgba(16, 185, 129, 0.5), 0 8px 24px rgba(0,0,0,0.3)' : '0 4px 20px rgba(0,0,0,0.25)'}; position: relative;"
+               title="Bấm để mở tin nhắn trên Telegram Web A">
+            
+            <!-- Card Header -->
+            <div style="padding: 14px 16px 10px; display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; border-bottom: 1px solid rgba(255,255,255,0.06);">
+              <div style="display: flex; gap: 10px; align-items: center;">
+                <input type="checkbox" class="tg-item-checkbox" data-id="${item.id}" ${isSelected ? 'checked' : ''} title="Chọn tin này để thao tác hàng loạt" style="width: 18px; height: 18px; cursor: pointer; accent-color: #10b981; flex-shrink: 0;" onclick="event.stopPropagation();">
+                <div style="width: 38px; height: 38px; border-radius: 10px; background: ${badgeBg}; border: 1px solid ${badgeBorder}; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; flex-shrink: 0;">
+                  ${groupIcon}
+                </div>
+                <div>
+                  <div style="font-weight: 700; font-size: 0.88rem; color: #f8fafc; line-height: 1.3;">
+                    ${escapeHtml(item.group_title)}
+                  </div>
+                  <div style="font-size: 0.73rem; color: #94a3b8; margin-top: 3px; display: flex; gap: 6px; align-items: center;">
+                    <span style="color: ${badgeColor}; font-weight: 700; background: ${badgeBg}; padding: 1px 6px; border-radius: 4px;">${item.normGroup}</span>
+                    <span>•</span>
+                    <span>${escapeHtml(item.sender_name)}</span>
+                  </div>
                 </div>
               </div>
-            </div>
-            <span style="font-size: 0.72rem; color: #64748b; white-space: nowrap;">${item.date}</span>
-          </div>
-
-          <div style="padding: 12px 16px; font-size: 0.83rem; color: #cbd5e1; flex: 1; line-height: 1.45;">
-            ${escapeHtml(item.text)}
-          </div>
-
-          <div style="padding: 0 16px 16px;">
-            <div class="tg-img-wrapper" data-img="${item.image_url}" data-cap="${escapeHtml(item.group_title)} - ${escapeHtml(item.date)}" style="position: relative; border-radius: 10px; overflow: hidden; height: 210px; background: #000; border: 1px solid rgba(255,255,255,0.1); cursor: pointer;">
-              <img src="${item.image_url}" loading="lazy" style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.25s;" onmouseover="this.style.transform='scale(1.03)'" onmouseout="this.style.transform='scale(1)'">
-              <div style="position: absolute; bottom: 8px; right: 8px; background: rgba(15,23,42,0.85); backdrop-filter: blur(4px); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.4); padding: 4px 10px; border-radius: 6px; font-size: 0.72rem; font-weight: 600; display: flex; align-items: center; gap: 4px;">
-                🔍 Xem ảnh lớn
+              
+              <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 4px;">
+                ${item.isResolved 
+                  ? '<span style="background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.5); padding: 2px 7px; border-radius: 6px; font-weight: 700; font-size: 0.72rem; display: inline-flex; align-items: center; gap: 3px;">✓ ĐÃ XỬ LÝ</span>'
+                  : (item.isUrgent ? '<span class="badge-urgent-pulse">🚨 KHẨN CẤP</span>' : '')}
+                <span style="font-size: 0.72rem; color: #64748b; white-space: nowrap;">${item.date}</span>
               </div>
             </div>
+
+            <!-- Urgent Keywords Strip -->
+            ${kwBadgesHtml ? `<div style="padding: 6px 16px 0;">${kwBadgesHtml}</div>` : ''}
+
+            <!-- Message Content -->
+            <div style="padding: 12px 16px; font-size: 0.84rem; color: ${item.isResolved ? '#94a3b8' : '#cbd5e1'}; flex: 1; line-height: 1.5; word-break: break-word;">
+              ${highlightedText}
+            </div>
+
+            <!-- Attached Image (if any) -->
+            ${item.image_url ? `
+              <div style="padding: 0 16px 12px;">
+                <div class="tg-img-wrapper" data-img="${item.image_url}" data-cap="${escapeHtml(item.group_title)} - ${escapeHtml(item.date)}" style="position: relative; border-radius: 10px; overflow: hidden; height: 190px; background: #000; border: 1px solid rgba(255,255,255,0.1); cursor: pointer;">
+                  <img src="${item.image_url}" loading="lazy" style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.25s;" onmouseover="this.style.transform='scale(1.03)'" onmouseout="this.style.transform='scale(1)'">
+                  <div style="position: absolute; bottom: 8px; right: 8px; background: rgba(15,23,42,0.85); backdrop-filter: blur(4px); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.4); padding: 4px 10px; border-radius: 6px; font-size: 0.72rem; font-weight: 600; display: flex; align-items: center; gap: 4px;">
+                    🔍 Xem ảnh lớn
+                  </div>
+                </div>
+              </div>
+            ` : ''}
+
+            <!-- Direct Link & Resolve Action Buttons -->
+            <div style="padding: 0 16px 14px; margin-top: auto; display: flex; gap: 8px;">
+              <a href="${item.webUrl}" target="_blank" rel="noopener noreferrer" class="btn-open-tele-web" style="flex: 1;" onclick="event.stopPropagation();">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                <span>Telegram Web A</span>
+              </a>
+              <button class="btn-toggle-resolve ${item.isResolved ? 'is-resolved' : ''}" data-id="${item.id}" onclick="event.stopPropagation();" style="padding: 9px 12px; border-radius: 8px; font-size: 0.78rem; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; border: 1px solid ${item.isResolved ? 'rgba(148, 163, 184, 0.3)' : 'rgba(16, 185, 129, 0.6)'}; background: ${item.isResolved ? 'rgba(30, 41, 59, 0.7)' : 'linear-gradient(135deg, rgba(16, 185, 129, 0.25) 0%, rgba(5, 150, 105, 0.35) 100%)'}; color: ${item.isResolved ? '#94a3b8' : '#6ee7b7'}; transition: all 0.2s;" title="${item.isResolved ? 'Chuyển lại trạng thái Chưa Xử Lý' : 'Chuyển trạng thái sang Đã Xử Lý (Lưu trình duyệt 14 ngày, tự động xóa sau 14 ngày)'}">
+                <span>${item.isResolved ? '↺ Hoàn Tác' : '✓ Đã Xử Lý'}</span>
+              </button>
+            </div>
           </div>
-        </div>
-      `;
-    });
-    tgCardsGrid.innerHTML = html;
+        `;
+      });
+
+      if (filtered.length > displayCount) {
+        const remaining = filtered.length - displayCount;
+        cardsHtml += `
+          <div style="grid-column: 1/-1; text-align: center; padding: 24px 0 10px;">
+            <button id="btn-tg-load-more" class="btn btn-primary" style="padding: 12px 28px; font-size: 0.92rem; font-weight: 700; border-radius: 10px; box-shadow: 0 4px 16px rgba(56,189,248,0.35);">
+              📥 Tải Thêm 60 Tin Nhắn Tiếp Theo (Đang xem ${displayCount.toLocaleString()} / ${filtered.length.toLocaleString()} tin)
+            </button>
+          </div>
+        `;
+      }
+
+      tgCardsGrid.innerHTML = cardsHtml;
+
+      const btnLoadMore = document.getElementById('btn-tg-load-more');
+      if (btnLoadMore) {
+        btnLoadMore.addEventListener('click', () => {
+          currentTgDisplayLimit += 60;
+          renderTelegramFeed();
+        });
+      }
+    }
+
+    // Render Table View (Có phân trang 50 tin/trang)
+    if (tgTableTbody) {
+      const totalPages = Math.ceil(filtered.length / TG_PAGE_SIZE) || 1;
+      if (currentTgTablePage > totalPages) currentTgTablePage = totalPages;
+      const startIdx = (currentTgTablePage - 1) * TG_PAGE_SIZE;
+      const pageItems = filtered.slice(startIdx, startIdx + TG_PAGE_SIZE);
+
+      let tableHtml = '';
+      pageItems.forEach((item, idx) => {
+        const isKrc = item.normGroup === 'KRC';
+        const isAba = item.normGroup === 'ABA';
+        const badgeColor = isKrc ? '#34d399' : (isAba ? '#38bdf8' : '#c084fc');
+        const badgeBg = isKrc ? 'rgba(16, 185, 129, 0.15)' : (isAba ? 'rgba(56, 189, 248, 0.15)' : 'rgba(168, 85, 247, 0.15)');
+
+        const highlightedText = highlightTelegramText(item.text);
+        const isSelected = selectedMessageIds.has(String(item.id));
+
+        tableHtml += `
+          <tr style="border-bottom: 1px solid rgba(255,255,255,0.05); ${item.isResolved ? 'opacity: 0.65;' : (item.isUrgent ? 'background: rgba(239, 68, 68, 0.05);' : '')}">
+            <td style="text-align: center;">
+              <input type="checkbox" class="tg-item-checkbox" data-id="${item.id}" ${isSelected ? 'checked' : ''} onclick="event.stopPropagation();">
+            </td>
+            <td style="text-align: center; color: #64748b;">${startIdx + idx + 1}</td>
+            <td style="text-align: center;">
+              ${item.isResolved
+                ? '<span style="color: #34d399; font-weight: 700; font-size: 0.72rem;">✓ Đã Xử Lý</span>'
+                : (item.isUrgent ? '<span class="badge-urgent-pulse">🚨 KHẨN CẤP</span>' : '<span style="color: #64748b; font-size: 0.74rem;">Bình thường</span>')}
+            </td>
+            <td style="text-align: center;">
+              <span style="color: ${badgeColor}; font-weight: 700; background: ${badgeBg}; padding: 2px 7px; border-radius: 4px; font-size: 0.74rem;">
+                ${item.normGroup}
+              </span>
+            </td>
+            <td>
+              <div style="font-weight: 700; color: #f8fafc; font-size: 0.82rem;">${escapeHtml(item.group_title)}</div>
+              ${item.store_code ? `<div style="font-size: 0.72rem; color: #94a3b8;">Mã ST: <b style="color: #38bdf8;">${escapeHtml(item.store_code)}</b></div>` : ''}
+            </td>
+            <td>
+              <div style="font-weight: 600; color: #e2e8f0; font-size: 0.8rem;">${escapeHtml(item.sender_name)}</div>
+              ${item.sender_role ? `<div style="font-size: 0.7rem; color: #64748b;">${escapeHtml(item.sender_role)}</div>` : ''}
+            </td>
+            <td style="text-align: center; font-size: 0.74rem; color: #94a3b8; white-space: nowrap;">
+              ${item.date}
+            </td>
+            <td style="line-height: 1.45; font-size: 0.8rem; color: #cbd5e1; max-width: 420px;">
+              ${highlightedText}
+            </td>
+            <td style="text-align: center; white-space: nowrap; display: flex; gap: 6px; justify-content: center; align-items: center; padding-top: 14px;">
+              <a href="${item.webUrl}" target="_blank" rel="noopener noreferrer" class="btn btn-outline btn-sm" style="font-size: 0.76rem; border-color: rgba(56, 189, 248, 0.4); color: #38bdf8; text-decoration: none; padding: 4px 10px; border-radius: 6px; display: inline-flex; align-items: center; gap: 4px;">
+                <span>✈️ Web A</span>
+              </a>
+              <button class="btn btn-outline btn-sm btn-toggle-resolve" data-id="${item.id}" style="font-size: 0.76rem; padding: 4px 10px; border-radius: 6px; color: ${item.isResolved ? '#94a3b8' : '#34d399'}; border-color: ${item.isResolved ? 'rgba(148, 163, 184, 0.3)' : 'rgba(16, 185, 129, 0.5)'}; cursor: pointer;" title="${item.isResolved ? 'Chuyển lại trạng thái Chưa Xử Lý' : 'Chuyển trạng thái sang Đã Xử Lý (Lưu 14 ngày)'}">
+                ${item.isResolved ? '↺' : '✓ Xong'}
+              </button>
+            </td>
+          </tr>
+        `;
+      });
+      tgTableTbody.innerHTML = tableHtml;
+    }
   }
 
-  // Delegated click on images in feed
+  function toggleResolveMessage(msgId) {
+    const idStr = String(msgId);
+    if (resolvedMessageIds.has(idStr)) {
+      resolvedMessageIds.delete(idStr);
+      delete resolvedMessageMap[idStr];
+      showToast('Đã hoàn tác tin nhắn về trạng thái Chưa Xử Lý', '↺');
+    } else {
+      const now = Date.now();
+      resolvedMessageIds.add(idStr);
+      resolvedMessageMap[idStr] = now;
+      showToast('Đã chuyển trạng thái: ĐÃ XỬ LÝ (lưu 14 ngày)', '✅');
+    }
+    saveResolvedStorage();
+    renderTelegramFeed();
+  }
+
+  // Toggle giữa Dạng Thẻ và Dạng Bảng
+  if (btnTgToggleView) {
+    btnTgToggleView.addEventListener('click', () => {
+      if (tgViewMode === 'cards') {
+        tgViewMode = 'table';
+        if (tgCardsGrid) tgCardsGrid.style.display = 'none';
+        if (tgTableView) tgTableView.style.display = 'block';
+        btnTgToggleView.innerHTML = '📇 Xem Dạng Thẻ';
+        btnTgToggleView.style.borderColor = 'rgba(168, 85, 247, 0.5)';
+        btnTgToggleView.style.color = '#c084fc';
+      } else {
+        tgViewMode = 'cards';
+        if (tgCardsGrid) tgCardsGrid.style.display = 'grid';
+        if (tgTableView) tgTableView.style.display = 'none';
+        btnTgToggleView.innerHTML = '📋 Xem Dạng Bảng';
+        btnTgToggleView.style.borderColor = 'rgba(56, 189, 248, 0.4)';
+        btnTgToggleView.style.color = '#38bdf8';
+      }
+    });
+  }
+
+  // Bật/Tắt Chuông báo
+  if (btnToggleAudio) {
+    btnToggleAudio.addEventListener('click', () => {
+      audioAlertEnabled = !audioAlertEnabled;
+      btnToggleAudio.innerHTML = audioAlertEnabled ? '🔔 Chuông Báo: Bật' : '🔕 Chuông Báo: Tắt';
+      btnToggleAudio.style.color = audioAlertEnabled ? '#fbbf24' : '#64748b';
+      btnToggleAudio.style.borderColor = audioAlertEnabled ? 'rgba(245, 158, 11, 0.4)' : 'rgba(100, 116, 139, 0.3)';
+      showToast(audioAlertEnabled ? 'Đã BẬT chuông báo tin khẩn cấp' : 'Đã TẮT chuông báo', audioAlertEnabled ? '🔔' : '🔕');
+      if (audioAlertEnabled) playUrgentAlertSound();
+    });
+  }
+
+  // Delegated click on card to open Telegram Web A / Checkbox / Resolve
+  if (tgCardsGrid) {
+    tgCardsGrid.addEventListener('click', (e) => {
+      // 1. Nút Đã xử lý
+      const btnResolve = e.target.closest('.btn-toggle-resolve');
+      if (btnResolve) {
+        e.stopPropagation();
+        const msgId = btnResolve.getAttribute('data-id');
+        if (msgId) toggleResolveMessage(msgId);
+        return;
+      }
+
+      // 2. Checkbox chọn tin
+      const chk = e.target.closest('.tg-item-checkbox');
+      if (chk) {
+        e.stopPropagation();
+        const msgId = chk.getAttribute('data-id');
+        if (chk.checked) {
+          selectedMessageIds.add(String(msgId));
+        } else {
+          selectedMessageIds.delete(String(msgId));
+        }
+        renderTelegramFeed();
+        return;
+      }
+
+      // 3. Nếu click vào xem ảnh lớn hoặc nút mở web thì không can thiệp
+      if (e.target.closest('.tg-img-wrapper') || e.target.closest('.btn-open-tele-web')) return;
+
+      const card = e.target.closest('.tg-feed-card');
+      if (card) {
+        const link = card.querySelector('.btn-open-tele-web');
+        if (link && link.href) {
+          window.open(link.href, '_blank');
+        }
+      }
+    });
+  }
+
+  // Delegated click trong Table View
+  if (tgTableTbody) {
+    tgTableTbody.addEventListener('click', (e) => {
+      const btnResolve = e.target.closest('.btn-toggle-resolve');
+      if (btnResolve) {
+        e.stopPropagation();
+        const msgId = btnResolve.getAttribute('data-id');
+        if (msgId) toggleResolveMessage(msgId);
+        return;
+      }
+
+      const chk = e.target.closest('.tg-item-checkbox');
+      if (chk) {
+        e.stopPropagation();
+        const msgId = chk.getAttribute('data-id');
+        if (chk.checked) {
+          selectedMessageIds.add(String(msgId));
+        } else {
+          selectedMessageIds.delete(String(msgId));
+        }
+        renderTelegramFeed();
+        return;
+      }
+    });
+  }
+
+  // Sự kiện nút Thao Tác Hàng Loạt (Bulk Action Bar)
+  if (btnBulkSelectAllCards) {
+    btnBulkSelectAllCards.addEventListener('click', () => {
+      document.querySelectorAll('.tg-item-checkbox').forEach(chk => {
+        const id = chk.getAttribute('data-id');
+        if (id) selectedMessageIds.add(String(id));
+      });
+      renderTelegramFeed();
+    });
+  }
+
+  if (btnBulkDeselectAll) {
+    btnBulkDeselectAll.addEventListener('click', () => {
+      selectedMessageIds.clear();
+      renderTelegramFeed();
+    });
+  }
+
+  if (btnBulkMarkResolved) {
+    btnBulkMarkResolved.addEventListener('click', () => {
+      const count = selectedMessageIds.size;
+      const now = Date.now();
+      selectedMessageIds.forEach(id => {
+        const idStr = String(id);
+        resolvedMessageIds.add(idStr);
+        resolvedMessageMap[idStr] = now;
+      });
+      selectedMessageIds.clear();
+      saveResolvedStorage();
+      showToast(`Đã chuyển ${count} tin nhắn sang trạng thái ĐÃ XỬ LÝ (lưu 14 ngày)!`, '✅');
+      renderTelegramFeed();
+    });
+  }
+
+  if (btnBulkMarkUnresolved) {
+    btnBulkMarkUnresolved.addEventListener('click', () => {
+      const count = selectedMessageIds.size;
+      selectedMessageIds.forEach(id => {
+        const idStr = String(id);
+        resolvedMessageIds.delete(idStr);
+        delete resolvedMessageMap[idStr];
+      });
+      selectedMessageIds.clear();
+      saveResolvedStorage();
+      showToast(`Đã hoàn tác ${count} tin nhắn về trạng thái Chưa Xử Lý!`, '↺');
+      renderTelegramFeed();
+    });
+  }
+
+  // Sự kiện chuyển Tab Trạng Thái (Chưa xử lý / Đã xử lý / Tất cả)
+  document.querySelectorAll('.tg-status-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.tg-status-btn').forEach(b => {
+        b.classList.remove('active');
+        b.style.background = 'transparent';
+        b.style.color = '#94a3b8';
+      });
+      btn.classList.add('active');
+      btn.style.background = '#10b981';
+      btn.style.color = '#fff';
+      currentStatusFilter = btn.getAttribute('data-status');
+      currentTgDisplayLimit = 60;
+      currentTgTablePage = 1;
+      renderTelegramFeed();
+    });
+  });
+
+  // Sự kiện thay đổi Kiểu Sắp Xếp
+  if (tgSortSelect) {
+    tgSortSelect.addEventListener('change', () => {
+      currentTgSort = tgSortSelect.value;
+      renderTelegramFeed();
+    });
+  }
+
+  // Delegated click on images in feed (Lightbox)
   if (tgCardsGrid) {
     tgCardsGrid.addEventListener('click', (e) => {
       const wrap = e.target.closest('.tg-img-wrapper');
       if (wrap) {
+        e.stopPropagation();
         const imgUrl = wrap.getAttribute('data-img');
         const cap = wrap.getAttribute('data-cap');
         openLightbox(imgUrl, cap);
@@ -2560,24 +2674,23 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   });
 
-  // Sub-filter button clicks
+  // Group Filter Tabs Click Events
   document.querySelectorAll('.tg-tab-btn').forEach(btn => {
     btn.addEventListener('click', () => {
-      document.querySelectorAll('.tg-tab-btn').forEach(b => {
-        b.classList.remove('active');
-        b.style.background = 'transparent';
-        b.style.color = '#94a3b8';
-      });
+      document.querySelectorAll('.tg-tab-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
-      btn.style.background = 'var(--accent-blue)';
-      btn.style.color = '#fff';
-
       currentTgFilter = btn.getAttribute('data-tg-group');
+      currentTgDisplayLimit = 60;
+      currentTgTablePage = 1;
       renderTelegramFeed();
     });
   });
 
-  if (tgInputSearch) tgInputSearch.addEventListener('input', renderTelegramFeed);
+  if (tgInputSearch) tgInputSearch.addEventListener('input', () => {
+    currentTgDisplayLimit = 60;
+    currentTgTablePage = 1;
+    renderTelegramFeed();
+  });
 
   const btnRefreshTg = document.getElementById('btn-refresh-telegram');
   if (btnRefreshTg) {
@@ -2585,31 +2698,52 @@ document.addEventListener('DOMContentLoaded', async () => {
       btnRefreshTg.innerText = '⏳ Đang làm mới...';
       loadTelegramFeed().then(() => {
         btnRefreshTg.innerText = '🔄 Làm Mới';
+        showToast('Đã cập nhật danh sách tin nhắn Telegram mới nhất!', '🔄');
       });
     });
   }
 
   // Realtime Polling every 5 seconds when on Telegram tab
   setInterval(() => {
-    if (typeof currentViewMode !== 'undefined' && currentViewMode === 'telegram') {
+    if (currentViewMode === 'telegram') {
       loadTelegramFeed();
     }
   }, 5000);
 
   // Initial Run
-  if (typeof populateDates === 'function') populateDates();
-  if (typeof populateStores === 'function') populateStores();
-  if (typeof updateKPIs === 'function') updateKPIs();
-  if (typeof renderTable === 'function') renderTable();
-  if (typeof switchViewMode === 'function') switchViewMode('analytics');
-
-  // Start Realtime Auto Sync countdown immediately
-  if (typeof resetAutoSyncTimer === 'function') resetAutoSyncTimer();
+  populateDates();
+  populateStores();
+  updateKPIs();
+  renderTable();
+  loadTelegramFeed();
+  switchViewMode('analytics');
 
   // Start Realtime Auto Sync countdown immediately
   resetAutoSyncTimer();
 
+  // Tự động đồng bộ dữ liệu Google Sheets ngay nếu chưa có records
+  if (!allRecords || allRecords.length === 0) {
+    console.log('[KRC] Chưa có records, tự động tải trực tiếp từ Google Sheets...');
+    syncGoogleSheetsRealtime(false);
   }
 
-  // Stream 3 is initialized on-demand when user clicks 'tab-stream3'
-});
+} // 1. Closes renderTelegramFeed
+
+// Khởi chạy Stream 3
+initStream3();
+
+} // 2. Closes initStream3
+
+} // 3. Closes initKrcDashboard
+
+// Expose toàn cục để Kayo Next.js Shell gọi trực tiếp
+if (typeof window !== 'undefined') {
+  window.initKrcDashboard = initKrcDashboard;
+}
+
+// Hỗ trợ cả 2 chế độ: Standalone HTML (chờ DOMContentLoaded) hoặc Next.js Shell (chạy ngay lập tức)
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initKrcDashboard);
+} else {
+  initKrcDashboard();
+}
